@@ -7,6 +7,9 @@
     "test": "exit 0",
     "start": "node index.js"
   },
-  "author": "",
+  "author": "Ad Astra",
+  "contributors": [
+    "Andrew Regier <aregier@regiernet.com>"
+  ],
   "license": "MIT"
 }
