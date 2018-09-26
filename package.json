@@ -4,12 +4,52 @@
   "description": "Ad Astra Docker agent code base for cloud integration without VPN tunnels",
   "main": "index.js",
   "scripts": {
-    "test": "exit 0",
+    "test": "nyc --require ts-node/register mocha test/unit/**/*.spec.ts",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node index.js"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "pipeline/**",
+      "coverage/**",
+      "dist/**",
+      "test/**",
+      "webpack.config.js",
+      "source-map-install.js"
+    ],
+    "reporter": [
+      "lcov",
+      "html",
+      "text"
+    ],
+    "sourceMap": true,
+    "all": true
   },
   "author": "Ad Astra",
   "contributors": [
     "Andrew Regier <aregier@regiernet.com>"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chai": "^4.1.5",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.11.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "coveralls": "^3.0.2",
+    "install": "^0.12.1",
+    "mocha": "^5.2.0",
+    "npm": "^6.4.1",
+    "nyc": "^13.0.1",
+    "ts-loader": "^5.2.1",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  }
 }
