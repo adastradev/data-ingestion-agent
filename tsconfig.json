@@ -10,7 +10,8 @@
     "lib": [
       "esnext"
     ],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "module": "commonjs"
   },
   "exclude": [
     "node_modules"
