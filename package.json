@@ -2,11 +2,11 @@
   "name": "@adastradev/data-ingestion-agent",
   "version": "1.0.0",
   "description": "Ad Astra Docker agent code base for cloud integration without VPN tunnels",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "nyc --require ts-node/register mocha test/unit/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "start": "node index.js"
+    "start": "node dist/index.js"
   },
   "nyc": {
     "extension": [

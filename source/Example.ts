@@ -3,7 +3,7 @@ export class Example {
     }
 
     public getGreeting() {
-        return 'Hello world'
+        return 'Hello world';
     }
 
 }
