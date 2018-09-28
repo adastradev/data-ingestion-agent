@@ -16,11 +16,6 @@ class Startup {
             ]
         });
 
-        process.once('SIGTERM', function (code) {
-            logger.log('info', 'SIGTERM received, shutting down');
-            // do shutdown
-          });
-
         logger.log('info', 'waiting for sqs schedule event');
         
         var sqsConfig = { apiVersion: '2012-11-05', region: 'us-east-1'};
@@ -51,12 +46,18 @@ class Startup {
 
                 logger.log('info', 'Ingesting...');
 
+
                 await sleep(1000);
 
                 logger.log('info', 'Done Ingesting!');
 
                 // ack
                 await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: result.Messages[0].ReceiptHandle }).promise();
+                
+                // Debug hack for now
+                if (result.Messages[0].Body === 'failme') {
+                    throw Error('Fail');
+                }
             }
         }
     }
