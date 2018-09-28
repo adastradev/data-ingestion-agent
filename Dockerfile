@@ -5,13 +5,15 @@ ADD . .
 RUN \
     node --version \
     npm install && \
+    node_modules/typescript/bin/tsc && \
     npm run-script test
 
 # compile image intended for production use
 FROM node:alpine
 WORKDIR /app
 ADD . .
-RUN npm install --production
+RUN npm install --production && \
+    node_modules/typescript/bin/tsc
 
 # Report to docker the health status so we can possibly uses that information
 # For now mark unhealthy after 25 sec (interval*retries)
