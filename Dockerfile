@@ -2,9 +2,8 @@
 FROM node:alpine
 WORKDIR /app
 ADD . .
-RUN \
-    node --version \
-    npm install && \
+RUN node --version
+RUN npm install && \
     node_modules/typescript/bin/tsc && \
     npm run-script test
 
