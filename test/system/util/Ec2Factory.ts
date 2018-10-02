@@ -15,8 +15,12 @@ export default class Ec2Factory {
         this.client = new aws.EC2({ apiVersion: '2016-11-15', region: this.config.region });
     }
 
-    private getApplicableAmi(): string {
-        for(var regionAmi of this.config.images) {
+    get currentInstance(): aws.EC2.Instance {
+        return this.instance;
+    }
+
+    private getApplicableAmi(imageType: string): string {
+        for(var regionAmi of this.config.images[imageType]) {
             if (regionAmi.region === this.config.region) {
                 return regionAmi.ami;
             }
@@ -28,10 +32,15 @@ export default class Ec2Factory {
     /**
      * Creates an EC2 instance for testing.
      */
-    public async createTestInstance(): Promise<void> {        
+    public async createTestInstance(imageType: string): Promise<void> {
+        
+        if (this.instance) {
+            throw new Error(`Cannot create another instance, please terminate the existing instance '${this.instance.InstanceId}' first.`)
+        }
+        
         var params = this.config.instance;
 
-        var amiId = this.getApplicableAmi();
+        var amiId = this.getApplicableAmi(imageType);
         params.ImageId = amiId;
 
         var results = await this.client.runInstances(params).promise();
@@ -46,16 +55,19 @@ export default class Ec2Factory {
             var error = results.$response.error;
             console.log(error, error.stack); 
         }
-        else {
-            console.log(`Created instance - ${this.instance.InstanceId}`); 
-        }
     }
 
     public async removeTestInstance(): Promise<void> {
+        if (!this.instance) {
+            throw new Error('Cannot terminate a non-existant image; please create one first');
+        }
+
         var params = {
             InstanceIds: [this.instance.InstanceId]
         };
 
         await this.client.terminateInstances(params).promise();
+
+        this.instance = null;
     }
 }

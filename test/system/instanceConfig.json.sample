@@ -29,18 +29,21 @@
                 }
             ]
     },
-    "images": [
-        {
-            "region": "us-east-1",
-            "ami": "ami-a8d369c0"
-        },
-        {
-            "region": "us-west-1",
-            "ami": "ami-dcc8d299"
-        },
-        {
-            "region": "us-west-2",
-            "ami": "ami-212e0911"
-        }
-    ]
+    "images": 
+    {
+        "linux-rhel7": [
+            {
+                "region": "us-east-1",
+                "ami": "ami-a8d369c0"
+            },
+            {
+                "region": "us-west-1",
+                "ami": "ami-dcc8d299"
+            },
+            {
+                "region": "us-west-2",
+                "ami": "ami-212e0911"
+            }
+        ]
+    }
 }
