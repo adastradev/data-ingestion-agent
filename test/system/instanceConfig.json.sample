@@ -1,0 +1,46 @@
+{
+    "region": "",
+    "instance": {
+        "BlockDeviceMappings": 
+            [
+                {
+                    "DeviceName": "/dev/sdh", 
+                    "Ebs": {
+                        "VolumeSize": 100
+                    }
+                }
+            ], 
+            "ImageId": "", 
+            "InstanceType": "t2.micro", 
+            "KeyName": "", 
+            "MaxCount": 1, 
+            "MinCount": 1, 
+            "SecurityGroupIds": [], 
+            "TagSpecifications": 
+            [
+                {
+                    "ResourceType": "instance", 
+                    "Tags": [
+                        {
+                            "Key": "Purpose", 
+                            "Value": "data-ingestion-test"
+                        }
+                    ]
+                }
+            ]
+    },
+    "images": [
+        {
+            "region": "us-east-1",
+            "ami": "ami-a8d369c0"
+        },
+        {
+            "region": "us-west-1",
+            "ami": "ami-dcc8d299"
+        },
+        {
+            "region": "us-west-2",
+            "ami": "ami-212e0911"
+        }
+    ]
+}

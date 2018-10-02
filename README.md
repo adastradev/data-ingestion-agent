@@ -14,10 +14,14 @@ docker run -d -t -e AWS_ACCESS_KEY=<your_access_key> -e AWS_SECRET_ACCESS_KEY=<y
 
 ## Development
 ```sh
-docker build -t data-ingestion-agent .
+docker build -t data-ingestion-agent .or j
 ```
 
 ## Docker Health
 ```sh
 docker inspect --format='{{json .State.Health.Status}}' <your_container_name_or_id>
 ```
+
+## Host System Requirements
+
+TBD

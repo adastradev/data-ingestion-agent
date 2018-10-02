@@ -8,3 +8,6 @@ typings/
 *.tgz
 config.ts
 .vscode
+
+instanceConfig.json
+*.pem

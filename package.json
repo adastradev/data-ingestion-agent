@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "nyc --require ts-node/register mocha test/unit/**/*.spec.ts",
+    "system-test": "mocha test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js"
   },
