@@ -15,7 +15,8 @@
             "KeyName": "", 
             "MaxCount": 1, 
             "MinCount": 1, 
-            "SecurityGroupIds": [], 
+            "SecurityGroupIds": [],
+            "SubnetId": "",
             "TagSpecifications": 
             [
                 {

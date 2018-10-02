@@ -51,6 +51,10 @@ export default class Ec2Factory {
         await this.client.waitFor("instanceRunning", params).promise();
         await this.client.waitFor("instanceStatusOk", params).promise();
 
+        var describeResult = await this.client.describeInstances({ InstanceIds: [this.instance.InstanceId]}).promise();
+
+        this.instance = describeResult.Reservations[0].Instances[0];
+
         if (results.$response.error) { 
             var error = results.$response.error;
             console.log(error, error.stack); 
