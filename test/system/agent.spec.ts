@@ -28,12 +28,19 @@ describe('Data Ingestion Agent on CentOS 7', () => {
 
             var ssh = new node_ssh();
             await ssh.connect({
-                host: "ec2-18-234-62-29.compute-1.amazonaws.com" || targetInstance.PublicDnsName,
+                host: targetInstance.PublicDnsName,
                 username: 'ec2-user',
                 privateKey: 'automated-system-tests.pem'
             });
 
             var result = await ssh.execCommand('ls -a', { cwd: '/' });
+
+            // TODO: Install docker (as before step?) 
+            // sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+            // sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+            // sudo yum install -y docker-ce
+            // sudo systemctl start docker
+            // sudo docker pull adastradev/data-ingestion-agent:?
 
             expect(0).to.eq(0);
         });
