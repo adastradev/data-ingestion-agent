@@ -45,6 +45,24 @@
                 "region": "us-west-2",
                 "ami": "ami-212e0911"
             }
+        ],
+        "linux-centos7": [
+            {
+                "region": "us-east-1",
+                "ami": "ami-9887c6e7"
+            },
+            {
+                "region": "us-east-2",
+                "ami": "ami-994575fc"
+            },
+            {
+                "region": "us-west-1",
+                "ami": "ami-78485818"
+            },
+            {
+                "region": "us-west-2",
+                "ami": "ami-0ebdd976"
+            }
         ]
     }
 }
