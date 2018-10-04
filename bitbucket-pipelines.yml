@@ -49,7 +49,7 @@ pipelines:
             # an image tag.
             - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
 
-            - . ./pipeline/wait-for-latest-docker-image.sh
+            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
 
             # Run system test
             - . ./pipeline/run-system-tests.sh
