@@ -3,12 +3,9 @@
 docker_tag=$1
 
 function refreshDockerImageDate {
-    echo "Fetching docker image last update date..."
     # echo 'Fetching docker last updated value...'
     raw_image_date=`curl -s $docker_tag_uri | jq -r '.last_updated'`
     
-    echo "Latest Docker Publish Date: $raw_image_date"
-
     # echo "Docker Image Last Updated: $raw_image_date"
     image_date=$(date -u -d "$raw_image_date" "+%s")
 }
@@ -20,7 +17,6 @@ function prep {
     refreshDockerImageDate
 
     # Parse out the git image publish date and git commit date
-    echo "Fetching Git Commit Date..."
     raw_git_date=`TZ=UTC git log -n 1 --date=iso-local --pretty=format:%cd | sed -e "s| |T|"`
     echo "Git Commit Date: $raw_git_date"
 
@@ -31,6 +27,9 @@ function prep {
 
 function waitForNewImageToBuild {
     prep
+
+    echo "Latest Docker Publish Date: $raw_image_date"
+
     wait_interval_sec=5    
     
     # Wait until docker has a newer image
