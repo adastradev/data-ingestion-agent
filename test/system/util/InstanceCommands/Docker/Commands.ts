@@ -9,7 +9,8 @@ import ICommand from '../ICommand';
  */
 export class PullLatestDockerImageCommand implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        return ['sudo docker pull adastradev/data-ingestion-agent:feature_pipeline'];
+        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
+        return [`sudo docker pull adastradev/data-ingestion-agent:${normalized_docker_tag}`];
     }
 }
 

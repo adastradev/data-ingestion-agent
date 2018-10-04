@@ -1,5 +1,5 @@
 {
-    "region": "",
+    "region": "us-east-1",
     "instance": {
         "BlockDeviceMappings": 
             [
@@ -12,11 +12,11 @@
             ], 
             "ImageId": "", 
             "InstanceType": "t2.micro", 
-            "KeyName": "", 
+            "KeyName": "TEST_INSTANCE_SSH_KEY_NAME", 
             "MaxCount": 1, 
             "MinCount": 1, 
-            "SecurityGroupIds": [],
-            "SubnetId": "",
+            "SecurityGroupIds": ["TEST_INSTANCE_SECURITYGROUP"],
+            "SubnetId": "TEST_INSTANCE_SUBNETID",
             "TagSpecifications": 
             [
                 {
@@ -24,7 +24,11 @@
                     "Tags": [
                         {
                             "Key": "Purpose", 
-                            "Value": "data-ingestion-test"
+                            "Value": "data-ingestion-automated-test"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "data-ingestion-automated-test-instance"
                         }
                     ]
                 }

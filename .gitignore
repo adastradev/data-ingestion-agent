@@ -11,3 +11,5 @@ config.ts
 
 instanceConfig.json
 *.pem
+
+npm-debug.log

@@ -13,7 +13,6 @@ import
     InspectHealthStatusCommand
 } from './util/InstanceCommands/Docker/Commands';
 
-
 const expect = chai.expect;
 const should = chai.should();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -32,6 +31,7 @@ describe('Data Ingestion Agent on CentOS 7', () => {
         await sshClient.connect({
             host: ec2Factory.currentInstance.PublicDnsName,
             username: ec2Factory.getRootUser(),
+            // For now assume it's a pem from AWS
             privateKey: `${instanceConfig.instance.KeyName}.pem`
         });
 
@@ -45,21 +45,10 @@ describe('Data Ingestion Agent on CentOS 7', () => {
         commandInvoker.dispose();
     });
 
-    describe('when installed and the container is started', () => {
-        it('should successfully pull, start and maintain a healthy data ingestion agent', async () => {
+    describe('when the latest docker image has been pulled', () => {
+        it('the image can be started and report an initial healthy state', async () => {
             let result = await commandInvoker.invoke(new RunDataIngestionAgent());
-            await sleep(10000);
-
-            result = await commandInvoker.invoke(new InspectHealthStatusCommand());
-
-            expect(result).to.eq('"healthy"');
-        });
-    });
-
-    describe('when installed and the container started', () => {
-        it('should successfully pull, start and maintain a healthy data ingestion agent', async () => {
-            let result = await commandInvoker.invoke(new RunDataIngestionAgent());
-            await sleep(10000);
+            await sleep(20000);
 
             result = await commandInvoker.invoke(new InspectHealthStatusCommand());
 
