@@ -14,11 +14,10 @@ export default class SshCommandInvoker implements IInvoker<string, string> {
         var commands: Iterable<string> = command.getCommands();
         var results = "";
         for (var cmd of commands) {
-            console.log(cmd);
             var commandResult = await this.sshClient.execCommand(cmd, { cwd: '/' });
 
             if (commandResult.code > 0) {
-                console.log(`Potential Command Failure: '${cmd}' - Code: '${commandResult.code}' - Message: '${commandResult.stderr}'`);
+                console.log(`ERROR: Return Code: '${commandResult.code}' - Message: '${commandResult.stderr}'`);
             }
 
             results = results.concat(commandResult.stdout);
