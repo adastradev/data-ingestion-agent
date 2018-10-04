@@ -36,37 +36,45 @@
     },
     "images": 
     {
-        "linux-rhel7": [
-            {
-                "region": "us-east-1",
-                "ami": "ami-a8d369c0"
-            },
-            {
-                "region": "us-west-1",
-                "ami": "ami-dcc8d299"
-            },
-            {
-                "region": "us-west-2",
-                "ami": "ami-212e0911"
-            }
-        ],
-        "linux-centos7": [
-            {
-                "region": "us-east-1",
-                "ami": "ami-9887c6e7"
-            },
-            {
-                "region": "us-east-2",
-                "ami": "ami-994575fc"
-            },
-            {
-                "region": "us-west-1",
-                "ami": "ami-78485818"
-            },
-            {
-                "region": "us-west-2",
-                "ami": "ami-0ebdd976"
-            }
-        ]
+        "linux_rhel7": {
+            "root_user": "ec2-user",
+            "ami_map": 
+            [
+                {
+                    "region": "us-east-1",
+                    "ami": "ami-a8d369c0"
+                },
+                {
+                    "region": "us-west-1",
+                    "ami": "ami-dcc8d299"
+                },
+                {
+                    "region": "us-west-2",
+                    "ami": "ami-212e0911"
+                }
+            ]
+        },
+        "linux_centos7": {
+            "root_user" : "centos",
+            "ami_map": 
+            [
+                {
+                    "region": "us-east-1",
+                    "ami": "ami-9887c6e7"
+                },
+                {
+                    "region": "us-east-2",
+                    "ami": "ami-994575fc"
+                },
+                {
+                    "region": "us-west-1",
+                    "ami": "ami-78485818"
+                },
+                {
+                    "region": "us-west-2",
+                    "ami": "ami-0ebdd976"
+                }
+            ]
+        }
     }
 }
