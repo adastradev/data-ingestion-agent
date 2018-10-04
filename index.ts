@@ -21,7 +21,7 @@ class Startup {
         var sqsConfig = { apiVersion: '2012-11-05', region: 'us-east-1'};
         
         // TODO: Change to better authentication scheme
-        if (process.env.AWS_ACCESS_KEY && process.env.AWS_SECRET_ACCESS_KEY) {
+        if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
             
             logger.log('info', 'Configuring security credentials');
             

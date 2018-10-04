@@ -23,7 +23,7 @@ export class PullLatestDockerImageCommand implements ICommand<string> {
  */
 export class RunDataIngestionAgent implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        var aws_access_key = process.env.AWS_ACCESS_KEY;
+        var aws_access_key = process.env.AWS_ACCESS_KEY_ID;
         var aws_secret_access_key = process.env.AWS_SECRET_ACCESS_KEY;
         var sqs_queue_uri = process.env.SQS_QUEUE_URI;
         return [[
@@ -31,7 +31,7 @@ export class RunDataIngestionAgent implements ICommand<string> {
             '--name dia',
             '-d',
             '-t',
-            `-e AWS_ACCESS_KEY=${aws_access_key}`,
+            `-e AWS_ACCESS_KEY_ID=${aws_access_key}`,
             `-e AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}`,
             `-e SQS_QUEUE_URI=${sqs_queue_uri}`,
             'adastradev/data-ingestion-agent:feature_pipeline'

@@ -9,7 +9,7 @@ Note: AWS access keys are a temporary solution and will be removed
 
 ```sh
 docker pull adastradev/data-ingestion-agent:latest
-docker run -d -t -e AWS_ACCESS_KEY=<your_access_key> -e AWS_SECRET_ACCESS_KEY=<your_secret_access_key> -e SQS_QUEUE_URI=https://sqs.<your_region>.amazonaws.com/<your_account_id>/<your_queue_name> data-ingestion-agent:latest
+docker run -d -t -e AWS_ACCESS_KEY_ID=<your_access_key> -e AWS_SECRET_ACCESS_KEY=<your_secret_access_key> -e SQS_QUEUE_URI=https://sqs.<your_region>.amazonaws.com/<your_account_id>/<your_queue_name> data-ingestion-agent:latest
 ```
 
 ## Development
