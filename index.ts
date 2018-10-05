@@ -25,7 +25,7 @@ class Startup {
             
             logger.log('info', 'Configuring security credentials');
             
-            const awsAccessKey = process.env.AWS_ACCESS_KEY;
+            const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
             const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
 
             Object.assign(sqsConfig, { accessKeyId: awsAccessKey, secretAccessKey: awsSecretKey });
