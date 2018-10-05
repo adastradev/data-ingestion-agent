@@ -1,23 +1,55 @@
-# This is a sample build configuration for Docker.
-# Check our guides at https://confluence.atlassian.com/x/O1toN for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
+options:
+  max-time: 120
+
 image: atlassian/default-image:2
 
 pipelines:
-  default:
-    - step:
-        services:
-          - docker
-        script: # Modify the commands below to build your repository.
-          # Set $DOCKER_HUB_USERNAME and $DOCKER_HUB_PASSWORD as environment variables in repository settings
-          #- export IMAGE_NAME=adastradev/data-ingestion-agent:$BITBUCKET_COMMIT
-          - export IMAGE_NAME=adastradev/data-ingestion-agent:latest
+  branches:
+    master:
+      - step:
+          services:
+            - docker
+          script:
+            # Set $DOCKER_HUB_USERNAME and $DOCKER_HUB_PASSWORD as environment variables in repository settings
+            #- export IMAGE_NAME=adastradev/data-ingestion-agent:$BITBUCKET_COMMIT
+            - export IMAGE_NAME=adastradev/data-ingestion-agent:latest
 
-          # build the Docker image (this will use the Dockerfile in the root of the repo)
-          - docker build -t $IMAGE_NAME .
-          # authenticate with the Docker Hub registry
-          - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
-          # push the new Docker image to the Docker registry
-          - docker push $IMAGE_NAME
+            # build the Docker image (this will use the Dockerfile in the root of the repo)
+            - docker build -t $IMAGE_NAME .
+
+            # Install prereqs for wait script
+            - apt-get update
+            - apt-get install -y jq
+
+            # Waiting on docker to publish the new image from its automated build
+            # and running system tests both rely on knowing the tag of the image.
+            # Dockerhub takes the branch name and slightly mangles it to be used as
+            # an image tag.
+            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
+
+            - . ./pipeline/wait-for-latest-docker-image.sh
+
+            # Run system test
+            - . ./pipeline/run-system-tests.sh
+    feature/*:
+      - step:
+          services:
+            - docker
+          script: 
+            - export IMAGE_NAME=adastradev/data-ingestion-agent:automated-$BITBUCKET_COMMIT
+            - docker build -t $IMAGE_NAME .
+
+            # Install prereqs for wait script
+            - apt-get update
+            - apt-get install -y jq
+
+            # Waiting on docker to publish the new image from its automated build
+            # and running system tests both rely on knowing the tag of the image.
+            # Dockerhub takes the branch name and slightly mangles it to be used as
+            # an image tag.
+            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
+
+            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
+
+            # Run system test
+            - . ./pipeline/run-system-tests.sh

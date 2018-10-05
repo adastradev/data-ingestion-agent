@@ -1,0 +1,15 @@
+dist
+node_modules/
+.nyc_output/
+coverage/
+jspm_packages/
+typings/
+.npm
+*.tgz
+config.ts
+.vscode
+
+instanceConfig.json
+*.pem
+
+npm-debug.log
