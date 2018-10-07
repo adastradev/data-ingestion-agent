@@ -13,8 +13,13 @@ export class CognitoUserPoolLocatorUserManagement implements CognitoUserPoolLoca
         return new Promise(async function(resolve, reject) {
             let api = new UserManagementApi(process.env.USER_MANAGEMENT_URI, this.region, { type: 'None' });
             const response: any = await api.getUserPoolByUserName(userName);
-            let result: CognitoUserPoolApiModel = JSON.parse(response.body);
+            let result: CognitoUserPoolApiModel = {
+                UserPoolId: response.data.cognito_user_pool_id,
+                ClientId: response.data.cognito_app_client_id,
+                IdentityPoolId: response.data.cognito_identity_pool_id
+            };
+        
             resolve(result);
-        });
+        }.bind(this));
     }
 }

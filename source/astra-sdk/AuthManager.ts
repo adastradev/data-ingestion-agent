@@ -2,6 +2,7 @@ import { CognitoUserPoolLocator } from "./CognitoUserPoolLocator";
 import { CognitoIdentity } from 'aws-sdk'
 import { CognitoUserPoolApiModel } from "./CognitoUserPoolApiModel";
 
+global['fetch'] = require('node-fetch');
 const CognitoUserPool = require('amazon-cognito-identity-js').CognitoUserPool;
 const AuthenticationDetails = require('amazon-cognito-identity-js').AuthenticationDetails;
 const CognitoUser = require('amazon-cognito-identity-js').CognitoUser;
@@ -106,7 +107,7 @@ export class AuthManager {
                     }
                 }
             });
-        });
+        }.bind(this));
     }
 
     public getIamCredentials(cognitoIdToken: string): Promise<CognitoIdentity.Credentials> {
@@ -132,7 +133,7 @@ export class AuthManager {
 
             const result = await CognitoIdentity.getCredentialsForIdentity(getCredentialParams).promise();
             resolve(result.Credentials);
-        });
+        }.bind(this));
     }
 
 }
