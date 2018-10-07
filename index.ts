@@ -1,8 +1,9 @@
 import * as SQS from 'aws-sdk/clients/sqs';
 import * as Winston from 'winston';
-import { DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
+import { DiscoverySdk, BearerTokenCredentials } from '@adastradev/serverless-discovery-sdk';
 import { AuthManager } from './source/astra-sdk/AuthManager';
 import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
+import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -38,10 +39,21 @@ class Startup {
             let cognitoJwt = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
 
             // Get IAM credentials
-            // sqsConfig.credentials = await authManager.getIamCredentials(cognitoJwt.idToken);
+            const iamCredentials = await authManager.getIamCredentials(cognitoJwt.idToken);
+            sqsConfig.credentials = {
+                accessKeyId: iamCredentials.AccessKeyId,
+                secretAccessKey: iamCredentials.SecretKey,
+                sessionToken: iamCredentials.SessionToken
+            };
 
-            // TODO: lookup SQS queue for this tenant
-            queueUrl = '';
+            // lookup SQS queue for this tenant
+            let credentialsBearerToken: BearerTokenCredentials = {
+                type: 'BearerToken',
+                idToken: cognitoJwt.idToken
+            };
+            let userManagementApi = new UserManagementApi(process.env.USER_MANAGEMENT_URI, REGION, credentialsBearerToken);
+            let poolListResponse = await userManagementApi.getUserPools();
+            queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
         }
 
         var sqs = new SQS(sqsConfig);

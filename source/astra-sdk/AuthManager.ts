@@ -1,5 +1,6 @@
 import { CognitoUserPoolLocator } from "./CognitoUserPoolLocator";
 import { CognitoIdentity } from 'aws-sdk'
+import * as AWS from 'aws-sdk'
 import { CognitoUserPoolApiModel } from "./CognitoUserPoolApiModel";
 
 global['fetch'] = require('node-fetch');
@@ -114,7 +115,7 @@ export class AuthManager {
         return new Promise(async function(resolve, reject) {
             const authenticator = `cognito-idp.${this.region}.amazonaws.com/${this.poolData.UserPoolId}`;
 
-            var CognitoIdentity = new CognitoIdentity({ region: this.region });
+            var CognitoIdentity = new AWS.CognitoIdentity({ region: this.region });
             var params: CognitoIdentity.Types.GetIdInput = {
                 IdentityPoolId: this.poolData.IdentityPoolId,
                 Logins: {
