@@ -1,5 +1,8 @@
 import * as SQS from 'aws-sdk/clients/sqs';
 import * as Winston from 'winston';
+import { DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
+import { AuthManager } from './source/astra-sdk/AuthManager';
+import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -7,6 +10,9 @@ async function sleep(ms: number) {
 
 class Startup {
     public static async main(): Promise<number> {
+        // NOTE: updates to the discovery service itself would require pushing a new docker image. This should still be an environment variable rather than hardcoded
+        process.env['DISCOVERY_SERVICE'] = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
+        const REGION = 'us-east-1';
 
         const logger = Winston.createLogger({
             level: 'info',
@@ -16,25 +22,31 @@ class Startup {
             ]
         });
 
-        logger.log('info', 'waiting for sqs schedule event');
-        
-        var sqsConfig = { apiVersion: '2012-11-05', region: 'us-east-1'};
-        
-        // TODO: Change to better authentication scheme
-        if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
-            
-            logger.log('info', 'Configuring security credentials');
-            
-            const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
-            const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
+        let queueUrl = '';
 
-            Object.assign(sqsConfig, { accessKeyId: awsAccessKey, secretAccessKey: awsSecretKey });
+        let sqsConfig: SQS.ClientConfiguration = { apiVersion: '2012-11-05', region: REGION};
+        if (process.env.ASTRA_CLOUD_USERNAME && process.env.ASTRA_CLOUD_PASSWORD) {
+            logger.log('info', 'Configuring security credentials');
+
+            // look up User Management service URI and cache in an environment variable
+            const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
+            const endpoints = await sdk.lookupService('user-management', 'dev');
+            process.env['USER_MANAGEMENT_URI'] = endpoints[0];
+
+            let poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
+            let authManager = new AuthManager(poolLocator, REGION);
+            let cognitoJwt = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+
+            // Get IAM credentials
+            // sqsConfig.credentials = await authManager.getIamCredentials(cognitoJwt.idToken);
+
+            // TODO: lookup SQS queue for this tenant
+            queueUrl = '';
         }
 
         var sqs = new SQS(sqsConfig);
 
-        // TODO: Discover this value per tenant
-        const queueUrl = process.env.SQS_QUEUE_URI;
+        logger.log('info', 'waiting for sqs schedule event');
         while(true) {
 
             await sleep(1000);
@@ -45,13 +57,10 @@ class Startup {
                 logger.log('info', `Schedule Signal Received - ${result.Messages[0].Body}`);      
 
                 logger.log('info', 'Ingesting...');
-
-
                 await sleep(1000);
-
                 logger.log('info', 'Done Ingesting!');
 
-                // ack
+                // TODO: message acks will fail right now until the User Management service handles this privilege
                 await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: result.Messages[0].ReceiptHandle }).promise();
                 
                 // Debug hack for now
