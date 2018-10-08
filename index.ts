@@ -58,7 +58,7 @@ class Startup {
 
             // look up User Management service URI and cache in an environment variable
             const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
-            const endpoints = await sdk.lookupService('user-management', 'dev');
+            const endpoints = await sdk.lookupService('user-management', 'prod');
             process.env['USER_MANAGEMENT_URI'] = endpoints[0];
 
             let poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
