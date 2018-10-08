@@ -6,8 +6,13 @@ function refreshDockerImageDate {
     # echo 'Fetching docker last updated value...'
     raw_image_date=`curl -s $docker_tag_uri | jq -r '.last_updated'`
     
-    # echo "Docker Image Last Updated: $raw_image_date"
-    image_date=$(date -u -d "$raw_image_date" "+%s")
+    if [ "$raw_image_date" == "null" ]; then
+        # The image is new, no prior instance exists yet so default to an old date
+        default_date="2000-01-01T00:00:00.000000Z"
+        image_date=$(date -u -d "$default_date" "+%s")
+    else
+        image_date=$(date -u -d "$raw_image_date" "+%s")
+    fi
 }
 
 # Discover the initial dates of the commit and pub date of the tagged image in dockerhub
