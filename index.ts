@@ -5,6 +5,7 @@ import { AuthManager } from './source/astra-sdk/AuthManager';
 import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
 import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 import { CognitoIdentity, S3 } from 'aws-sdk';
+import * as crypto from 'crypto';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -18,6 +19,18 @@ class Startup {
         s.push(null);
 
         return s;
+    }
+
+    private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string) {
+        const s3api = new S3(s3Config);
+        
+        var dataBody = this.createObject();
+        var params = {
+            Bucket: 'adastra-dev-data-ingestion/' + tenantId,
+            Body: dataBody,
+            Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
+        };
+        await s3api.upload(params).promise();
     }
 
     public static async main(): Promise<number> {
@@ -35,6 +48,7 @@ class Startup {
 
         let queueUrl = '';
         let sqsConfig: SQS.ClientConfiguration = { apiVersion: '2012-11-05', region: REGION};
+        let s3Config: S3.ClientConfiguration = { region: REGION };
         let tenantId = '';
         let iamCredentials: CognitoIdentity.Credentials = undefined;
 
@@ -52,7 +66,16 @@ class Startup {
 
             // Get IAM credentials
             iamCredentials = await authManager.getIamCredentials(cognitoJwt.idToken);
+
+            // Set up authenticated access to SQS
             sqsConfig.credentials = {
+                accessKeyId: iamCredentials.AccessKeyId,
+                secretAccessKey: iamCredentials.SecretKey,
+                sessionToken: iamCredentials.SessionToken
+            };
+
+            // Set up authenticated access to S3
+            s3Config.credentials = {
                 accessKeyId: iamCredentials.AccessKeyId,
                 secretAccessKey: iamCredentials.SecretKey,
                 sessionToken: iamCredentials.SessionToken
@@ -69,34 +92,6 @@ class Startup {
             tenantId = poolListResponse.data[0].tenant_id;
         }
 
-        const s3api = new S3(
-            {
-                region: 'us-east-1',
-                params: {
-                    Bucket: 'adastra-dev-data-ingestion/' + tenantId
-                },
-                credentials: {
-                    accessKeyId: iamCredentials.AccessKeyId,
-                    secretAccessKey: iamCredentials.SecretKey,
-                    sessionToken: iamCredentials.SessionToken    
-                }
-            }
-        );
-
-        var dataBody = this.createObject();
-        var params = {
-            Bucket: 'adastra-dev-data-ingestion/' + tenantId,
-            Body: dataBody,
-            Key: 'testUpload'
-        };
-        await s3api.upload(params).promise();
-       
-        var paramsDeleted = {
-            Bucket: 'adastra-dev-data-ingestion/' + tenantId,
-            Key: 'testUpload'
-        };
-        await s3api.deleteObject(paramsDeleted).promise();
-
         var sqs = new SQS(sqsConfig);
 
         logger.log('info', 'waiting for sqs schedule event');
@@ -109,7 +104,7 @@ class Startup {
                 logger.log('info', `Schedule Signal Received - ${result.Messages[0].Body}`);      
 
                 logger.log('info', 'Ingesting...');
-                await sleep(1000);
+                await this.sendSnapshot(s3Config, tenantId);
                 logger.log('info', 'Done Ingesting!');
 
                 // ack
