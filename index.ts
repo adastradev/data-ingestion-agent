@@ -12,7 +12,7 @@ async function sleep(ms: number) {
 }
 
 class Startup {
-    private static createObject() {
+    private static createSnapshot() {
         var Readable = require('stream').Readable
         var s = new Readable;
         s.push('this is a test stream');
@@ -23,8 +23,9 @@ class Startup {
 
     private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string) {
         const s3api = new S3(s3Config);
-        
-        var dataBody = this.createObject();
+
+        var dataBody = this.createSnapshot();
+        // TODO: configure a different bucket for prod vs dev
         var params = {
             Bucket: 'adastra-dev-data-ingestion/' + tenantId,
             Body: dataBody,
