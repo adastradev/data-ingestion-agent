@@ -6,12 +6,24 @@ import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/Cognito
 import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 import { CognitoIdentity, S3 } from 'aws-sdk';
 import * as crypto from 'crypto';
+import { bool } from 'aws-sdk/clients/signer';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+var shutdownRequested = false;
+process.on('SIGTERM', function() {
+    shutdownRequested = true;
+});
+
 class Startup {
+
+    private static logger: Winston.Logger = null;
+    private static readonly queries = [
+        "select * from sometable"
+    ];
+
     private static createObject() {
         var Readable = require('stream').Readable
         var s = new Readable;
@@ -21,7 +33,7 @@ class Startup {
         return s;
     }
 
-    private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string) {
+    private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, preview?: boolean) {
         const s3api = new S3(s3Config);
         
         var dataBody = this.createObject();
@@ -30,15 +42,26 @@ class Startup {
             Body: dataBody,
             Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
         };
-        await s3api.upload(params).promise();
+
+        if (preview) {
+            this.logger.log("info", this.queries[0]);
+        }
+        else {
+            await s3api.upload(params).promise();
+        }
     }
 
-    public static async main(): Promise<number> {
+    public static async initiatePreview(sqs: SQS, queueUrl: string): Promise<void> {
+        await sqs.sendMessage({ QueueUrl: queueUrl, MessageBody: '{ "type": "SendData", "version": "v1", "payload": { "preview": true }}'}).promise();
+    }
+
+    public static async main() {
+
         // NOTE: updates to the discovery service itself would require pushing a new docker image. This should still be an environment variable rather than hardcoded
         process.env['DISCOVERY_SERVICE'] = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
         const REGION = 'us-east-1';
 
-        const logger = Winston.createLogger({
+        this.logger = Winston.createLogger({
             level: 'info',
             format: Winston.format.json(),
             transports: [
@@ -53,7 +76,7 @@ class Startup {
         let iamCredentials: CognitoIdentity.Credentials = undefined;
 
         if (process.env.ASTRA_CLOUD_USERNAME && process.env.ASTRA_CLOUD_PASSWORD) {
-            logger.log('info', 'Configuring security credentials');
+            this.logger.log('info', 'Configuring security credentials');
 
             // look up User Management service URI and cache in an environment variable
             const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
@@ -94,18 +117,39 @@ class Startup {
 
         var sqs = new SQS(sqsConfig);
 
-        logger.log('info', 'waiting for sqs schedule event');
-        while(true) {
+        var args = process.argv.splice(2);
+        if (args.length > 0) {
+            if (args[0] === "preview") {
+                await Startup.initiatePreview(sqs, queueUrl);
+            }
+        }
+
+        this.logger.log('info', 'waiting for sqs schedule event');
+        while(!shutdownRequested) {
             await sleep(1000);
             
             var result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
 
             if (result.Messages) {
-                logger.log('info', `Schedule Signal Received - ${result.Messages[0].Body}`);      
+                this.logger.log('info', `Schedule Signal Received - ${result.Messages[0].Body}`);      
 
-                logger.log('info', 'Ingesting...');
-                await this.sendSnapshot(s3Config, tenantId);
-                logger.log('info', 'Done Ingesting!');
+                this.logger.log('info', 'Ingesting...');
+                
+                var payloadAsJson = null;
+                try {
+                    payloadAsJson = JSON.parse(result.Messages[0].Body);
+                }
+                catch(error) {
+                    // probably not json
+                }
+
+                var preview: boolean = false;
+                if (payloadAsJson && payloadAsJson.payload.preview) {
+                    preview = payloadAsJson.payload.preview
+                }
+
+                await this.sendSnapshot(s3Config, tenantId, preview);
+                this.logger.log('info', 'Done Ingesting!');
 
                 // ack
                 await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: result.Messages[0].ReceiptHandle }).promise();
@@ -113,10 +157,13 @@ class Startup {
                 // Debug hack for now
                 if (result.Messages[0].Body === 'failme') {
                     throw Error('Fail');
+                } else if (preview) {
+                    return;
                 }
             }
         }
     }
 }
+
 
 Startup.main();
