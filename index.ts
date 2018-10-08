@@ -4,12 +4,22 @@ import { DiscoverySdk, BearerTokenCredentials } from '@adastradev/serverless-dis
 import { AuthManager } from './source/astra-sdk/AuthManager';
 import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
 import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
+import { CognitoIdentity, S3 } from 'aws-sdk';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 class Startup {
+    private static createObject() {
+        var Readable = require('stream').Readable
+        var s = new Readable;
+        s.push('this is a test stream');
+        s.push(null);
+
+        return s;
+    }
+
     public static async main(): Promise<number> {
         // NOTE: updates to the discovery service itself would require pushing a new docker image. This should still be an environment variable rather than hardcoded
         process.env['DISCOVERY_SERVICE'] = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
@@ -24,8 +34,10 @@ class Startup {
         });
 
         let queueUrl = '';
-
         let sqsConfig: SQS.ClientConfiguration = { apiVersion: '2012-11-05', region: REGION};
+        let tenantId = '';
+        let iamCredentials: CognitoIdentity.Credentials = undefined;
+
         if (process.env.ASTRA_CLOUD_USERNAME && process.env.ASTRA_CLOUD_PASSWORD) {
             logger.log('info', 'Configuring security credentials');
 
@@ -39,7 +51,7 @@ class Startup {
             let cognitoJwt = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
 
             // Get IAM credentials
-            const iamCredentials = await authManager.getIamCredentials(cognitoJwt.idToken);
+            iamCredentials = await authManager.getIamCredentials(cognitoJwt.idToken);
             sqsConfig.credentials = {
                 accessKeyId: iamCredentials.AccessKeyId,
                 secretAccessKey: iamCredentials.SecretKey,
@@ -54,13 +66,41 @@ class Startup {
             let userManagementApi = new UserManagementApi(process.env.USER_MANAGEMENT_URI, REGION, credentialsBearerToken);
             let poolListResponse = await userManagementApi.getUserPools();
             queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
+            tenantId = poolListResponse.data[0].tenant_id;
         }
+
+        const s3api = new S3(
+            {
+                region: 'us-east-1',
+                params: {
+                    Bucket: 'adastra-dev-data-ingestion/' + tenantId
+                },
+                credentials: {
+                    accessKeyId: iamCredentials.AccessKeyId,
+                    secretAccessKey: iamCredentials.SecretKey,
+                    sessionToken: iamCredentials.SessionToken    
+                }
+            }
+        );
+
+        var dataBody = this.createObject();
+        var params = {
+            Bucket: 'adastra-dev-data-ingestion/' + tenantId,
+            Body: dataBody,
+            Key: 'testUpload'
+        };
+        await s3api.upload(params).promise();
+       
+        var paramsDeleted = {
+            Bucket: 'adastra-dev-data-ingestion/' + tenantId,
+            Key: 'testUpload'
+        };
+        await s3api.deleteObject(paramsDeleted).promise();
 
         var sqs = new SQS(sqsConfig);
 
         logger.log('info', 'waiting for sqs schedule event');
         while(true) {
-
             await sleep(1000);
             
             var result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
@@ -72,7 +112,7 @@ class Startup {
                 await sleep(1000);
                 logger.log('info', 'Done Ingesting!');
 
-                // TODO: message acks will fail right now until the User Management service handles this privilege
+                // ack
                 await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: result.Messages[0].ReceiptHandle }).promise();
                 
                 // Debug hack for now
