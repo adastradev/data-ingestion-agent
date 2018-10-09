@@ -1,12 +1,42 @@
 import * as SQS from 'aws-sdk/clients/sqs';
 import * as Winston from 'winston';
+import { DiscoverySdk, BearerTokenCredentials } from '@adastradev/serverless-discovery-sdk';
+import { AuthManager } from './source/astra-sdk/AuthManager';
+import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
+import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
+import { CognitoIdentity, S3 } from 'aws-sdk';
+import * as crypto from 'crypto';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 class Startup {
+    private static createSnapshot() {
+        var Readable = require('stream').Readable
+        var s = new Readable;
+        s.push('this is a test stream');
+        s.push(null);
+
+        return s;
+    }
+
+    private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, bucketName: string) {
+        const s3api = new S3(s3Config);
+
+        var dataBody = this.createSnapshot();
+        var params = {
+            Bucket:  bucketName + '/' + tenantId,
+            Body: dataBody,
+            Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
+        };
+        await s3api.upload(params).promise();
+    }
+
     public static async main(): Promise<number> {
+        // NOTE: updates to the discovery service itself would require pushing a new docker image. This should still be an environment variable rather than hardcoded
+        process.env['DISCOVERY_SERVICE'] = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
+        const REGION = 'us-east-1';
 
         const logger = Winston.createLogger({
             level: 'info',
@@ -16,27 +46,62 @@ class Startup {
             ]
         });
 
-        logger.log('info', 'waiting for sqs schedule event');
-        
-        var sqsConfig = { apiVersion: '2012-11-05', region: 'us-east-1'};
-        
-        // TODO: Change to better authentication scheme
-        if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
-            
-            logger.log('info', 'Configuring security credentials');
-            
-            const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
-            const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
+        let s3Buckets = {
+            prod: 'adastra-prod-data-ingestion',
+            dev: 'adastra-dev-data-ingestion'
+        }
+        let stage = 'prod';
+        let queueUrl = '';
+        let sqsConfig: SQS.ClientConfiguration = { apiVersion: '2012-11-05', region: REGION};
+        let s3Config: S3.ClientConfiguration = { region: REGION };
+        let tenantId = '';
+        let iamCredentials: CognitoIdentity.Credentials = undefined;
+        let bucketName = s3Buckets[stage];
 
-            Object.assign(sqsConfig, { accessKeyId: awsAccessKey, secretAccessKey: awsSecretKey });
+        if (process.env.ASTRA_CLOUD_USERNAME && process.env.ASTRA_CLOUD_PASSWORD) {
+            logger.log('info', 'Configuring security credentials');
+
+            // look up User Management service URI and cache in an environment variable
+            const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
+            const endpoints = await sdk.lookupService('user-management', stage);
+            process.env['USER_MANAGEMENT_URI'] = endpoints[0];
+
+            let poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
+            let authManager = new AuthManager(poolLocator, REGION);
+            let cognitoJwt = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+
+            // Get IAM credentials
+            iamCredentials = await authManager.getIamCredentials(cognitoJwt.idToken);
+
+            // Set up authenticated access to SQS
+            sqsConfig.credentials = {
+                accessKeyId: iamCredentials.AccessKeyId,
+                secretAccessKey: iamCredentials.SecretKey,
+                sessionToken: iamCredentials.SessionToken
+            };
+
+            // Set up authenticated access to S3
+            s3Config.credentials = {
+                accessKeyId: iamCredentials.AccessKeyId,
+                secretAccessKey: iamCredentials.SecretKey,
+                sessionToken: iamCredentials.SessionToken
+            };
+
+            // lookup SQS queue for this tenant
+            let credentialsBearerToken: BearerTokenCredentials = {
+                type: 'BearerToken',
+                idToken: cognitoJwt.idToken
+            };
+            let userManagementApi = new UserManagementApi(process.env.USER_MANAGEMENT_URI, REGION, credentialsBearerToken);
+            let poolListResponse = await userManagementApi.getUserPools();
+            queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
+            tenantId = poolListResponse.data[0].tenant_id;
         }
 
         var sqs = new SQS(sqsConfig);
 
-        // TODO: Discover this value per tenant
-        const queueUrl = process.env.SQS_QUEUE_URI;
+        logger.log('info', 'waiting for sqs schedule event');
         while(true) {
-
             await sleep(1000);
             
             var result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
@@ -45,10 +110,7 @@ class Startup {
                 logger.log('info', `Schedule Signal Received - ${result.Messages[0].Body}`);      
 
                 logger.log('info', 'Ingesting...');
-
-
-                await sleep(1000);
-
+                await this.sendSnapshot(s3Config, tenantId, bucketName);
                 logger.log('info', 'Done Ingesting!');
 
                 // ack
