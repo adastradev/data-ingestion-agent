@@ -48,7 +48,7 @@ describe('Data Ingestion Agent on CentOS 7', () => {
     describe('when the latest docker image has been pulled', () => {
         it('the image can be started and report an initial healthy state', async () => {
             let result = await commandInvoker.invoke(new RunDataIngestionAgent());
-            await sleep(20000);
+            await sleep(30000);
 
             result = await commandInvoker.invoke(new InspectHealthStatusCommand());
 

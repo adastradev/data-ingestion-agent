@@ -23,18 +23,18 @@ export class PullLatestDockerImageCommand implements ICommand<string> {
  */
 export class RunDataIngestionAgent implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        var aws_access_key = process.env.AWS_ACCESS_KEY_ID;
-        var aws_secret_access_key = process.env.AWS_SECRET_ACCESS_KEY;
-        var sqs_queue_uri = process.env.SQS_QUEUE_URI;
+        var astra_cloud_username = process.env.ASTRA_CLOUD_USERNAME;
+        var astra_cloud_password = process.env.ASTRA_CLOUD_PASSWORD;
+        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
+
         return [[
             'sudo docker run',
             '--name dia',
             '-d',
             '-t',
-            `-e AWS_ACCESS_KEY_ID=${aws_access_key}`,
-            `-e AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}`,
-            `-e SQS_QUEUE_URI=${sqs_queue_uri}`,
-            'adastradev/data-ingestion-agent:feature_pipeline'
+            `-e ASTRA_CLOUD_USERNAME=${astra_cloud_username}`,
+            `-e ASTRA_CLOUD_PASSWORD=${astra_cloud_password}`,
+            `adastradev/data-ingestion-agent:${normalized_docker_tag}`
         ].join(' ')];
     }
 }
