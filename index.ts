@@ -23,8 +23,8 @@ class Startup {
     private static readonly queries = [
         "select * from sometable"
     ];
-
-    private static createObject() {
+    
+    private static createSnapshot() {
         var Readable = require('stream').Readable
         var s = new Readable;
         s.push('this is a test stream');
@@ -33,12 +33,12 @@ class Startup {
         return s;
     }
 
-    private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, preview?: boolean) {
+    private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, bucketName: string, preview: boolean = false) {
         const s3api = new S3(s3Config);
-        
-        var dataBody = this.createObject();
+
+        var dataBody = this.createSnapshot();
         var params = {
-            Bucket: 'adastra-dev-data-ingestion/' + tenantId,
+            Bucket:  bucketName + '/' + tenantId,
             Body: dataBody,
             Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
         };
@@ -69,18 +69,24 @@ class Startup {
             ]
         });
 
+        let s3Buckets = {
+            prod: 'adastra-prod-data-ingestion',
+            dev: 'adastra-dev-data-ingestion'
+        }
+        let stage = 'prod';
         let queueUrl = '';
         let sqsConfig: SQS.ClientConfiguration = { apiVersion: '2012-11-05', region: REGION};
         let s3Config: S3.ClientConfiguration = { region: REGION };
         let tenantId = '';
         let iamCredentials: CognitoIdentity.Credentials = undefined;
+        let bucketName = s3Buckets[stage];
 
         if (process.env.ASTRA_CLOUD_USERNAME && process.env.ASTRA_CLOUD_PASSWORD) {
             this.logger.log('info', 'Configuring security credentials');
 
             // look up User Management service URI and cache in an environment variable
             const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
-            const endpoints = await sdk.lookupService('user-management', 'dev');
+            const endpoints = await sdk.lookupService('user-management', stage);
             process.env['USER_MANAGEMENT_URI'] = endpoints[0];
 
             let poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
@@ -131,10 +137,8 @@ class Startup {
             var result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
 
             if (result.Messages) {
-                this.logger.log('info', `Schedule Signal Received - ${result.Messages[0].Body}`);      
+                this.logger.log('info', `Schedule Signal Received`);      
 
-                this.logger.log('info', 'Ingesting...');
-                
                 var payloadAsJson = null;
                 try {
                     payloadAsJson = JSON.parse(result.Messages[0].Body);
@@ -145,10 +149,11 @@ class Startup {
 
                 var preview: boolean = false;
                 if (payloadAsJson && payloadAsJson.payload.preview) {
-                    preview = payloadAsJson.payload.preview
+                    preview = payloadAsJson.payload.preview;
                 }
 
-                await this.sendSnapshot(s3Config, tenantId, preview);
+                this.logger.log('info', 'Ingesting...');
+                await this.sendSnapshot(s3Config, tenantId, bucketName, preview);
                 this.logger.log('info', 'Done Ingesting!');
 
                 // ack
