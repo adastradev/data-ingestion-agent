@@ -6,25 +6,67 @@ import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/Cognito
 import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 import { CognitoIdentity, S3 } from 'aws-sdk';
 import * as crypto from 'crypto';
+import * as oracledb from 'oracledb';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 class Startup {
-    private static createSnapshot() {
+
+    private static createDemoSnapshot() {
         var Readable = require('stream').Readable
         var s = new Readable;
         s.push('this is a test stream');
         s.push(null);
-
         return s;
+    }
+
+    private static async createSnapshot() {
+        let connection;
+        try {
+            let sql, binds, options, result;
+
+            connection = await oracledb.getConnection({
+              user          : process.env.ORACLE_USER,
+              password      : process.env.ORACLE_PASSWORD,
+              connectString : process.env.ORACLE_ENDPOINT
+            });
+
+            // Query the data
+            sql = `SELECT * FROM ALL_TABLES`;
+            binds = {};
+
+            // For a complete list of options see the documentation.
+            options = {
+              outFormat: oracledb.OBJECT   // query result format
+              // extendedMetaData: true,   // get extra metadata
+              // fetchArraySize: 100       // internal buffer allocation size for tuning
+            };
+
+            result = await connection.execute(sql, binds, options);
+
+            console.log("Column metadata: ", result.metaData);
+            console.log("Query results: ");
+            console.log(result.rows);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            if (connection) {
+                try {
+                    await connection.close();
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+        return "SELECT * FROM ALL_TABLES";
     }
 
     private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, bucketName: string) {
         const s3api = new S3(s3Config);
 
-        var dataBody = this.createSnapshot();
+        var dataBody = await this.createSnapshot();
         var params = {
             Bucket:  bucketName + '/' + tenantId,
             Body: dataBody,
@@ -45,6 +87,8 @@ class Startup {
                 new Winston.transports.Console()
             ]
         });
+
+        var body = this.createSnapshot();
 
         let s3Buckets = {
             prod: 'adastra-prod-data-ingestion',
