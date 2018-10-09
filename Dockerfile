@@ -18,7 +18,8 @@ RUN node --version && \
     cd /app && \
     npm install && \
     node_modules/typescript/bin/tsc
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH=/usr/lib/instantclient_18_3
+ENV LD_LIBRARY_PATH=/usr/lib/instantclient_18_3
+
 # RUN npm run-script test
 
 # compile image intended for production use
