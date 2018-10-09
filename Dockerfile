@@ -1,16 +1,24 @@
 # run unit tests first against the same base image
-FROM metaa/node-alpine-glibc
+FROM node:8-slim
 WORKDIR /app
 ADD . .
 RUN node --version && \
-    mkdir -p /opt/oracle && \
-    mv /app/instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip /opt/oracle && \
-    cd /opt/oracle && \
+    apt-get update && apt-get install libaio1 unzip && \
+    mkdir -p /usr/lib && \
+    mv /app/instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip /usr/lib && \
+    cd /usr/lib && \
     unzip instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip && \
+    rm instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip && \
+    ln /usr/lib/instantclient_18_3/libclntsh.so.18.1 /usr/lib/libclntsh.so && \
+    ln /usr/lib/instantclient_18_3/libocci.so.18.1 /usr/lib/libocci.so && \
+    ln /usr/lib/instantclient_18_3/libociei.so /usr/lib/libociei.so && \
+    ln /usr/lib/instantclient_18_3/libnnz12.so /usr/lib/libnnz12.so && \
+    apt-get -y remove unzip && \
+    apt-get clean && \
     cd /app && \
     npm install && \
     node_modules/typescript/bin/tsc
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/oracle/instantclient_18_3
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH=/usr/lib/instantclient_18_3
 # RUN npm run-script test
 
 # compile image intended for production use
