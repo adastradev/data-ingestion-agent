@@ -30,7 +30,15 @@ docker rmi <image>:<tag>
 docker build -t data-ingestion-agent .
 ```
 
-## Docker Health
+## Query Preview
+
+Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent do the destination using this command.
+
+```sh
+docker run -i -e ASTRA_CLOUD_USERNAME=<your_username> -e ASTRA_CLOUD_PASSWORD=<your_password> adastradev/data-ingestion-agent:latest preview
+```
+
+## Container Health Monitoring
 The data ingestion agent periodically informs docker of its current health. Using `docker inspect` you can get a general idea of the applications state.
 
 ```sh
