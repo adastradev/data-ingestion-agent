@@ -1,23 +1,20 @@
 # run unit tests first against the same base image
-FROM oraclelinux:7-slim
+FROM metaa/node-alpine-glibc
 WORKDIR /app
 ADD . .
-ENV PATH=$PATH:/usr/lib/oracle/18.3/client64/bin
-RUN yum -y install /app/oracle-instantclient*.rpm && \
-    rm -rf /var/cache/yum && \
-    rm -f /app/oracle-instantclient*.rpm && \
-    echo /usr/lib/oracle/18.3/client64/lib > /etc/ld.so.conf.d/oracle-instantclient18.3.conf && \
-    ldconfig && \
-    yum -y install yum-utils && \
-    yum-config-manager --enable ol7_developer_nodejs8 && \
-    yum -y install nodejs && \
+RUN node --version && \
+    mkdir -p /opt/oracle && \
+    mv /app/instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip /opt/oracle && \
+    cd /opt/oracle && \
+    unzip instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip && \
+    cd /app && \
     npm install && \
     node_modules/typescript/bin/tsc
-ENV PATH=$PATH:/usr/lib/oracle/18.3/client64/bin
-# RUN npm run-script test 
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/oracle/instantclient_18_3
+# RUN npm run-script test
 
 # compile image intended for production use
-# FROM oraclelinux:7-slim
+# FROM metaa/node-alpine-glibc
 # WORKDIR /app
 # ADD . .
 # RUN npm install --production && \
