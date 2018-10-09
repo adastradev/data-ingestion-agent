@@ -7,14 +7,12 @@ var target = ['dist/index.js'].concat(args);
 var restartCounter = 0;
 var child;
 
-
-var onExitHandler = (code, signal) =>{
+var onExitHandler = (code, signal) => {
     restartCounter++;
-    console.log('restarting container');
-    
-    if(restartCounter < 5){
-       child = spawnAgent();
-    }else{
+
+    if (restartCounter < 5) {
+        child = spawnAgent();
+    } else {
         childState.status = 'exited';
     }
 
@@ -25,20 +23,18 @@ var onExitHandler = (code, signal) =>{
     }
 }
 
-
-var spawnAgent = () =>
-{
-// start agent process
-var child = shell.spawn('node', target);
-child.unref(); // apparently detangles event loop of the child from the parent
-child.stdout.on('data', function (data) {
-    console.log(data.toString());
-});
-child.on('exit', onExitHandler);
-child.stderr.on('data', function (data) {
-    console.log(data.toString());
-});
-return child;
+var spawnAgent = () => {
+    // start agent process
+    var child = shell.spawn('node', target);
+    child.unref(); // apparently detangles event loop of the child from the parent
+    child.stdout.on('data', function (data) {
+        console.log(data.toString());
+    });
+    child.on('exit', onExitHandler);
+    child.stderr.on('data', function (data) {
+        console.log(data.toString());
+    });
+    return child;
 };
 
 child = spawnAgent();
