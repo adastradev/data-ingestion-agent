@@ -25,6 +25,8 @@ export class RunDataIngestionAgent implements ICommand<string> {
     public getCommands(): Iterable<string> {
         var astra_cloud_username = process.env.ASTRA_CLOUD_USERNAME;
         var astra_cloud_password = process.env.ASTRA_CLOUD_PASSWORD;
+        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
+
         return [[
             'sudo docker run',
             '--name dia',
@@ -32,7 +34,7 @@ export class RunDataIngestionAgent implements ICommand<string> {
             '-t',
             `-e ASTRA_CLOUD_USERNAME=${astra_cloud_username}`,
             `-e ASTRA_CLOUD_PASSWORD=${astra_cloud_password}`,
-            'adastradev/data-ingestion-agent:feature_pipeline'
+            `adastradev/data-ingestion-agent:${normalized_docker_tag}`
         ].join(' ')];
     }
 }
