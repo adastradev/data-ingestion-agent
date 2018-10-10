@@ -14,13 +14,11 @@ RUN node --version && \
     cd /usr/lib && \
     unzip ${CLIENT_FILENAME} && \
     rm ${CLIENT_FILENAME} && \
-    mv /usr/lib/instantclient_18_3/* . && \
     cd /app && \
     npm install https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz
-    # npm install && \
-    # node_modules/typescript/bin/tsc
 
 FROM node:8-alpine
+ENV LD_LIBRARY_PATH /usr/lib/instantclient_18_3
 WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
