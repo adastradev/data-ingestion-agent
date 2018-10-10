@@ -14,7 +14,8 @@
     "module": "commonjs",
     "types": [
       "reflect-metadata",
-      "mocha"
+      "mocha",
+      "node"
     ]
   },
   "exclude": [
