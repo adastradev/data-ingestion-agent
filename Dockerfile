@@ -1,7 +1,6 @@
 # run unit tests first against the same base image
 FROM node:8-slim AS build-env
 ENV CLIENT_FILENAME instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip
-
 WORKDIR /app
 ADD . .
 ADD https://github.com/adastradev/oracle-instantclient/raw/master/${CLIENT_FILENAME} .
@@ -17,13 +16,14 @@ RUN node --version && \
 
 FROM node:8-slim
 ENV LD_LIBRARY_PATH /usr/lib/instantclient_18_3
+ARG TEST_TARGET=test
 WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
 COPY --from=build-env /lib /lib
 RUN npm install && \
     node_modules/typescript/bin/tsc && \
-    npm run-script test
+    npm run ${TEST_TARGET} 
 
 # compile image intended for production use
 FROM node:8-slim
@@ -42,4 +42,3 @@ HEALTHCHECK --interval=5s --timeout=10s --start-period=10s --retries=5 CMD node 
 # Run the startup script which spawns the agent and acts as a intermediary between it
 # and docker to signal the containers health
 ENTRYPOINT ["npm", "start"]
-

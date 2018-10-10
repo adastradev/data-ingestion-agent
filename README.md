@@ -32,8 +32,19 @@ docker rmi <image>:<tag>
 ```
 
 ## Development
+Build docker image and run unit tests
 ```sh
 docker build -t data-ingestion-agent .
+```
+
+Run integration tests from a compiled docker image:
+```sh
+docker build \
+--build-arg ORACLE_ENDPOINT=hostname:port/service_name \
+--build-arg ORACLE_USER=user \
+--build-arg ORACLE_PASSWORD=password \
+--build-arg TEST_TARGET=integration-test \
+-t data-ingestion-agent .
 ```
 
 ## Query Preview

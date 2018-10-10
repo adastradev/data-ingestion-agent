@@ -8,7 +8,7 @@ const should = chai.should();
 describe('oracledb', () => {
 
     describe('When connecting to an Oracle database', () => {
-        xit('should return sample query results', async () => {
+        it('should return sample query results', async () => {
             let connection;
             try {
                 let sql, binds, options, result;
@@ -34,10 +34,11 @@ describe('oracledb', () => {
 
                 console.log('Test connection.execute');
                 result = await connection.execute(sql, binds, options);
+                console.log('Test returned ' + result.rows.length + ' rows');
             
-                console.log("Column metadata: ", result.metaData);
-                console.log("Query results: ");
-                console.log(result.rows);
+                // console.log("Column metadata: ", result.metaData);
+                // console.log("Query results: ");
+                // console.log(result.rows);
             } catch (err) {
                 console.error(err);
                 throw err;
