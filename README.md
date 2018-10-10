@@ -30,6 +30,29 @@ docker rmi <image>:<tag>
 docker build -t data-ingestion-agent .
 ```
 
+System Tests
+
+```sh
+$ npm install
+$ export ASTRA_CLOUD_USERNAME=<your_username>
+$ export ASTRA_CLOUD_PASSWORD=<your_password>
+# The system tests pull an image from dockerhub so you must provide the tag you wish to use in the test
+$ export NORMALIZED_DOCKER_TAG=feature_something
+
+# Copy the sample config
+$ cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
+# Update the following EC2 instance config fields:
+#  InstanceType (t2.micro is likely not ideal)
+#  Ebs.VolumeSize
+#  Keyname (the key name - without extension )
+#  SecurityGroupIds (can be a single security group)
+#  SubnetId (be sure it is a public facing subnet, no NAT)
+#  Tags.Name (adjust to be something unique to help identify the instance)
+
+# Start the system test
+$ npm run system-test
+```
+
 ## Query Preview
 
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent do the destination using this command.
