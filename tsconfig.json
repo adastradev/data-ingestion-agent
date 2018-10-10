@@ -11,7 +11,11 @@
       "esnext"
     ],
     "moduleResolution": "node",
-    "module": "commonjs"
+    "module": "commonjs",
+    "types": [
+      "reflect-metadata",
+      "mocha"
+    ]
   },
   "exclude": [
     "node_modules"

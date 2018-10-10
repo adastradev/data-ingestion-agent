@@ -130,7 +130,7 @@ class Startup {
             }
         }
 
-        this.logger.log('info', 'waiting for sqs schedule event');
+        this.logger.log('info', 'Waiting for sqs schedule event');
         while(!shutdownRequested) {
             await sleep(1000);
             
