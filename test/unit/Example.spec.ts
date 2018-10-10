@@ -17,6 +17,7 @@ describe('DiscoverySdk', () => {
             try {
                 let sql, binds, options, result;
 
+                console.log('oracledb.getConnection');
                 connection = await oracledb.getConnection({
                     user          : process.env.ORACLE_USER,
                     password      : process.env.ORACLE_PASSWORD,
@@ -34,6 +35,7 @@ describe('DiscoverySdk', () => {
                   // fetchArraySize: 100       // internal buffer allocation size for tuning
                 };
 
+                console.log('Test connection.execute');
                 result = await connection.execute(sql, binds, options);
             
                 console.log("Column metadata: ", result.metaData);

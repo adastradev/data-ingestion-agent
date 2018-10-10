@@ -1,7 +1,7 @@
 # run unit tests first against the same base image
 FROM node:8-slim AS build-env
-ENV CLIENT_FILENAME instantclient-basic-linux.x64-12.1.0.1.0.zip
-# ENV CLIENT_FILENAME instantclient-basic-linux.x64-18.3.0.0.0dbru.zip
+# ENV CLIENT_FILENAME instantclient-basic-linux.x64-12.1.0.1.0.zip
+ENV CLIENT_FILENAME instantclient-basic-linux.x64-18.3.0.0.0dbru.zip
 # ENV CLIENT_FILENAME instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip
 
 WORKDIR /app
@@ -12,8 +12,7 @@ RUN node --version && \
     cd /usr/lib && \
     unzip ${CLIENT_FILENAME} && \
     rm ${CLIENT_FILENAME} && \
-    cd instantclient_12_1 && \
-    ln -s libclntsh.so.12.1 libclntsh.so && \
+    cd instantclient_18_3 && \
     apt-get -y remove unzip && \
     apt-get clean && \
     cd /app && \
@@ -21,7 +20,7 @@ RUN node --version && \
     # npm install https://github.com/oracle/node-oracledb/releases/download/v3.0.0/oracledb-src-3.0.0.tgz
 
 FROM node:8-slim
-ENV LD_LIBRARY_PATH /usr/lib/instantclient_12_1
+ENV LD_LIBRARY_PATH /usr/lib/instantclient_18_3
 WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
