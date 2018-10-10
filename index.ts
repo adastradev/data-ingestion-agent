@@ -21,7 +21,7 @@ process.on('SIGTERM', function() {
 class Startup {
     private static logger: Winston.Logger = null;
     private static readonly queries = [
-        "select * from sometable"
+        'SELECT * FROM ALL_TABLES'
     ];
 
     private static createDemoSnapshot() {
@@ -33,6 +33,10 @@ class Startup {
     }
 
     private static async createSnapshot() {
+        if (process.env.ORACLE_ENDPOINT === undefined) {
+            return this.createDemoSnapshot();
+        }
+
         let connection;
         try {
             let sql, binds, options, result;
@@ -44,21 +48,11 @@ class Startup {
             });
 
             // Query the data
-            sql = `SELECT * FROM ALL_TABLES`;
             binds = {};
-
-            // For a complete list of options see the documentation.
             options = {
-              outFormat: oracledb.OBJECT   // query result format
-              // extendedMetaData: true,   // get extra metadata
-              // fetchArraySize: 100       // internal buffer allocation size for tuning
+              outFormat: oracledb.OBJECT // query result format
             };
-
-            result = await connection.execute(sql, binds, options);
-
-            // console.log("Column metadata: ", result.metaData);
-            // console.log("Query results: ");
-            // console.log(result.rows);
+            result = await connection.execute(this.queries[0], binds, options);
             return result.rows;
         } catch (err) {
             console.error(err);
