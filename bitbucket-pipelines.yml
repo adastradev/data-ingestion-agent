@@ -11,7 +11,6 @@ pipelines:
             - docker
           script:
             # Set $DOCKER_HUB_USERNAME and $DOCKER_HUB_PASSWORD as environment variables in repository settings
-            #- export IMAGE_NAME=adastradev/data-ingestion-agent:$BITBUCKET_COMMIT
             - export IMAGE_NAME=adastradev/data-ingestion-agent:latest
 
             # build the Docker image (this will use the Dockerfile in the root of the repo)
@@ -25,9 +24,9 @@ pipelines:
             # and running system tests both rely on knowing the tag of the image.
             # Dockerhub takes the branch name and slightly mangles it to be used as
             # an image tag.
-            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
+            - export NORMALIZED_DOCKER_TAG=latest
 
-            - . ./pipeline/wait-for-latest-docker-image.sh
+            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
 
             # Run system test
             - . ./pipeline/run-system-tests.sh
