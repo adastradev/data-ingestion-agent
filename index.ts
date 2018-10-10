@@ -46,11 +46,13 @@ class Startup {
 
             result = await connection.execute(sql, binds, options);
 
-            console.log("Column metadata: ", result.metaData);
-            console.log("Query results: ");
-            console.log(result.rows);
+            // console.log("Column metadata: ", result.metaData);
+            // console.log("Query results: ");
+            // console.log(result.rows);
+            return result.rows;
         } catch (err) {
             console.error(err);
+            throw err;
         } finally {
             if (connection) {
                 try {
@@ -60,7 +62,6 @@ class Startup {
                 }
             }
         }
-        return "SELECT * FROM ALL_TABLES";
     }
 
     private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, bucketName: string) {
