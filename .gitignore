@@ -11,6 +11,7 @@ config.ts
 instantclient_18_3
 *.zip
 *.rpm
+devTest.sh
 
 instanceConfig.json
 *.pem
