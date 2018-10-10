@@ -53,7 +53,15 @@ class Startup {
               outFormat: oracledb.OBJECT // query result format
             };
             result = await connection.execute(this.queries[0], binds, options);
-            return result.rows;
+
+            var Readable = require('stream').Readable
+            var s = new Readable;
+            result.rows.forEach(element => {
+                s.push(JSON.stringify(element));
+                s.push('\n');
+            });
+            s.push(null);
+            return s;
         } catch (err) {
             console.error(err);
             throw err;

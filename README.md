@@ -11,7 +11,13 @@ docker pull adastradev/data-ingestion-agent:latest
 
 ## Run
 ```sh
-docker run -d -t -e ASTRA_CLOUD_USERNAME=<your_username> -e ASTRA_CLOUD_PASSWORD=<your_password> adastradev/data-ingestion-agent:<tag>
+docker run -d -t \
+-e ASTRA_CLOUD_USERNAME=<your_username> \
+-e ASTRA_CLOUD_PASSWORD=<your_password> \
+-e ORACLE_ENDPOINT=hostname:port/service_name \
+-e ORACLE_USER=user \
+-e ORACLE_PASSWORD=password \
+adastradev/data-ingestion-agent:<tag>
 ```
 
 ## Uninstall
