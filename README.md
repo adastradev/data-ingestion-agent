@@ -11,7 +11,13 @@ docker pull adastradev/data-ingestion-agent:latest
 
 ## Run
 ```sh
-docker run -d -t -e ASTRA_CLOUD_USERNAME=<your_username> -e ASTRA_CLOUD_PASSWORD=<your_password> adastradev/data-ingestion-agent:<tag>
+docker run -d -t \
+-e ASTRA_CLOUD_USERNAME=<your_username> \
+-e ASTRA_CLOUD_PASSWORD=<your_password> \
+-e ORACLE_ENDPOINT=hostname:port/service_name \
+-e ORACLE_USER=user \
+-e ORACLE_PASSWORD=password \
+adastradev/data-ingestion-agent:<tag>
 ```
 
 ## Uninstall
@@ -26,21 +32,31 @@ docker rmi <image>:<tag>
 ```
 
 ## Development
+Build docker image and run unit tests
 ```sh
 docker build -t data-ingestion-agent .
 ```
 
-System Tests
-
+Build docker image and run integration tests
 ```sh
-$ npm install
-$ export ASTRA_CLOUD_USERNAME=<your_username>
-$ export ASTRA_CLOUD_PASSWORD=<your_password>
+docker build \
+--build-arg ORACLE_ENDPOINT=hostname:port/service_name \
+--build-arg ORACLE_USER=user \
+--build-arg ORACLE_PASSWORD=password \
+--build-arg TEST_TARGET=integration-test \
+-t data-ingestion-agent .
+```
+
+Run System Tests
+```sh
+npm install
+export ASTRA_CLOUD_USERNAME=<your_username>
+export ASTRA_CLOUD_PASSWORD=<your_password>
 # The system tests pull an image from dockerhub so you must provide the tag you wish to use in the test
-$ export NORMALIZED_DOCKER_TAG=feature_something
+export NORMALIZED_DOCKER_TAG=feature_something
 
 # Copy the sample config
-$ cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
+cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
 # Update the following EC2 instance config fields:
 #  InstanceType (t2.micro is likely not ideal)
 #  Ebs.VolumeSize
@@ -50,11 +66,10 @@ $ cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
 #  Tags.Name (adjust to be something unique to help identify the instance)
 
 # Start the system test
-$ npm run system-test
+npm run system-test
 ```
 
 ## Query Preview
-
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent do the destination using this command.
 
 ```sh

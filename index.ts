@@ -6,6 +6,7 @@ import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/Cognito
 import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 import { CognitoIdentity, S3 } from 'aws-sdk';
 import * as crypto from 'crypto';
+import * as oracledb from 'oracledb';
 import { bool } from 'aws-sdk/clients/signer';
 
 async function sleep(ms: number) {
@@ -18,25 +19,67 @@ process.on('SIGTERM', function() {
 });
 
 class Startup {
-
     private static logger: Winston.Logger = null;
     private static readonly queries = [
-        "select * from sometable"
+        'SELECT * FROM ALL_TABLES'
     ];
-    
-    private static createSnapshot() {
+
+    private static createDemoSnapshot() {
         var Readable = require('stream').Readable
         var s = new Readable;
         s.push('this is a test stream');
         s.push(null);
-
         return s;
+    }
+
+    private static async createSnapshot() {
+        if (process.env.ORACLE_ENDPOINT === undefined) {
+            return this.createDemoSnapshot();
+        }
+
+        let connection;
+        try {
+            let sql, binds, options, result;
+
+            connection = await oracledb.getConnection({
+              user          : process.env.ORACLE_USER,
+              password      : process.env.ORACLE_PASSWORD,
+              connectString : process.env.ORACLE_ENDPOINT
+            });
+
+            // Query the data
+            binds = {};
+            options = {
+              outFormat: oracledb.OBJECT // query result format
+            };
+            result = await connection.execute(this.queries[0], binds, options);
+
+            var Readable = require('stream').Readable
+            var s = new Readable;
+            result.rows.forEach(element => {
+                s.push(JSON.stringify(element));
+                s.push('\n');
+            });
+            s.push(null);
+            return s;
+        } catch (err) {
+            console.error(err);
+            throw err;
+        } finally {
+            if (connection) {
+                try {
+                    await connection.close();
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
     }
 
     private static async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, bucketName: string, preview: boolean = false) {
         const s3api = new S3(s3Config);
 
-        var dataBody = this.createSnapshot();
+        var dataBody = await this.createSnapshot();
         var params = {
             Bucket:  bucketName + '/' + tenantId,
             Body: dataBody,
@@ -68,6 +111,8 @@ class Startup {
                 new Winston.transports.Console()
             ]
         });
+
+        var body = this.createSnapshot();
 
         let s3Buckets = {
             prod: 'adastra-prod-data-ingestion',
