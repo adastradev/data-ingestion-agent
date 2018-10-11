@@ -70,7 +70,7 @@ npm run system-test
 ```
 
 ## Query Preview
-Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent do the destination using this command.
+Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
 
 ```sh
 docker run -i -e ASTRA_CLOUD_USERNAME=<your_username> -e ASTRA_CLOUD_PASSWORD=<your_password> adastradev/data-ingestion-agent:latest preview
