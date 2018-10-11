@@ -54,7 +54,7 @@ describe('Data Ingestion Agent on CentOS 7', () => {
 
         it('the preview command can be used to output queries to be executed in interactive mode', async () => {
             let result = await commandInvoker.invoke(new DockerCommands.RunDataIngestionAgentWithPreview());
-            expect(result).to.contain('select * from sometable');
+            expect(result).to.contain('SELECT * FROM ALL_TABLES');
 
             result = await commandInvoker.invoke(new DockerCommands.StopAndRemoveContainerCommand());
             expect(result).to.eq('diadia');
