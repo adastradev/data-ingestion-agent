@@ -30,6 +30,7 @@ RUN npm install && \
 
 # compile image intended for production use
 FROM node:8-slim
+ENV LD_LIBRARY_PATH /usr/lib/instantclient_18_3
 WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
