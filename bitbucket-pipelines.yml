@@ -14,7 +14,7 @@ pipelines:
             - export IMAGE_NAME=adastradev/data-ingestion-agent:latest
 
             # build the Docker image (this will use the Dockerfile in the root of the repo)
-            - docker build -t $IMAGE_NAME .
+            - . ./pipeline/build-docker-image.sh
 
             # Install prereqs for wait script
             - apt-get update
@@ -36,7 +36,7 @@ pipelines:
             - docker
           script: 
             - export IMAGE_NAME=adastradev/data-ingestion-agent:automated-$BITBUCKET_COMMIT
-            - docker build -t $IMAGE_NAME .
+            - . ./pipeline/build-docker-image.sh
 
             # Install prereqs for wait script
             - apt-get update

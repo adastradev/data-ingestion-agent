@@ -5,6 +5,7 @@ import { S3, SQS } from "aws-sdk";
 import { Logger } from "winston";
 
 import * as crypto from 'crypto';
+import * as oracledb from 'oracledb';
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
 import SendDataMessage from "../Messages/SendDataMessage";
@@ -31,15 +32,19 @@ export default class SendDataHandler implements IMessageHandler {
         this._queueUrl = queueUrl;
     }
 
-    private _authManager: AuthManager;
+    // will need this or a better abstraction if tokens 
+    // eventually expire and things need refreshed
+    private _authManager: AuthManager; 
+
     private _s3Config: S3.ClientConfiguration;
     private _sqsConfig: SQS.ClientConfiguration;
     private _logger: Logger; 
     private _tenantId: string;
     private _bucket: string;
     private _queueUrl: string;
+    
     private readonly queries = [
-        "select * from sometable"
+        'SELECT * FROM ALL_TABLES'
     ];
 
     public async handle(message: SendDataMessage) {
@@ -56,19 +61,62 @@ export default class SendDataHandler implements IMessageHandler {
         await sqsApi.deleteMessage({ QueueUrl: this._queueUrl, ReceiptHandle: message.receiptHandle }).promise();
     }
     
-    private createSnapshot() {
+    private createDemoSnapshot() {
         var Readable = require('stream').Readable
         var s = new Readable;
         s.push('this is a test stream');
         s.push(null);
-
         return s;
+    }
+    
+    private async createSnapshot() {
+        if (process.env.ORACLE_ENDPOINT === undefined) {
+            return this.createDemoSnapshot();
+        }
+
+        let connection;
+        try {
+            let sql, binds, options, result;
+
+            connection = await oracledb.getConnection({
+              user          : process.env.ORACLE_USER,
+              password      : process.env.ORACLE_PASSWORD,
+              connectString : process.env.ORACLE_ENDPOINT
+            });
+
+            // Query the data
+            binds = {};
+            options = {
+              outFormat: oracledb.OBJECT // query result format
+            };
+            result = await connection.execute(this.queries[0], binds, options);
+
+            var Readable = require('stream').Readable
+            var s = new Readable;
+            result.rows.forEach(element => {
+                s.push(JSON.stringify(element));
+                s.push('\n');
+            });
+            s.push(null);
+            return s;
+        } catch (err) {
+            console.error(err);
+            throw err;
+        } finally {
+            if (connection) {
+                try {
+                    await connection.close();
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
     }
 
     private async sendSnapshot(s3Config: S3.ClientConfiguration, tenantId: string, bucketName: string, preview: boolean = false) {
         const s3api = new S3(s3Config);
 
-        var dataBody = this.createSnapshot();
+        var dataBody = await this.createSnapshot();
         var params = {
             Bucket:  bucketName + '/' + tenantId,
             Body: dataBody,

@@ -1,0 +1,7 @@
+.git
+dist
+node_modules/
+.nyc_output/
+coverage/
+jspm_packages/
+typings/

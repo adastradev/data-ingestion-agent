@@ -1,12 +1,5 @@
 import * as SQS from 'aws-sdk/clients/sqs';
 import * as Winston from 'winston';
-import { DiscoverySdk, BearerTokenCredentials } from '@adastradev/serverless-discovery-sdk';
-import { AuthManager } from './source/astra-sdk/AuthManager';
-import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
-import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
-import { CognitoIdentity, S3 } from 'aws-sdk';
-
-import { bool } from 'aws-sdk/clients/signer';
 import { Container } from 'inversify';
 import startup from './inversify.config';
 import TYPES from './ioc.types';
