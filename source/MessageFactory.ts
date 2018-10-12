@@ -23,9 +23,13 @@ export default class MessageFactory {
         this._container = container;
     }
 
-    createFromJson(messageValue: string, identifier: string): IMessage {
-        var message = <IMessage>JSON.parse(messageValue);
-        message.receiptHandle = identifier;
+    createFromJson(messageBody: string, identifier?: string): IMessage {
+        var message = <IMessage>JSON.parse(messageBody);
+
+        if (identifier) {
+            message.receiptHandle = identifier;
+        }
+        
         var targetMessage = this._container.get<IMessage>(TYPES[`${message.type}Message`]);
 
         Object.assign(targetMessage, message);

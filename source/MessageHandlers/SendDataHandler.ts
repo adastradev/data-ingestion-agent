@@ -15,7 +15,6 @@ import { AuthManager } from "../astra-sdk/AuthManager";
 export default class SendDataHandler implements IMessageHandler {
 
     constructor(
-        @inject(TYPES.AuthManager) authManager: AuthManager,
         @inject(TYPES.S3Config) s3Config: S3.ClientConfiguration,
         @inject(TYPES.SQSConfig) sqsConfig: SQS.ClientConfiguration,
         @inject(TYPES.Logger) logger: Logger,
@@ -23,7 +22,6 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.Bucket) bucket: string,
         @inject(TYPES.QueueUrl) queueUrl: string) {
         
-        this._authManager = authManager;
         this._s3Config = s3Config;
         this._sqsConfig = sqsConfig;
         this._logger = logger;
@@ -31,10 +29,6 @@ export default class SendDataHandler implements IMessageHandler {
         this._bucket = bucket;
         this._queueUrl = queueUrl;
     }
-
-    // will need this or a better abstraction if tokens 
-    // eventually expire and things need refreshed
-    private _authManager: AuthManager; 
 
     private _s3Config: S3.ClientConfiguration;
     private _sqsConfig: SQS.ClientConfiguration;
