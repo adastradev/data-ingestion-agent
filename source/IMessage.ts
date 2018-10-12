@@ -25,7 +25,7 @@ export default interface IMessage {
      * @type {string}
      * @memberof IMessage
      */
-    receiptHandle: string,
+    receiptHandle?: string,
     payload: any,
     toJson: MessageToJsonFunction
 }

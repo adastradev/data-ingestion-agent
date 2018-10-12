@@ -1,5 +1,6 @@
 import IMessage from "../IMessage";
 import { injectable } from "inversify";
+import ISendDataMessagePayload from "./ISendDataMessagePayload";
 
 /**
  * Represents a message requesting the delivery of data to the configured endpoint.
@@ -12,8 +13,8 @@ import { injectable } from "inversify";
 export default class SendDataMessage implements IMessage {
     public type: string = "SendData";
     public version: string = "v1";
-    public payload: SendDataPayload;
-    public receiptHandle: string;
+    public payload: ISendDataMessagePayload = {};
+    public receiptHandle?: string;
 
     /**
      * Creates a new SendDataMessage given the payload and optional identifier.
@@ -25,10 +26,13 @@ export default class SendDataMessage implements IMessage {
      * @returns {SendDataMessage}
      * @memberof SendDataMessage
      */
-    public static create(payload: SendDataPayload, receiptHandle?: string): SendDataMessage {
+    public static create(payload?: ISendDataMessagePayload, receiptHandle?: string): SendDataMessage {
         var message = new SendDataMessage();
-        message.payload = payload;
-        message.receiptHandle = receiptHandle;
+        message.payload = payload || {};
+
+        if (receiptHandle) {
+            message.receiptHandle = receiptHandle;
+        }
 
         return message;
     }
@@ -41,20 +45,3 @@ export default class SendDataMessage implements IMessage {
     }
 }
 
-/**
- * The expected structure of a SendData messages payload property.
- *
- * @export
- * @interface SendDataPayload
- */
-export interface SendDataPayload {
-    
-    /**
-     * When true only a log will be produced containing a preview of queries to be executed. Otherwise 
-     * the ingestion process will run and push data to the S3 bucket.
-     *
-     * @type {boolean}
-     * @memberof SendDataPayload
-     */
-    preview: boolean;
-}
