@@ -4,6 +4,8 @@ import TYPES from "../../ioc.types";
 // Handlers
 import IMessageHandler from "../../source/IMessageHandler";
 import DummyHandler from "../../source/MessageHandlers/DummyHandler";
+import DummyReader from "../../source/DataAccess/Dummy/DummyReader";
+import DummyWriter from "../../source/DataAccess/Dummy/DummyWriter";
 
 // Services/cross-cutting concerns
 import { S3, SQS } from 'aws-sdk';
@@ -21,6 +23,9 @@ import MessageFactory from "../../source/MessageFactory";
 import IMessage from "../../source/IMessage";
 import SendDataMessage from "../../source/Messages/SendDataMessage";
 import DummyMessage from "../../source/Messages/DummyMessage";
+import IDataAccessor from "../../source/DataAccess/IIngestionReader";
+import IIngestionWriter from "../../source/DataAccess/IIngestionWriter";
+import SendDataHandler from "../../source/MessageHandlers/SendDataHandler";
 
 var container = new Container();
 
@@ -32,7 +37,7 @@ var logger: Winston.Logger = Winston.createLogger({
     ]
 });
 
-// var s3Config: S3.ClientConfiguration = { region: "us-east-1" };
+var s3Config: S3.ClientConfiguration = { region: "us-east-1" };
 // var sqsConfig: SQS.ClientConfiguration = { apiVersion: '2012-11-05', region: "us-east-1" };
 
 container.bind<IMessageHandler>(TYPES.DummyHandler).to(DummyHandler);
@@ -40,12 +45,16 @@ container.bind<IMessage>(TYPES.DummyMessage).to(DummyMessage);
 container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
 container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
 container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
+container.bind<IMessageHandler>(TYPES.SendDataHandler).to(SendDataHandler);
 // container.bind<S3.ClientConfiguration>(TYPES.S3Config).toConstantValue(s3Config);
 // container.bind<SQS.ClientConfiguration>(TYPES.SQSConfig).toConstantValue(s3Config);
 container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
-// container.bind<string>(TYPES.QueueUrl).toConstantValue("http://www.someurl.com");
-// container.bind<string>(TYPES.TenantId).toConstantValue("74c23bda-a496-4ccb-b08f-a9ab80e407b6");
-// container.bind<string>(TYPES.Bucket).toConstantValue("some-bucket");
+container.bind<string>(TYPES.QueueUrl).toConstantValue("http://www.someurl.com");
+container.bind<string>(TYPES.TenantId).toConstantValue("74c23bda-a496-4ccb-b08f-a9ab80e407b6");
+container.bind<string>(TYPES.Bucket).toConstantValue("some-bucket");
+
+container.bind<IDataAccessor>(TYPES.IngestionReader).to(DummyReader);
+container.bind<IIngestionWriter>(TYPES.IngestionWriter).to(DummyWriter);
 
 container.bind<Container>(TYPES.Container).toConstantValue(container);
 

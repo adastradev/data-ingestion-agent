@@ -46,6 +46,7 @@
     "@types/node": "^10.11.0",
     "@types/reflect-metadata": "^0.1.0",
     "@types/shelljs": "^0.8.0",
+    "@types/sinon": "^5.0.5",
     "@types/ssh2": "^0.5.36",
     "amazon-cognito-identity-js": "^3.0.2",
     "aws-api-gateway-client": "^0.2.16",
@@ -69,6 +70,7 @@
     "mocha": "^5.2.0",
     "npm": "^6.4.1",
     "nyc": "^13.0.1",
+    "sinon": "^7.0.0",
     "ssh2": "^0.6.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0"

@@ -18,7 +18,7 @@ export default class OracleReader implements IIngestionReader {
         this._logger = logger;
     }
 
-    public async queryStream(): Promise<Readable> {
+    public async read(): Promise<Readable> {
 
         if (process.env.ORACLE_ENDPOINT === undefined) {
             return this.createDemoSnapshot();

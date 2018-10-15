@@ -65,10 +65,15 @@ class Startup {
                     messageHandler = handlerFactory.getHandler(message);
                     
                     // TODO: Async or block?
-                    await messageHandler.handle(message);
+                    await messageHandler.handle(message);                    
                 }
                 catch(error) {
+                    // TODO: Dead-letter the message?
                     throw Error(error.message);
+                }
+                finally {                   
+                    console.log(`Acknowledging message: ${message.receiptHandle}`);                        
+                    await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
                 }
 
                 // Bail early on preview
