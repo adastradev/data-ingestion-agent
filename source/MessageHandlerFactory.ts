@@ -1,9 +1,9 @@
-import IMessage from './IMessage';
-import IMessageHandler from './IMessageHandler';
-import SendDataHandler from './MessageHandlers/SendDataHandler';
 import TYPES from '../ioc.types';
 import { Container, injectable, inject } from 'inversify';
 import "reflect-metadata";
+
+import IMessage from './IMessage';
+import IMessageHandler from './IMessageHandler';
 
 /**
  * Dynamically creates message handlers based on the message type.

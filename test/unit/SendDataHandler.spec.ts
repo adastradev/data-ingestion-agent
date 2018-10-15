@@ -1,15 +1,14 @@
 
 import "reflect-metadata";
 import * as chai from 'chai';
-import IMessage from '../../source/IMessage';
 import container from './test.inversify.config';
 import TYPES from '../../ioc.types';
 
-import IMessageHandler from "../../source/IMessageHandler";
+import IMessage from '../../source/IMessage';
 import SendDataMessage from "../../source/Messages/SendDataMessage";
 import SendDataHandler from "../../source/MessageHandlers/SendDataHandler";
-import IIngestionReader from "../../source/DataAccess/IIngestionReader";
-import IIngestionWriter from "../../source/DataAccess/IIngestionWriter";
+import IIngestionReader from "../../source/DataAccess/IDataReader";
+import IIngestionWriter from "../../source/DataAccess/IDataWriter";
 import * as sinon from "sinon";
 import { Logger } from "winston";
 

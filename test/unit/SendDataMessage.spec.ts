@@ -1,6 +1,7 @@
 
 import "reflect-metadata";
 import * as chai from 'chai';
+
 import SendDataMessage from '../../source/Messages/SendDataMessage';
 import IMessage from '../../source/IMessage';
 

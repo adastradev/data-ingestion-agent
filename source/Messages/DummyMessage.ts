@@ -1,5 +1,5 @@
-import IMessage from "../IMessage";
 import { injectable } from "inversify";
+import IMessage from "../IMessage";
 
 /**
  * Represents a message requesting the delivery of data to the configured endpoint.

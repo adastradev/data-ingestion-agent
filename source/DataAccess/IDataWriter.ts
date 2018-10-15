@@ -1,6 +1,6 @@
 import { Readable } from "stream";
 
-export default interface IIngestionWriter {
+export default interface IDataWriter {
     ingest: IngestionFunction
 }
 

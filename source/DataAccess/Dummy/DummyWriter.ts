@@ -1,7 +1,8 @@
-import IIngestionWriter from "../IIngestionWriter";
 import { Readable } from "stream";
 import { injectable, inject } from "inversify";
 import TYPES from "../../../ioc.types";
+
+import IIngestionWriter from "../IDataWriter";
 
 @injectable()
 export default class DummyWriter implements IIngestionWriter {

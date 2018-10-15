@@ -1,8 +1,7 @@
-import IMessageHandler from "../IMessageHandler";
-import IMessage from "../IMessage";
-
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
+
+import IMessageHandler from "../IMessageHandler";
 import DummyMessage from "../Messages/DummyMessage";
 
 @injectable()

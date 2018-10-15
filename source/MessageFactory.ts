@@ -1,8 +1,9 @@
-import IMessage from './IMessage';
 import TYPES from '../ioc.types';
 import { Container, injectable, inject, tagged } from 'inversify';
 import "reflect-metadata";
 import * as Winston from 'winston';
+
+import IMessage from './IMessage';
 
 /**
  * Given a raw JSON string, create a properly typed message instance.

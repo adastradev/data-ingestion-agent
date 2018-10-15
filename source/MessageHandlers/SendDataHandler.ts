@@ -1,14 +1,15 @@
 import IMessageHandler from "../IMessageHandler";
 import TYPES from "../../ioc.types";
 
+import { Readable } from "stream";
 import { Logger } from "winston";
-
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
+
 import SendDataMessage from "../Messages/SendDataMessage";
-import IIngestionReader from "../DataAccess/IIngestionReader";
-import IIngestionWriter from "../DataAccess/IIngestionWriter";
-import { Readable } from "stream";
+import IIngestionReader from "../DataAccess/IDataReader";
+import IIngestionWriter from "../DataAccess/IDataWriter";
+
 
 @injectable()
 export default class SendDataHandler implements IMessageHandler {

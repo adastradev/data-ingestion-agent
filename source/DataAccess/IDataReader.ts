@@ -1,6 +1,6 @@
 import { Readable } from "stream";
 
-export default interface IDataAccessor {
+export default interface IDataReader {
     read: QueryStreamFunction,
     logQueries: LogQueriesFunction
 }

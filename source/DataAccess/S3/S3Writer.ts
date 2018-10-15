@@ -1,9 +1,10 @@
-import IIngestionWriter from "../IIngestionWriter";
 import { Readable } from "stream";
 import { S3 } from "aws-sdk";
 import { injectable, inject } from "inversify";
 import TYPES from "../../../ioc.types";
 import * as crypto from 'crypto';
+
+import IIngestionWriter from "../IDataWriter";
 
 @injectable()
 export default class S3Writer implements IIngestionWriter {

@@ -1,10 +1,10 @@
-import IIngestionReader from "../IIngestionReader";
 import { Readable } from "stream";
-
 import * as oracledb from 'oracledb';
 import { injectable, inject } from "inversify";
 import TYPES from "../../../ioc.types";
 import { Logger } from "winston";
+
+import IIngestionReader from "../IDataReader";
 
 @injectable()
 export default class OracleReader implements IIngestionReader {
