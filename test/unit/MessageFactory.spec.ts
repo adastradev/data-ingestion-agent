@@ -25,6 +25,13 @@ describe('MessageFactory', () => {
             expect(createdMessage).to.deep.eq(message);
         });
 
+        // it('should return a properly configured message', () => {
+        //     var val = "SendData";
+        //     const message = startup.get<IMessage>(TYPES[`${val}Message`]);
+
+        //     expect(message).to.not.be.null;
+        // });
+
         it('should return a properly configured message when a message identifier is not specified', () => {
             const message = SendDataMessage.create({ preview: true });
             let json = message.toJson();
@@ -47,6 +54,14 @@ describe('MessageFactory', () => {
             expect(createdMessage.payload.preview).to.be.true;
             expect(createdMessage.receiptHandle).to.eq("1234");
         });
-        
+
+        it('should fail when an invalid message type is specified', () => {
+            const message = <IMessage> { type: "DoesNotExist", version: "1" };
+            let json = JSON.stringify(message);
+
+            var mf = startup.get<MessageFactory>(TYPES.MessageFactory);
+            expect(mf.createFromJson.bind(mf, json, "1234")).to.throw('Unknown message type: DoesNotExist - (inner) Error: NULL argument');
+        });
+
     });
 });

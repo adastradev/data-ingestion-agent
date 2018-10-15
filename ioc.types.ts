@@ -12,7 +12,11 @@ let TYPES = {
     MessageHandlerFactory: Symbol("MessageHandlerFactory"),
     Bucket: Symbol("Bucket"),
     MessageFactory: Symbol("MessageFactory"),
-    SendDataMessage: Symbol("SendDataMessage")
+    SendDataMessage: Symbol("SendDataMessage"),
+    IngestionReader: Symbol("IngestionReader"),
+    IngestionWriter: Symbol("IngestionWriter"),
+    DummyHandler: Symbol("DummyHandler"),
+    DummyMessage: Symbol("DummyMessage")
 };
 
 export default TYPES;

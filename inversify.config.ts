@@ -1,8 +1,6 @@
 import { Container } from "inversify";
 import TYPES from "./ioc.types";
-import {
-    SendDataHandler
-} from "./source/MessageHandlers";
+import SendDataHandler from "./source/MessageHandlers/SendDataHandler";
 
 import { S3, SQS } from 'aws-sdk';
 import * as Winston from 'winston';
@@ -15,6 +13,10 @@ import MessageHandlerFactory from "./source/MessageHandlerFactory";
 import MessageFactory from "./source/MessageFactory";
 import SendDataMessage from "./source/Messages/SendDataMessage";
 import IMessage from "./source/IMessage";
+import IDataAccessor from "./source/DataAccess/IIngestionReader";
+import S3Writer from "./source/DataAccess/S3/S3Writer";
+import OracleReader from "./source/DataAccess/Oracle/OracleReader";
+import IIngestionWriter from "./source/DataAccess/IIngestionWriter";
 
 
 // TODO: Make configurable?
@@ -99,6 +101,8 @@ var startup = () => (async () => {
     container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
     container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
     container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
+    container.bind<IDataAccessor>(TYPES.IngestionReader).to(OracleReader);
+    container.bind<IIngestionWriter>(TYPES.IngestionWriter).to(S3Writer);
 
     container.bind<Container>(TYPES.Container).toConstantValue(container);
 

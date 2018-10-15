@@ -1,6 +1,6 @@
-import * as handlers from './MessageHandlers';
 import IMessage from './IMessage';
-import IMessageHandler from './IMessageHandler'
+import IMessageHandler from './IMessageHandler';
+import SendDataHandler from './MessageHandlers/SendDataHandler';
 import TYPES from '../ioc.types';
 import { Container, injectable, inject } from 'inversify';
 import "reflect-metadata";
@@ -26,7 +26,16 @@ export default class MessageHandlerFactory {
     }
 
     getHandler(message: IMessage, ...args: any[]): IMessageHandler {
-        return this._container.get<IMessageHandler>(TYPES[`${message.type}Handler`]);
+        var handler: IMessageHandler;
+        try {
+            handler = this._container.get<IMessageHandler>(TYPES[`${message.type}Handler`]);
+        }
+        catch (error) {
+            var msg = `Unknown message handler type: ${message.type} - (inner) ${error}`;
+            throw Error(msg)
+        }
+
+        return handler;
     }
 }
 
