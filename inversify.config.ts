@@ -124,8 +124,8 @@ var startup =
         container.bind<IMessage>(TYPES.PreviewMessage).to(PreviewMessage);
         
         // Data Access
-        container.bind<IDataReader>(TYPES.IngestionReader).to(OracleReader);
-        container.bind<IDataWriter>(TYPES.IngestionWriter).to(S3Writer);
+        container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
+        container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
 
         // Agent Commands
         container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);

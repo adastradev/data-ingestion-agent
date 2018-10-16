@@ -5,7 +5,7 @@ import container from './test.inversify.config';
 import TYPES from '../../ioc.types';
 
 import IMessage from '../../source/IMessage';
-import IIngestionReader from "../../source/DataAccess/IDataReader";
+import IDataReader from "../../source/DataAccess/IDataReader";
 import * as sinon from "sinon";
 import { Logger, loggers } from "winston";
 import PreviewMessage from "../../source/Messages/PreviewMessage";
@@ -21,7 +21,7 @@ describe('PreviewHandler', () => {
             const message: IMessage = PreviewMessage.create({}, "1234");
 
             var logger = container.get<Logger>(TYPES.Logger);
-            var reader = container.get<IIngestionReader>(TYPES.IngestionReader);
+            var reader = container.get<IDataReader>(TYPES.DataReader);
 
             var loggerSpy = sinon.spy(logger, "log");
             var readerLogQuerySpy = sinon.spy(reader, "logQueries");

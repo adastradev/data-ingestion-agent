@@ -7,8 +7,8 @@ import TYPES from '../../ioc.types';
 import IMessage from '../../source/IMessage';
 import SendDataMessage from "../../source/Messages/SendDataMessage";
 import SendDataHandler from "../../source/MessageHandlers/SendDataHandler";
-import IIngestionReader from "../../source/DataAccess/IDataReader";
-import IIngestionWriter from "../../source/DataAccess/IDataWriter";
+import IDataReader from "../../source/DataAccess/IDataReader";
+import IDataWriter from "../../source/DataAccess/IDataWriter";
 import * as sinon from "sinon";
 import { Logger } from "winston";
 
@@ -22,8 +22,8 @@ describe('SendDataHandler', () => {
             const message: IMessage = SendDataMessage.create({}, "1234");
 
             var logger = container.get<Logger>(TYPES.Logger);
-            var reader = container.get<IIngestionReader>(TYPES.IngestionReader);
-            var writer = container.get<IIngestionWriter>(TYPES.IngestionWriter);
+            var reader = container.get<IDataReader>(TYPES.DataReader);
+            var writer = container.get<IDataWriter>(TYPES.DataWriter);
 
             var readerLogQuerySpy = sinon.spy(reader, "logQueries");
             var readerReadSpy = sinon.spy(reader, "read");

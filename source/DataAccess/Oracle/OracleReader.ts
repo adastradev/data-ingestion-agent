@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 
-import IIngestionReader from '../IDataReader';
+import IDataReader from '../IDataReader';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -12,10 +12,10 @@ import IIngestionReader from '../IDataReader';
  *
  * @export
  * @class OracleReader
- * @implements {IIngestionReader}
+ * @implements {IDataReader}
  */
 @injectable()
-export default class OracleReader implements IIngestionReader {
+export default class OracleReader implements IDataReader {
     private logger: Logger;
 
     private readonly queries = [

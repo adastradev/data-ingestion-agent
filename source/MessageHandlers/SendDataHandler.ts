@@ -7,8 +7,8 @@ import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
 import SendDataMessage from '../Messages/SendDataMessage';
-import IIngestionReader from '../DataAccess/IDataReader';
-import IIngestionWriter from '../DataAccess/IDataWriter';
+import IDataReader from '../DataAccess/IDataReader';
+import IDataWriter from '../DataAccess/IDataWriter';
 
 /**
  * Handles messages received to instruct the agent to being its ingestion process
@@ -21,12 +21,12 @@ import IIngestionWriter from '../DataAccess/IDataWriter';
 export default class SendDataHandler implements IMessageHandler {
 
     private logger: Logger;
-    private writer: IIngestionWriter;
-    private reader: IIngestionReader;
+    private writer: IDataWriter;
+    private reader: IDataReader;
 
     constructor(
-        @inject(TYPES.IngestionReader) reader: IIngestionReader,
-        @inject(TYPES.IngestionWriter) writer: IIngestionWriter,
+        @inject(TYPES.DataReader) reader: IDataReader,
+        @inject(TYPES.DataWriter) writer: IDataWriter,
         @inject(TYPES.Logger) logger: Logger) {
 
         this.writer = writer;

@@ -2,10 +2,10 @@ import { Readable } from "stream";
 import { injectable, inject } from "inversify";
 import TYPES from "../../../ioc.types";
 
-import IIngestionWriter from "../IDataWriter";
+import IDataReader from "../IDataWriter";
 
 @injectable()
-export default class DummyWriter implements IIngestionWriter {
+export default class DummyWriter implements IDataReader {
     
     private _tenantId: string;
 

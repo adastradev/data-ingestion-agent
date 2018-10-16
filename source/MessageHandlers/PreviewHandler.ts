@@ -19,7 +19,7 @@ import IDataReader from "../DataAccess/IDataReader";
 export default class PreviewHandler implements IMessageHandler {
 
     constructor(
-        @inject(TYPES.IngestionReader) reader: IDataReader,
+        @inject(TYPES.DataReader) reader: IDataReader,
         @inject(TYPES.Logger) logger: Logger) {
 
         this._logger = logger;

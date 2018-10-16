@@ -44,8 +44,8 @@ container.bind<IMessageHandler>(TYPES.SendDataHandler).to(SendDataHandler);
 container.bind<IMessage>(TYPES.DummyMessage).to(DummyMessage);
 container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
 
-container.bind<IDataReader>(TYPES.IngestionReader).to(DummyReader);
-container.bind<IDataWriter>(TYPES.IngestionWriter).to(DummyWriter);
+container.bind<IDataReader>(TYPES.DataReader).to(DummyReader);
+container.bind<IDataWriter>(TYPES.DataWriter).to(DummyWriter);
 
 container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
 
