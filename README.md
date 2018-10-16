@@ -73,7 +73,25 @@ npm run system-test
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
 
 ```sh
-docker run -i -e ASTRA_CLOUD_USERNAME=<your_username> -e ASTRA_CLOUD_PASSWORD=<your_password> adastradev/data-ingestion-agent:latest preview
+docker run -i \
+-e ASTRA_CLOUD_USERNAME=<your_username> \
+-e ASTRA_CLOUD_PASSWORD=<your_password> \
+adastradev/data-ingestion-agent:latest \
+preview
+```
+
+## Adhoc Ingestion
+To immediately begin the ingestion process you can run the following with the 'ingest' flag. This command will terminate the container once the process has completed.
+
+```sh
+docker run -i \
+-e ASTRA_CLOUD_USERNAME=<your_username> \
+-e ASTRA_CLOUD_PASSWORD=<your_password> \
+-e ORACLE_ENDPOINT=hostname:port/service_name \
+-e ORACLE_USER=user \
+-e ORACLE_PASSWORD=password \
+adastradev/data-ingestion-agent:latest \
+ingest
 ```
 
 ## Container Health Monitoring
