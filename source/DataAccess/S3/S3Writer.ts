@@ -4,17 +4,17 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import * as crypto from 'crypto';
 
-import IIngestionWriter from '../IDataWriter';
+import IDataWriter from '../IDataWriter';
 
 /**
  * Given a readable stream ingest data into an S3 bucket
  *
  * @export
  * @class S3Writer
- * @implements {IIngestionWriter}
+ * @implements {IDataWriter}
  */
 @injectable()
-export default class S3Writer implements IIngestionWriter {
+export default class S3Writer implements IDataWriter {
 
     private _s3Config: S3.ClientConfiguration;
     private _tenantId: string;

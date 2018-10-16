@@ -22,7 +22,7 @@ export default class PreviewHandler implements IMessageHandler {
     private _reader: IDataReader;
 
     constructor(
-        @inject(TYPES.IngestionReader) reader: IDataReader,
+        @inject(TYPES.DataReader) reader: IDataReader,
         @inject(TYPES.Logger) logger: Logger) {
 
         this._logger = logger;
