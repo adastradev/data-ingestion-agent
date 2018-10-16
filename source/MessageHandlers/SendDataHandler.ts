@@ -10,7 +10,13 @@ import SendDataMessage from "../Messages/SendDataMessage";
 import IIngestionReader from "../DataAccess/IDataReader";
 import IIngestionWriter from "../DataAccess/IDataWriter";
 
-
+/**
+ * Handles messages received to instruct the agent to being its ingestion process
+ *
+ * @export
+ * @class SendDataHandler
+ * @implements {IMessageHandler}
+ */
 @injectable()
 export default class SendDataHandler implements IMessageHandler {
 
@@ -36,12 +42,6 @@ export default class SendDataHandler implements IMessageHandler {
         //       be able to assume we can perform the ingestion in the same
         //       process/thread, especially in just one pass...
         var readable: Readable = await this._reader.read();
-
-        if (message.payload.preview) {
-            this._reader.logQueries();   
-        }
-        else {
-            this._writer.ingest(readable);
-        }   
+        await this._writer.ingest(readable);   
     }
 }

@@ -6,6 +6,13 @@ import * as crypto from 'crypto';
 
 import IIngestionWriter from "../IDataWriter";
 
+/**
+ * Given a readable stream ingest data into an S3 bucket
+ *
+ * @export
+ * @class S3Writer
+ * @implements {IIngestionWriter}
+ */
 @injectable()
 export default class S3Writer implements IIngestionWriter {
     

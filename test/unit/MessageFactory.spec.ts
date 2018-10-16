@@ -16,25 +16,7 @@ describe('MessageFactory', () => {
     describe('when creating a new message instance', () => {
 
         it('should return a properly configured message', () => {
-            const message = SendDataMessage.create({ preview: true }, "1234");
-            let json = message.toJson();
-
-            var mf = startup.get<MessageFactory>(TYPES.MessageFactory);
-            var createdMessage = mf.createFromJson(json);
-
-            expect(createdMessage).to.be.instanceOf(SendDataMessage);
-            expect(createdMessage).to.deep.eq(message);
-        });
-
-        // it('should return a properly configured message', () => {
-        //     var val = "SendData";
-        //     const message = startup.get<IMessage>(TYPES[`${val}Message`]);
-
-        //     expect(message).to.not.be.null;
-        // });
-
-        it('should return a properly configured message when a message identifier is not specified', () => {
-            const message = SendDataMessage.create({ preview: true });
+            const message = SendDataMessage.create({}, "1234");
             let json = message.toJson();
 
             var mf = startup.get<MessageFactory>(TYPES.MessageFactory);
@@ -45,14 +27,24 @@ describe('MessageFactory', () => {
         });
 
         it('should return a properly configured message when a message identifier is not specified', () => {
-            const message = SendDataMessage.create({ preview: true });
+            const message = SendDataMessage.create();
+            let json = message.toJson();
+
+            var mf = startup.get<MessageFactory>(TYPES.MessageFactory);
+            var createdMessage = mf.createFromJson(json);
+
+            expect(createdMessage).to.be.instanceOf(SendDataMessage);
+            expect(createdMessage).to.deep.eq(message);
+        });
+
+        it('should return a properly configured message when a message identifier is not specified', () => {
+            const message = SendDataMessage.create();
             let json = message.toJson();
 
             var mf = startup.get<MessageFactory>(TYPES.MessageFactory);
             var createdMessage = mf.createFromJson(json, "1234");
 
             expect(createdMessage).to.be.instanceOf(SendDataMessage);
-            expect(createdMessage.payload.preview).to.be.true;
             expect(createdMessage.receiptHandle).to.eq("1234");
         });
 

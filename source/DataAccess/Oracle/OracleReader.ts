@@ -6,6 +6,14 @@ import { Logger } from "winston";
 
 import IIngestionReader from "../IDataReader";
 
+/**
+ * An interface through which data is queried using predefined queries for the 
+ * target Oracle database.
+ *
+ * @export
+ * @class OracleReader
+ * @implements {IIngestionReader}
+ */
 @injectable()
 export default class OracleReader implements IIngestionReader {
     private _logger: Logger;
@@ -14,7 +22,8 @@ export default class OracleReader implements IIngestionReader {
         'SELECT * FROM ALL_TABLES'
     ];
 
-    constructor(@inject(TYPES.Logger) logger: Logger) {
+    constructor(
+        @inject(TYPES.Logger) logger: Logger) {
         this._logger = logger;
     }
 

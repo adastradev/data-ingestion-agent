@@ -13,17 +13,22 @@ import { UserManagementApi } from "./source/astra-sdk/UserManagementApi";
 import MessageHandlerFactory from "./source/MessageHandlerFactory";
 import IMessageHandler from "./source/IMessageHandler";
 import SendDataHandler from "./source/MessageHandlers/SendDataHandler";
+import PreviewHandler from "./source/MessageHandlers/PreviewHandler";
 
 // Messages
 import IMessage from "./source/IMessage";
 import MessageFactory from "./source/MessageFactory";
 import SendDataMessage from "./source/Messages/SendDataMessage";
+import PreviewMessage from "./source/Messages/PreviewMessage";
 
 // Data Access
 import IDataReader from "./source/DataAccess/IDataReader";
 import IDataWriter from "./source/DataAccess/IDataWriter";
 import S3Writer from "./source/DataAccess/S3/S3Writer";
 import OracleReader from "./source/DataAccess/Oracle/OracleReader";
+import ICommand from "./source/Commands/ICommand";
+import AdHocIngestCommand from "./source/Commands/AdHocIngestCommand";
+import AdHocPreviewCommand from "./source/Commands/AdHocPreviewCommand";
 
 // TODO: Make configurable?
 const REGION = "us-east-1";
@@ -111,14 +116,20 @@ var startup =
         // Message Management        
         container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
         container.bind<IMessageHandler>(TYPES.SendDataHandler).to(SendDataHandler);
+        container.bind<IMessageHandler>(TYPES.PreviewHandler).to(PreviewHandler);
         
         // Messages
         container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
         container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
+        container.bind<IMessage>(TYPES.PreviewMessage).to(PreviewMessage);
         
         // Data Access
         container.bind<IDataReader>(TYPES.IngestionReader).to(OracleReader);
         container.bind<IDataWriter>(TYPES.IngestionWriter).to(S3Writer);
+
+        // Agent Commands
+        container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);
+        container.bind<ICommand>(TYPES.PREVIEW).to(AdHocPreviewCommand);
 
         // TODO: Revisit, is this necessary?
         container.bind<Container>(TYPES.Container).toConstantValue(container);

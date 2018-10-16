@@ -16,7 +16,13 @@ let TYPES = {
     IngestionReader: Symbol("IngestionReader"),
     IngestionWriter: Symbol("IngestionWriter"),
     DummyHandler: Symbol("DummyHandler"),
-    DummyMessage: Symbol("DummyMessage")
+    DummyMessage: Symbol("DummyMessage"),
+    PreviewMessage: Symbol("PreviewMessage"),
+    PreviewHandler: Symbol("PreviewHandler"),
+
+    // Commands
+    PREVIEW: Symbol("Preview"),
+    INGEST: Symbol("Ingest")
 };
 
 export default TYPES;

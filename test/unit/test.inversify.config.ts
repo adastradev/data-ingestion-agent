@@ -29,7 +29,7 @@ var logger: Winston.Logger = Winston.createLogger({
     level: 'info',
     format: Winston.format.json(),
     transports: [
-        new Winston.transports.Console()
+        new Winston.transports.Console({ silent: true })
     ]
 });
 
