@@ -1,9 +1,9 @@
-import { Readable } from "stream";
-import { injectable, inject } from "inversify";
-import TYPES from "../../../ioc.types";
-import { Logger } from "winston";
+import { Readable } from 'stream';
+import { inject, injectable } from 'inversify';
+import TYPES from '../../../ioc.types';
+import { Logger } from 'winston';
 
-import IDataReader from "../IDataReader";
+import IDataReader from '../IDataReader';
 
 @injectable()
 export default class DummyReader implements IDataReader {
@@ -14,15 +14,14 @@ export default class DummyReader implements IDataReader {
     }
 
     public async read(): Promise<Readable> {
-        var Readable = require('stream').Readable
-        var s = new Readable;
-            s.push("dummy data");
-            s.push('\n');
+        const s = new Readable();
+        s.push('dummy data');
+        s.push('\n');
         s.push(null);
         return s;
     }
 
     public logQueries(): void {
-        this._logger.log("info", "dummy query");
+        this._logger.log('info', 'dummy query');
     }
 }

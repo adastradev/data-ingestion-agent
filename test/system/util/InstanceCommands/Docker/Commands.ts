@@ -1,3 +1,5 @@
+// tslint:disable:max-classes-per-file
+
 import ICommand from '../ICommand';
 
 /**
@@ -9,8 +11,8 @@ import ICommand from '../ICommand';
  */
 export class PullLatestDockerImageCommand implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
-        return [`sudo docker pull adastradev/data-ingestion-agent:${normalized_docker_tag}`];
+        const normalizedDockerTag = process.env.NORMALIZED_DOCKER_TAG;
+        return [`sudo docker pull adastradev/data-ingestion-agent:${normalizedDockerTag}`];
     }
 }
 
@@ -21,9 +23,10 @@ export class PullLatestDockerImageCommand implements ICommand<string> {
  * @class PullLatestDockerImageCommand
  * @implements {ICommand<string>}
  */
+
 export class StopAndRemoveContainerCommand implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
+        const normalizedDockerTag = process.env.NORMALIZED_DOCKER_TAG;
         return [
             'sudo docker stop dia',
             'sudo docker rm dia'
@@ -40,18 +43,18 @@ export class StopAndRemoveContainerCommand implements ICommand<string> {
  */
 export class RunDataIngestionAgent implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        var astra_cloud_username = process.env.ASTRA_CLOUD_USERNAME;
-        var astra_cloud_password = process.env.ASTRA_CLOUD_PASSWORD;
-        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
+        const astraCloudUserName = process.env.ASTRA_CLOUD_USERNAME;
+        const astraCloudPassword = process.env.ASTRA_CLOUD_PASSWORD;
+        const normalizedDockerTag = process.env.NORMALIZED_DOCKER_TAG;
 
         return [[
             'sudo docker run',
             '--name dia',
             '-d',
             '-t',
-            `-e ASTRA_CLOUD_USERNAME=${astra_cloud_username}`,
-            `-e ASTRA_CLOUD_PASSWORD=${astra_cloud_password}`,
-            `adastradev/data-ingestion-agent:${normalized_docker_tag}`
+            `-e ASTRA_CLOUD_USERNAME=${astraCloudUserName}`,
+            `-e ASTRA_CLOUD_PASSWORD=${astraCloudPassword}`,
+            `adastradev/data-ingestion-agent:${normalizedDockerTag}`
         ].join(' ')];
     }
 }
@@ -65,22 +68,21 @@ export class RunDataIngestionAgent implements ICommand<string> {
  */
 export class RunDataIngestionAgentWithPreview implements ICommand<string> {
     public getCommands(): Iterable<string> {
-        var astra_cloud_username = process.env.ASTRA_CLOUD_USERNAME;
-        var astra_cloud_password = process.env.ASTRA_CLOUD_PASSWORD;
-        var normalized_docker_tag = process.env.NORMALIZED_DOCKER_TAG;
+        const astraCloudUserName = process.env.ASTRA_CLOUD_USERNAME;
+        const astraCloudPassword = process.env.ASTRA_CLOUD_PASSWORD;
+        const normalizedDockerTag = process.env.NORMALIZED_DOCKER_TAG;
 
         return [[
             'sudo docker run',
             '--name dia',
             '-i',
-            `-e ASTRA_CLOUD_USERNAME=${astra_cloud_username}`,
-            `-e ASTRA_CLOUD_PASSWORD=${astra_cloud_password}`,
-            `adastradev/data-ingestion-agent:${normalized_docker_tag}`,
+            `-e ASTRA_CLOUD_USERNAME=${astraCloudUserName}`,
+            `-e ASTRA_CLOUD_PASSWORD=${astraCloudPassword}`,
+            `adastradev/data-ingestion-agent:${normalizedDockerTag}`,
             'preview'
         ].join(' ')];
     }
 }
-
 
 /**
  * Retrieve the health description of the data ingestion agent container from docker

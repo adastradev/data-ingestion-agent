@@ -1,4 +1,4 @@
-import IMessage from "./IMessage";
+import IMessage from './IMessage';
 
 /**
  * Handles messages received by the agent.
@@ -13,9 +13,7 @@ export default interface IMessageHandler {
      * @type {HandleFunc}
      * @memberof IMessageHandler
      */
-    handle: HandleFunc
+    handle: IHandleFunc;
 }
 
-interface HandleFunc {
-    (message: IMessage): Promise<void>
-}
+type IHandleFunc = (message: IMessage) => Promise<void>;

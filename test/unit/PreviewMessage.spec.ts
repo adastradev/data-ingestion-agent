@@ -1,8 +1,8 @@
 
-import "reflect-metadata";
+import 'reflect-metadata';
 import * as chai from 'chai';
 
-import PreviewMessage from "../../source/Messages/PreviewMessage";
+import PreviewMessage from '../../source/Messages/PreviewMessage';
 
 const expect = chai.expect;
 
@@ -10,20 +10,20 @@ describe('PreviewMessage', () => {
 
     const validMessageWithHandle = new PreviewMessage();
     validMessageWithHandle.payload = {};
-    validMessageWithHandle.receiptHandle = "1234";
+    validMessageWithHandle.receiptHandle = '1234';
 
     const validMessageNoHandle = new PreviewMessage();
     validMessageNoHandle.payload = {};
 
     const validMessageNoPayload = new PreviewMessage();
-    validMessageNoPayload.receiptHandle = "1234";
+    validMessageNoPayload.receiptHandle = '1234';
 
     const validMessageDefault = new PreviewMessage();
 
     describe('when creating a new message instance', () => {
 
         it('should return a properly configured message', () => {
-            const message = PreviewMessage.create({}, "1234");
+            const message = PreviewMessage.create({}, '1234');
             expect(message).to.deep.eq(validMessageWithHandle);
         });
 
@@ -43,12 +43,12 @@ describe('PreviewMessage', () => {
         });
 
         it('should return a properly configured message when payload is an empty object', () => {
-            const message = PreviewMessage.create({}, "1234");
+            const message = PreviewMessage.create({}, '1234');
             expect(message).to.deep.eq(validMessageNoPayload);
         });
 
         it('should return a properly configured message when payload is specified as null', () => {
-            const message = PreviewMessage.create(null, "1234");
+            const message = PreviewMessage.create(null, '1234');
             expect(message).to.deep.eq(validMessageNoPayload);
         });
 
@@ -60,30 +60,30 @@ describe('PreviewMessage', () => {
 
     describe('when converting an existing message to JSON', () => {
         it('should return a valid JSON value', () => {
-            const message = PreviewMessage.create({}, "1234");
-            let json = message.toJson();
-            let deserializedMessage = <PreviewMessage> JSON.parse(json);
+            const message = PreviewMessage.create({}, '1234');
+            const json = message.toJson();
+            const deserializedMessage = JSON.parse(json) as PreviewMessage;
             expect(deserializedMessage).to.deep.eq(validMessageWithHandle);
         });
 
         it('should return a valid JSON value when no receipt handle is specified', () => {
             const message = PreviewMessage.create({});
-            let json = message.toJson();
-            let deserializedMessage = <PreviewMessage> JSON.parse(json);
+            const json = message.toJson();
+            const deserializedMessage = JSON.parse(json) as PreviewMessage;
             expect(deserializedMessage).to.deep.eq(validMessageNoHandle);
         });
 
         it('should return a valid JSON value when no payload is specified', () => {
-            const message = PreviewMessage.create(null, "1234");
-            let json = message.toJson();
-            let deserializedMessage = <PreviewMessage> JSON.parse(json);
+            const message = PreviewMessage.create(null, '1234');
+            const json = message.toJson();
+            const deserializedMessage = JSON.parse(json) as PreviewMessage;
             expect(deserializedMessage).to.deep.eq(validMessageNoPayload);
         });
 
         it('should return a valid JSON value when neither payload or receipt handle is specified', () => {
             const message = PreviewMessage.create();
-            let json = message.toJson();
-            let deserializedMessage = <PreviewMessage> JSON.parse(json);
+            const json = message.toJson();
+            const deserializedMessage = JSON.parse(json) as PreviewMessage;
             expect(deserializedMessage).to.deep.eq(validMessageDefault);
         });
     });

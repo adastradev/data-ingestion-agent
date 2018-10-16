@@ -11,25 +11,23 @@ export default interface IMessage {
      * @type {string}
      * @memberof IMessage
      */
-    type: string,
+    type: string;
     /**
      * The version of the message which may determine what tasks are performed
      *
      * @type {string}
      * @memberof IMessage
      */
-    version: string,
+    version: string;
     /**
-     * A unique identifier of the message that may have context within 
+     * A unique identifier of the message that may have context within
      *
      * @type {string}
      * @memberof IMessage
      */
-    receiptHandle?: string,
-    payload: any,
-    toJson: MessageToJsonFunction
+    receiptHandle?: string;
+    payload: any;
+    toJson: IMessageToJsonFunction;
 }
 
-export interface MessageToJsonFunction {
-    (): string
-}
+export type IMessageToJsonFunction = () => string;

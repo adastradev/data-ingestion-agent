@@ -1,6 +1,6 @@
 import TYPES from '../ioc.types';
-import { Container, injectable, inject, tagged } from 'inversify';
-import "reflect-metadata";
+import { Container, inject, injectable, tagged } from 'inversify';
+import 'reflect-metadata';
 import * as Winston from 'winston';
 
 import IMessage from './IMessage';
@@ -24,24 +24,23 @@ export default class MessageFactory {
      */
     constructor(@inject(TYPES.Container) container: Container, @inject(TYPES.Logger) logger: Winston.Logger) {
         this._container = container;
-        this._logger = logger;0
+        this._logger = logger;
     }
 
-    createFromJson(messageBody: string, identifier?: string): IMessage {
-        var message = <IMessage>JSON.parse(messageBody);
+    public createFromJson(messageBody: string, identifier?: string): IMessage {
+        const message = JSON.parse(messageBody) as IMessage;
 
         if (identifier) {
             message.receiptHandle = identifier;
         }
 
-        var targetMessage: IMessage;
-        
+        let targetMessage: IMessage;
+
         try {
-            this._logger.log("info", `Handling message type: ${message.type}`);
+            this._logger.log('info', `Handling message type: ${message.type}`);
             targetMessage = this._container.get<IMessage>(TYPES[`${message.type}Message`]);
-        }
-        catch (error) {
-            var msg = `Unknown message type: ${message.type} - (inner) ${error}`;
+        } catch (error) {
+            const msg = `Unknown message type: ${message.type} - (inner) ${error}`;
             throw Error(msg);
         }
 
@@ -50,4 +49,3 @@ export default class MessageFactory {
         return targetMessage;
     }
 }
-

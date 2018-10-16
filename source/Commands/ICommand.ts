@@ -5,9 +5,7 @@
  * @interface ICommand
  */
 export default interface ICommand {
-    invoke: invokeFunction
+    invoke: IInvokeFunction;
 }
 
-export interface invokeFunction {
-    (subArgs?: string[]): Promise<void>
-}
+export type IInvokeFunction = (subArgs?: string[]) => Promise<void>;

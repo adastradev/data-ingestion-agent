@@ -11,16 +11,21 @@ describe('oracledb', () => {
         it('should return sample query results', async () => {
             let connection;
             try {
-                let sql, binds, options, result;
+                let sql;
+                let binds;
+                let options;
+                let result;
 
                 console.log('oracledb.getConnection');
                 connection = await oracledb.getConnection({
-                    user          : process.env.ORACLE_USER,
+                    connectString : process.env.ORACLE_ENDPOINT,
                     password      : process.env.ORACLE_PASSWORD,
-                    connectString : process.env.ORACLE_ENDPOINT
+                    user          : process.env.ORACLE_USER
                 });
+
+                // tslint:disable-next-line:no-unused-expression
                 expect(connection).to.be.not.undefined;
-  
+
                 // Query the data
                 sql = `SELECT * FROM ALL_TABLES`;
                 binds = {};
@@ -35,7 +40,7 @@ describe('oracledb', () => {
                 console.log('Test connection.execute');
                 result = await connection.execute(sql, binds, options);
                 console.log('Test returned ' + result.rows.length + ' rows');
-            
+
                 // console.log("Column metadata: ", result.metaData);
                 // console.log("Query results: ");
                 // console.log(result.rows);

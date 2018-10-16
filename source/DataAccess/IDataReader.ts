@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import { Readable } from 'stream';
 
 /**
  * Represents a mechanism intended to read data from some datasource and output that data as a stream
@@ -7,14 +7,10 @@ import { Readable } from "stream";
  * @interface IDataReader
  */
 export default interface IDataReader {
-    read: QueryStreamFunction,
-    logQueries: LogQueriesFunction
+    read: QueryStreamFunction;
+    logQueries: LogQueriesFunction;
 }
 
-export interface QueryStreamFunction {
-    (): Promise<Readable>
-}
+export type QueryStreamFunction = () => Promise<Readable>;
 
-export interface LogQueriesFunction {
-    (): void
-}
+export type LogQueriesFunction = () => void;

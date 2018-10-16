@@ -1,8 +1,8 @@
-import ICommand from "./ICommand";
-import { injectable, inject } from "inversify";
-import TYPES from "../../ioc.types";
-import { SQS } from "aws-sdk";
-import SendDataMessage from "../Messages/SendDataMessage";
+import ICommand from './ICommand';
+import { inject, injectable } from 'inversify';
+import TYPES from '../../ioc.types';
+import { SQS } from 'aws-sdk';
+import SendDataMessage from '../Messages/SendDataMessage';
 
 /**
  * Initiates an adhoc run of the data ingestion agent ingestion process
@@ -20,14 +20,14 @@ export default class AdHocIngestCommand implements ICommand {
     constructor(
         @inject(TYPES.SQSConfig) sqsConfig: SQS.ClientConfiguration,
         @inject(TYPES.QueueUrl) queueUrl: string) {
-        
+
         this._sqsConfig = sqsConfig;
         this._queueUrl = queueUrl;
     }
 
     public async invoke(subArgs?: string[]) {
-        var sqs = new SQS(this._sqsConfig);
-        var sendDataMessage = SendDataMessage.create();
+        const sqs = new SQS(this._sqsConfig);
+        const sendDataMessage = SendDataMessage.create();
         await sqs.sendMessage({ QueueUrl: this._queueUrl, MessageBody: sendDataMessage.toJson() }).promise();
     }
 }
