@@ -1,13 +1,13 @@
-import { Readable } from "stream";
+import { Readable } from 'stream';
 import * as oracledb from 'oracledb';
-import { injectable, inject } from "inversify";
-import TYPES from "../../../ioc.types";
-import { Logger } from "winston";
+import { inject, injectable } from 'inversify';
+import TYPES from '../../../ioc.types';
+import { Logger } from 'winston';
 
-import IIngestionReader from "../IDataReader";
+import IIngestionReader from '../IDataReader';
 
 /**
- * An interface through which data is queried using predefined queries for the 
+ * An interface through which data is queried using predefined queries for the
  * target Oracle database.
  *
  * @export
@@ -16,15 +16,15 @@ import IIngestionReader from "../IDataReader";
  */
 @injectable()
 export default class OracleReader implements IIngestionReader {
-    private _logger: Logger;
-    
+    private logger: Logger;
+
     private readonly queries = [
         'SELECT * FROM ALL_TABLES'
     ];
 
     constructor(
         @inject(TYPES.Logger) logger: Logger) {
-        this._logger = logger;
+        this.logger = logger;
     }
 
     public async read(): Promise<Readable> {
@@ -35,24 +35,21 @@ export default class OracleReader implements IIngestionReader {
 
         let connection;
         try {
-            let sql, binds, options, result;
-
             connection = await oracledb.getConnection({
-              user          : process.env.ORACLE_USER,
-              password      : process.env.ORACLE_PASSWORD,
-              connectString : process.env.ORACLE_ENDPOINT
+                connectString : process.env.ORACLE_ENDPOINT,
+                password      : process.env.ORACLE_PASSWORD,
+                user          : process.env.ORACLE_USER
             });
 
             // Query the data
-            binds = {};
-            options = {
+            const binds = {};
+            const options = {
               outFormat: oracledb.OBJECT // query result format
             };
-            result = await connection.execute(this.queries[0], binds, options);
+            const result = await connection.execute(this.queries[0], binds, options);
 
-            var Readable = require('stream').Readable
-            var s = new Readable;
-            result.rows.forEach(element => {
+            const s = new Readable();
+            result.rows.forEach((element) => {
                 s.push(JSON.stringify(element));
                 s.push('\n');
             });
@@ -73,13 +70,13 @@ export default class OracleReader implements IIngestionReader {
     }
 
     public logQueries(): void {
-        for (var query of this.queries) {
-            this._logger.log("info", query)
+        for (const query of this.queries) {
+            this.logger.log('info', query);
         }
     }
 
     private createDemoSnapshot() {
-        var s = new Readable;
+        const s = new Readable();
         s.push('this is a test stream');
         s.push(null);
         return s;
