@@ -37,7 +37,7 @@ Build docker image and run unit tests
 docker build -t data-ingestion-agent .
 ```
 
-Run integration tests from a compiled docker image:
+Build docker image and run integration tests
 ```sh
 docker build \
 --build-arg ORACLE_ENDPOINT=hostname:port/service_name \
@@ -47,12 +47,59 @@ docker build \
 -t data-ingestion-agent .
 ```
 
-## Query Preview
+Run System Tests
+```sh
+npm install
+export ASTRA_CLOUD_USERNAME=<your_username>
+export ASTRA_CLOUD_PASSWORD=<your_password>
+# The system tests pull an image from dockerhub so you must provide the tag you wish to use in the test
+export NORMALIZED_DOCKER_TAG=feature_something
 
-Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent do the destination using this command.
+# Copy the sample config
+cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
+# Update the following EC2 instance config fields:
+#  InstanceType (t2.micro is likely not ideal)
+#  Ebs.VolumeSize
+#  Keyname (the key name - without extension )
+#  SecurityGroupIds (can be a single security group)
+#  SubnetId (be sure it is a public facing subnet, no NAT)
+#  Tags.Name (adjust to be something unique to help identify the instance)
+
+# Start the system test
+npm run system-test
+```
+
+## Query Preview
+Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
 
 ```sh
-docker run -i -e ASTRA_CLOUD_USERNAME=<your_username> -e ASTRA_CLOUD_PASSWORD=<your_password> adastradev/data-ingestion-agent:latest preview
+docker run -i \
+-e ASTRA_CLOUD_USERNAME=<your_username> \
+-e ASTRA_CLOUD_PASSWORD=<your_password> \
+adastradev/data-ingestion-agent:latest \
+preview
+```
+
+## Adhoc Ingestion
+To immediately begin the ingestion process you can run the following with the 'ingest' flag. This command will terminate the container once the process has completed.
+
+```sh
+docker run -i \
+-e ASTRA_CLOUD_USERNAME=<your_username> \
+-e ASTRA_CLOUD_PASSWORD=<your_password> \
+-e ORACLE_ENDPOINT=hostname:port/service_name \
+-e ORACLE_USER=user \
+-e ORACLE_PASSWORD=password \
+adastradev/data-ingestion-agent:latest \
+ingest
+```
+
+## Root Access to a running agent container
+
+After starting the agent and confirming a healthy status you can use the containers name or ID to access the virtual machine via command line (bash) as follows:
+
+```sh
+docker exec -it <container_id_or_name> /bin/bash
 ```
 
 ## Container Health Monitoring

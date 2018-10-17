@@ -15,17 +15,14 @@ export default interface IInvoker<TCommandType, TResultType> {
      * @type {AsyncInvokeFunction<TCommandType, TResultType>}
      * @memberof IInvoker
      */
-    invoke: AsyncInvokeFunction<TCommandType, TResultType>,
-
+    invoke: IAsyncInvokeFunction<TCommandType, TResultType>;
 
     /**
      * Perform any cleanup
      *
      * @memberof IInvoker
      */
-    dispose(): void
+    dispose(): void;
 }
 
-interface AsyncInvokeFunction<TCommandType, TResultType> {
-    (command: ICommand<TCommandType>): Promise<TResultType>
-}
+type IAsyncInvokeFunction<TCommandType, TResultType> = (command: ICommand<TCommandType>) => Promise<TResultType>;

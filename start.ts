@@ -2,12 +2,12 @@ import * as express from 'express';
 import * as shell from 'child_process';
 
 // optional args
-var args = process.argv.slice(2);
-var target = ['dist/index.js'].concat(args);
-var restartCounter = 0;
-var child;
+const args = process.argv.slice(2);
+const target = ['dist/index.js'].concat(args);
+let restartCounter = 0;
+let child;
 
-var onExitHandler = (code, signal) => {
+const onExitHandler = (code, signal) => {
     restartCounter++;
 
     if (restartCounter < 5) {
@@ -16,29 +16,29 @@ var onExitHandler = (code, signal) => {
         childState.status = 'exited';
     }
 
-    if (args[0] === "preview") {
+    if (args[0] === 'preview') {
         if (server) {
             server.close();
         }
     }
-}
+};
 
-var spawnAgent = () => {
+const spawnAgent = () => {
     // start agent process
-    var child = shell.spawn('node', target);
+    child = shell.spawn('node', target);
     child.unref(); // apparently detangles event loop of the child from the parent
-    child.stdout.on('data', function (data) {
+    child.stdout.on('data', (data) => {
         console.log(data.toString());
     });
     child.on('exit', onExitHandler);
-    child.stderr.on('data', function (data) {
+    child.stderr.on('data', (data) => {
         console.log(data.toString());
     });
     return child;
 };
 
 child = spawnAgent();
-var childState = { status: 'running' };
+const childState = { status: 'running' };
 
 // start server
 const app = express();
@@ -54,8 +54,8 @@ app.get('/', (req, res) => {
     res.send(childState.status);
 });
 
-var server = app.listen(port, () => console.log('healthcheck server'));
-process.on('SIGTERM', function () {
-    child.kill("SIGTERM");
+const server = app.listen(port, () => console.log('healthcheck server'));
+process.on('SIGTERM', () => {
+    child.kill('SIGTERM');
     server.close();
 });
