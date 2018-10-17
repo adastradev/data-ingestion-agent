@@ -64,60 +64,57 @@ const s3Buckets = {
 
 const bucketName = s3Buckets[stage];
 
-const startup =
-    () => (async () => {
-        const endpoints = await sdk.lookupService('user-management', stage);
-        process.env.USER_MANAGEMENT_URI = endpoints[0];
-    })()
-    .then(async () => {
-        const cognitoSession =
-            await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
-        await authManager.configureIamCredentials();
+const startup = async () => {
+    // Authentication & Resource lookups
+    const endpoints = await sdk.lookupService('user-management', stage);
+    process.env.USER_MANAGEMENT_URI = endpoints[0];
+    const cognitoSession =
+        await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+    await authManager.configureIamCredentials();
 
-        // lookup SQS queue for this tenant
-        const credentialsBearerToken: BearerTokenCredentials = {
-            idToken: cognitoSession.getIdToken().getJwtToken(),
-            type: 'BearerToken'
-        };
-        const userManagementApi = new UserManagementApi(
-            process.env.USER_MANAGEMENT_URI,
-            REGION,
-            credentialsBearerToken);
+    // lookup SQS queue for this tenant
+    const credentialsBearerToken: BearerTokenCredentials = {
+        idToken: cognitoSession.getIdToken().getJwtToken(),
+        type: 'BearerToken'
+    };
+    const userManagementApi = new UserManagementApi(
+        process.env.USER_MANAGEMENT_URI,
+        REGION,
+        credentialsBearerToken);
 
-        const poolListResponse = await userManagementApi.getUserPools();
-        queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
-        tenantId = poolListResponse.data[0].tenant_id;
-    })
-    .then(() => {
-        // Config
-        container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
-        container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
-        container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
-        container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
-        container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
+    const poolListResponse = await userManagementApi.getUserPools();
+    queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
+    tenantId = poolListResponse.data[0].tenant_id;
 
-        // Message Management
-        container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
-        container.bind<IMessageHandler>(TYPES.SendDataHandler).to(SendDataHandler);
-        container.bind<IMessageHandler>(TYPES.PreviewHandler).to(PreviewHandler);
+    // Config injection
+    container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
+    container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
+    container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
+    container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
+    container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
 
-        // Messages
-        container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
-        container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
-        container.bind<IMessage>(TYPES.PreviewMessage).to(PreviewMessage);
+    // Message Management
+    container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
+    container.bind<IMessageHandler>(TYPES.SendDataHandler).to(SendDataHandler);
+    container.bind<IMessageHandler>(TYPES.PreviewHandler).to(PreviewHandler);
 
-        // Data Access
-        container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
-        container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
+    // Messages
+    container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
+    container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
+    container.bind<IMessage>(TYPES.PreviewMessage).to(PreviewMessage);
 
-        // Agent Commands
-        container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);
-        container.bind<ICommand>(TYPES.PREVIEW).to(AdHocPreviewCommand);
+    // Data Access
+    container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
+    container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
 
-        // TODO: Revisit, is this necessary?
-        container.bind<Container>(TYPES.Container).toConstantValue(container);
+    // Agent Commands
+    container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);
+    container.bind<ICommand>(TYPES.PREVIEW).to(AdHocPreviewCommand);
 
-        return container;
-    });
+    // TODO: Revisit, is this necessary?
+    container.bind<Container>(TYPES.Container).toConstantValue(container);
+
+    return container;
+};
 
 export default startup;

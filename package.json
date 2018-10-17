@@ -22,7 +22,8 @@
       "dist/**",
       "test/**",
       "webpack.config.js",
-      "source-map-install.js"
+      "source-map-install.js",
+      "inversify.config.ts"
     ],
     "reporter": [
       "lcov",
