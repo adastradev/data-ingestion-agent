@@ -1,22 +1,21 @@
 import * as http from 'http';
 
-var options = {  
-    host : "localhost",
-    port : "4000",
+const options = {
+    host : 'localhost',
+    port : '4000',
     timeout : 2000
 };
 
-var request = http.request(options, (res) => {  
+const request = http.request(options, (res) => {
     console.log(`STATUS: ${res.statusCode}`);
-    if (res.statusCode == 200) {
+    if (res.statusCode === 200) {
         process.exit(0);
-    }
-    else {
+    } else {
         process.exit(1);
     }
 });
 
-request.on('error', function(err) {  
+request.on('error', (err) => {
     console.log('ERROR');
     process.exit(1);
 });
