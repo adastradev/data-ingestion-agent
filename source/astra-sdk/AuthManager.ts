@@ -1,21 +1,32 @@
+import 'reflect-metadata';
 import { ICognitoUserPoolLocator } from './CognitoUserPoolLocator';
 import * as AWS from 'aws-sdk';
 import { ICognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
 import { AuthenticationDetails, CognitoUser, CognitoUserPool, CognitoUserSession } from 'amazon-cognito-identity-js';
+import { inject, injectable } from 'inversify';
+import TYPES from '../../ioc.types';
+import { Logger } from 'winston';
 
 // tslint:disable-next-line:no-string-literal no-var-requires
 global['fetch'] = require('node-fetch');
 
+@injectable()
 export class AuthManager {
     private locator: ICognitoUserPoolLocator;
     private poolData: ICognitoUserPoolApiModel;
     private region: string;
     private cognitoUser: CognitoUser;
     private cognitoUserSession: CognitoUserSession;
+    private logger: Logger;
 
-    constructor(locator: ICognitoUserPoolLocator, region: string) {
+    constructor(
+        locator: ICognitoUserPoolLocator,
+        region: string,
+        @inject(TYPES.Logger) logger: Logger
+    ) {
         this.locator = locator;
         this.region = region;
+        this.logger = logger;
     }
 
     public signIn(email: string, password: string, newPassword: string = ''): Promise<CognitoUserSession> {
@@ -69,21 +80,25 @@ export class AuthManager {
                 // tslint:disable-next-line:max-line-length
                 this.cognitoUser.refreshSession(this.cognitoUserSession.getRefreshToken(), (refreshCognitoErr, newSession) => {
                     if (refreshCognitoErr) {
-                        console.log(refreshCognitoErr);
+                        this.logger.log('error', refreshCognitoErr);
+                        reject(refreshCognitoErr);
                     } else {
                         that.cognitoUserSession = newSession;
                         // tslint:disable-next-line:no-string-literal max-line-length
                         cognitoIdentityCredentials.params['Logins'][authenticator]  = newSession.getIdToken().getJwtToken();
                         cognitoIdentityCredentials.refresh((refreshIamErr) => {
                             if (refreshIamErr) {
-                                console.log(refreshIamErr);
+                                this.logger.log('error', refreshIamErr);
+                                reject(refreshIamErr);
                             } else {
-                                console.log('TOKEN SUCCESSFULLY UPDATED');
+                                this.logger.log('info', 'Cognito token successfully updated');
+                                resolve(true);
                             }
                         });
                     }
                 });
             }
+            resolve(true);
         }.bind(this));
     }
 

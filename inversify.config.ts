@@ -53,7 +53,7 @@ process.env.DISCOVERY_SERVICE = 'https://4w35qhpotd.execute-api.us-east-1.amazon
 const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
-const authManager = new AuthManager(poolLocator, REGION);
+const authManager = new AuthManager(poolLocator, REGION, logger);
 let queueUrl: string;
 let tenantId: string;
 
