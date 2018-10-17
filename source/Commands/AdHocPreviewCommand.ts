@@ -13,20 +13,15 @@ import PreviewMessage from '../Messages/PreviewMessage';
  */
 @injectable()
 export default class AdHocPreviewCommand implements ICommand {
-
-    private _sqsConfig;
     private _queueUrl;
 
     constructor(
-        @inject(TYPES.SQSConfig) sqsConfig: SQS.ClientConfiguration,
         @inject(TYPES.QueueUrl) queueUrl: string) {
-
-        this._sqsConfig = sqsConfig;
         this._queueUrl = queueUrl;
     }
 
     public async invoke(subArgs?: string[]) {
-        const sqs = new SQS(this._sqsConfig);
+        const sqs = new SQS();
         const previewMessage = PreviewMessage.create();
         await sqs.sendMessage({ QueueUrl: this._queueUrl, MessageBody: previewMessage.toJson() }).promise();
     }

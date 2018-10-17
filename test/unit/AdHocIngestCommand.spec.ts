@@ -13,10 +13,9 @@ describe('AdHocIngestCommand', () => {
     describe('when invoked', () => {
 
         it('should create and send a SendData message to the queue', async () => {
-            const sqsConfig = { apiVersion: '2012-11-05', region: 'us-east-1' };
             const queueUrl = 'someurl';
 
-            const command: AdHocIngestCommand = new AdHocIngestCommand(sqsConfig, queueUrl);
+            const command: AdHocIngestCommand = new AdHocIngestCommand(queueUrl);
             let sendMessageCalls = 0;
 
             // The ability to pass a spy in as the stub seems to be broken, so we do it the hard way for now.

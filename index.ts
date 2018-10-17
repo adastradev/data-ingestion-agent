@@ -21,14 +21,11 @@ process.on('SIGTERM', () => {
 class App {
 
     public static async main() {
-
         this.container = await startup();
 
         this.logger = this.container.get<Winston.Logger>(TYPES.Logger);
         const queueUrl = this.container.get<string>(TYPES.QueueUrl);
-        const sqsConfig = this.container.get<SQS.ClientConfiguration>(TYPES.SQSConfig);
-
-        const sqs = new SQS(sqsConfig);
+        const sqs = new SQS();
         let isAdhoc = false;
 
         // Handle agent commands

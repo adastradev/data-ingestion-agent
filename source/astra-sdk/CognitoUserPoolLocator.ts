@@ -1,5 +1,5 @@
-import { CognitoUserPoolApiModel } from "./CognitoUserPoolApiModel";
+import { ICognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
 
-export interface CognitoUserPoolLocator {
-    getPoolForUsername(userName: string): Promise<CognitoUserPoolApiModel>;
+export interface ICognitoUserPoolLocator {
+    getPoolForUsername(userName: string): Promise<ICognitoUserPoolApiModel>;
 }

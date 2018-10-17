@@ -13,9 +13,8 @@ describe('AdHocPreviewCommand', () => {
     describe('when invoked', () => {
 
         it('should create and send a Preview message to the queue', async () => {
-            const sqsConfig = { apiVersion: '2012-11-05', region: 'us-east-1' };
             const queueUrl = 'someurl';
-            const command: AdHocPreviewCommand = new AdHocPreviewCommand(sqsConfig, 'someurl');
+            const command: AdHocPreviewCommand = new AdHocPreviewCommand('someurl');
             let sendMessageCalls = 0;
 
             // The ability to pass a spy in as the stub seems to be broken, so we do it the hard way for now.

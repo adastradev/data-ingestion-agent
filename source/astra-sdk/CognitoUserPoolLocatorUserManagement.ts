@@ -1,19 +1,19 @@
-import { CognitoUserPoolLocator } from './CognitoUserPoolLocator';
+import { ICognitoUserPoolLocator } from './CognitoUserPoolLocator';
 import { UserManagementApi } from './UserManagementApi';
-import { CognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
+import { ICognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
 
-export class CognitoUserPoolLocatorUserManagement implements CognitoUserPoolLocator {
+export class CognitoUserPoolLocatorUserManagement implements ICognitoUserPoolLocator {
     private region: string;
 
     constructor(region: string) {
         this.region = region;
     }
 
-    public getPoolForUsername(userName: string): Promise<CognitoUserPoolApiModel> {
+    public getPoolForUsername(userName: string): Promise<ICognitoUserPoolApiModel> {
         return new Promise(async function (resolve, reject) {
             const api = new UserManagementApi(process.env.USER_MANAGEMENT_URI, this.region, { type: 'None' });
             const response: any = await api.getUserPoolByUserName(userName);
-            const result: CognitoUserPoolApiModel = {
+            const result: ICognitoUserPoolApiModel = {
                 ClientId: response.data.cognito_app_client_id,
                 IdentityPoolId: response.data.cognito_identity_pool_id,
                 UserPoolId: response.data.cognito_user_pool_id
