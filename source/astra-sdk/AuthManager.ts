@@ -1,8 +1,10 @@
-import { CognitoUserPoolLocator } from "./CognitoUserPoolLocator";
-import { CognitoIdentity } from 'aws-sdk'
-import * as AWS from 'aws-sdk'
-import { CognitoUserPoolApiModel } from "./CognitoUserPoolApiModel";
+// tslint:disable:no-var-requires
+import { CognitoUserPoolLocator } from './CognitoUserPoolLocator';
+import { CognitoIdentity } from 'aws-sdk';
+import * as AWS from 'aws-sdk';
+import { CognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
 
+// tslint:disable-next-line:no-string-literal
 global['fetch'] = require('node-fetch');
 const CognitoUserPool = require('amazon-cognito-identity-js').CognitoUserPool;
 const AuthenticationDetails = require('amazon-cognito-identity-js').AuthenticationDetails;
@@ -10,7 +12,7 @@ const CognitoUser = require('amazon-cognito-identity-js').CognitoUser;
 
 export interface CognitoJwtToken {
     idToken: string;
-    AccessToken: string;
+    accessToken: string;
 }
 
 export class AuthManager {
@@ -23,48 +25,45 @@ export class AuthManager {
         this.region = region;
     }
 
-    public signIn(email: string, password: string, newPassword:string = ''): Promise<CognitoJwtToken> {
-        return new Promise(async function(resolve, reject) {
+    public signIn(email: string, password: string, newPassword: string = ''): Promise<CognitoJwtToken> {
+        return new Promise(async function (resolve, reject) {
             // get the pool data from the response
             this.poolData = await this.locator.getPoolForUsername(email);
 
             // construct a user pool object
-            var userPool = new CognitoUserPool(this.poolData);
+            const userPool = new CognitoUserPool(this.poolData);
             // configure the authentication credentials
-            var authenticationData = {
-                Username: email,
-                Password: password
+            const authenticationData = {
+                Password: password,
+                Username: email
             };
             // create object with user/pool combined
-            var userData = {
-                Username: email,
-                Pool: userPool
+            const userData = {
+                Pool: userPool,
+                Username: email
             };
             // init Cognito auth details with auth data
-            var authenticationDetails = new AuthenticationDetails(authenticationData);
+            const authenticationDetails = new AuthenticationDetails(authenticationData);
             // authenticate user to in Cognito user pool
-            var cognitoUser = new CognitoUser(userData);
+            const cognitoUser = new CognitoUser(userData);
 
             cognitoUser.authenticateUser(authenticationDetails, {
-                onSuccess: function (result) {
+                onSuccess (result) {
                     // get the ID token
-                    var idToken = result.getIdToken().getJwtToken();
-                    var AccessToken = result.getAccessToken().getJwtToken();
-                    var tokens: CognitoJwtToken = {
-                        idToken,
-                        AccessToken
+                    const idToken = result.getIdToken().getJwtToken();
+                    const accessToken = result.getAccessToken().getJwtToken();
+                    const tokens: CognitoJwtToken = {
+                        accessToken,
+                        idToken
                     };
                     resolve(tokens);
                 },
-                onFailure: function(err) {
+                onFailure(err) {
                     reject(err);
                 },
-                mfaRequired: function(codeDeliveryDetails) { // eslint-disable-line
+                mfaRequired(codeDeliveryDetails) { // eslint-disable-line
                     reject(Error('Multi-factor auth is not currently supported in this library'));
-                    // // MFA is required to complete user authentication.
-                    // // Get the code from user and call
-
-                    // //MFA is Disabled for this QuickStart. This may be submitted as an enhancement, if there are sufficient requests.
+                    // //MFA is Disabled for this QuickStart.
                     // var mfaCode = '';
 
                     // if (user.mfaCode == undefined){
@@ -74,7 +73,7 @@ export class AuthManager {
                     // }
                     // cognitoUser.sendMFACode(mfaCode, this)
                 },
-                newPasswordRequired: function(userAttributes, requiredAttributes) { // eslint-disable-line
+                newPasswordRequired(userAttributes, requiredAttributes) { // eslint-disable-line
                     if (newPassword !== undefined && newPassword.length > 0) {
                         // User was signed up by an admin and must provide new
                         // password and required attributes, if any, to complete
@@ -88,22 +87,21 @@ export class AuthManager {
                         delete userAttributes.email_verified;
                         delete userAttributes['custom:tenant_id'];
                         cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
-                            onSuccess: function (result) {
+                            onSuccess (result) {
                                 // get the ID token
-                                var idToken = result.getIdToken().getJwtToken();
-                                var AccessToken = result.getAccessToken().getJwtToken();
-                                var tokens: CognitoJwtToken = {
-                                    idToken,
-                                    AccessToken
+                                const idToken = result.getIdToken().getJwtToken();
+                                const accessToken = result.getAccessToken().getJwtToken();
+                                const tokens: CognitoJwtToken = {
+                                    accessToken,
+                                    idToken
                                 };
                                 resolve(tokens);
                             },
-                            onFailure: function(err) {
+                            onFailure(err) {
                                 reject(err);
                             }
                         });
-                    }
-                    else {
+                    } else {
                         reject(Error('New password is required for the user'));
                     }
                 }
@@ -112,30 +110,29 @@ export class AuthManager {
     }
 
     public getIamCredentials(cognitoIdToken: string): Promise<CognitoIdentity.Credentials> {
-        return new Promise(async function(resolve, reject) {
+        return new Promise(async function (resolve, reject) {
             const authenticator = `cognito-idp.${this.region}.amazonaws.com/${this.poolData.UserPoolId}`;
 
-            var CognitoIdentity = new AWS.CognitoIdentity({ region: this.region });
-            var params: CognitoIdentity.Types.GetIdInput = {
+            const cognitoIdentity = new AWS.CognitoIdentity({ region: this.region });
+            const params: CognitoIdentity.Types.GetIdInput = {
                 IdentityPoolId: this.poolData.IdentityPoolId,
                 Logins: {
                     [authenticator]: cognitoIdToken
                 }
-            }
+            };
 
-            var response = await CognitoIdentity.getId(params).promise();
+            const response = await cognitoIdentity.getId(params).promise();
 
-            var getCredentialParams: CognitoIdentity.GetCredentialsForIdentityInput = {
+            const getCredentialParams: CognitoIdentity.GetCredentialsForIdentityInput = {
                 IdentityId: response.IdentityId,
                 Logins: {
                     [authenticator]: cognitoIdToken
                 }
-            }
+            };
 
-            const result = await CognitoIdentity.getCredentialsForIdentity(getCredentialParams).promise();
+            const result = await cognitoIdentity.getCredentialsForIdentity(getCredentialParams).promise();
             resolve(result.Credentials);
         }.bind(this));
     }
 
 }
-

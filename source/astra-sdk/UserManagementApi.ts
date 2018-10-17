@@ -1,4 +1,4 @@
-import { ApiCredentials, IAMCredentials, BearerTokenCredentials } from "@adastradev/serverless-discovery-sdk";
+import { ApiCredentials, BearerTokenCredentials, IAMCredentials } from '@adastradev/serverless-discovery-sdk';
 
 // ignore type checking for private member aws-api-gateway-client for now
 // declare function require(name:string): any; // tslint:disable-line
@@ -49,94 +49,94 @@ export class UserManagementApi {
         }
     }
 
-    createUserPool(tenant_id) {
-        var params = {};
-        var pathTemplate = '/admin/userpools';
-        var method = 'POST';
-        var additionalParams = {};
-        var body = { tenant_id: tenant_id };
+    public createUserPool(tenant_id: string) {
+        const params = {};
+        const pathTemplate = '/admin/userpools';
+        const method = 'POST';
+        const additionalParams = {};
+        const body = { tenant_id };
 
         return this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 
-    deleteUserPool(id) {
-        var params = {};
-        var pathTemplate = '/admin/userpools/' + id;
-        var method = 'DELETE';
-        var additionalParams = {};
-        var body = { };
+    public deleteUserPool(id) {
+        const params = {};
+        const pathTemplate = '/admin/userpools/' + id;
+        const method = 'DELETE';
+        const additionalParams = {};
+        const body = { };
 
         return this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 
-    getUserPools() {
-        var params = {};
-        var pathTemplate = '/userpools';
-        var method = 'GET';
+    public getUserPools() {
+        const params = {};
+        const pathTemplate = '/userpools';
+        const method = 'GET';
         // var additionalParams = {};
-        var body = {};
+        const body = {};
 
         return this.apigClient.invokeApi(params, pathTemplate, method, this.additionalParams, body);
     }
 
-    createUser(tenant_id, userName, password, firstName, lastName) {
-        var params = {};
-        var pathTemplate = '/admin/users';
-        var method = 'POST';
-        var additionalParams = {};
-        var body = { tenant_id: tenant_id, userName: userName, password: password, firstName: firstName, lastName: lastName };
+    public createUser(tenant_id, userName, password, firstName, lastName) {
+        const params = {};
+        const pathTemplate = '/admin/users';
+        const method = 'POST';
+        const additionalParams = {};
+        const body = { tenant_id, userName, password, firstName, lastName };
 
         return this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 
-    registerTenant(tenantName, userName, firstName, lastName) {
-        var params = {};
-        var pathTemplate = '/tenant/register';
-        var method = 'POST';
-        var additionalParams = {};
-        var body = { tenantName: tenantName, userName: userName, firstName: firstName, lastName: lastName };
+    public registerTenant(tenantName, userName, firstName, lastName) {
+        const params = {};
+        const pathTemplate = '/tenant/register';
+        const method = 'POST';
+        const additionalParams = {};
+        const body = { tenantName, userName, firstName, lastName };
 
         return this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 
-    deleteUser(userName) {
-        var params = {};
-        var pathTemplate = '/admin/users/' + encodeURIComponent(userName);
-        var method = 'DELETE';
-        var additionalParams = {};
-        var body = { };
+    public deleteUser(userName) {
+        const params = {};
+        const pathTemplate = '/admin/users/' + encodeURIComponent(userName);
+        const method = 'DELETE';
+        const additionalParams = {};
+        const body = { };
 
         return this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 
-    getUserPoolByUserName(userName): Promise<{}> {
-        var params = {};
-        var pathTemplate = '/users/' + encodeURIComponent(userName) + '/pool';
-        var method = 'GET';
-        var additionalParams = {};
-        var body = {};
+    public getUserPoolByUserName(userName): Promise<{}> {
+        const params = {};
+        const pathTemplate = '/users/' + encodeURIComponent(userName) + '/pool';
+        const method = 'GET';
+        const additionalParams = {};
+        const body = {};
 
         return this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 
-    getUserInfo(userName) {
-        var params = {};
-        var pathTemplate = '/users/' + encodeURIComponent(userName) + '/info';
-        var method = 'GET';
+    public getUserInfo(userName) {
+        const params = {};
+        const pathTemplate = '/users/' + encodeURIComponent(userName) + '/info';
+        const method = 'GET';
         // var additionalParams = {};
-        var body = {};
+        const body = {};
 
         return this.apigClient.invokeApi(params, pathTemplate, method, this.additionalParams, body);
     }
 
-    getUsers(firstNameSearch) { // eslint-disable-line
+    public getUsers(firstNameSearch) { // eslint-disable-line
         // TODO: implement search parameters
-        var params = {};
-        var pathTemplate = '/users';
-        var method = 'GET';
+        const params = {};
+        const pathTemplate = '/users';
+        const method = 'GET';
         // var additionalParams = {};
-        var body = {};
+        const body = {};
 
-        return this.apigClient.invokeApi(params, pathTemplate, method, this.additionalParams, body);        
+        return this.apigClient.invokeApi(params, pathTemplate, method, this.additionalParams, body);
     }
 }
