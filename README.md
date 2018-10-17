@@ -94,6 +94,14 @@ adastradev/data-ingestion-agent:latest \
 ingest
 ```
 
+## Root Access to a running agent container
+
+After starting the agent and confirming a healthy status you can use the containers name or ID to access the virtual machine via command line (bash) as follows:
+
+```sh
+docker exec -it <container_id_or_name> /bin/bash
+```
+
 ## Container Health Monitoring
 The data ingestion agent periodically informs docker of its current health. Using `docker inspect` you can get a general idea of the applications state.
 

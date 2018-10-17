@@ -71,11 +71,12 @@ export default class Ec2Factory {
 
         this.instance = results.Instances[0];
 
-        await this.client.waitFor('instanceRunning', runInstanceParams).promise();
-        await this.client.waitFor('instanceStatusOk', runInstanceParams).promise();
+        const instanceIdsParam = { InstanceIds: [results.Instances[0].InstanceId]} as any;
+        await this.client.waitFor('instanceRunning', instanceIdsParam).promise();
+        await this.client.waitFor('instanceStatusOk', instanceIdsParam).promise();
 
         const describeResult =
-            await this.client.describeInstances({ InstanceIds: [this.instance.InstanceId]}).promise();
+            await this.client.describeInstances(instanceIdsParam).promise();
 
         this.instance = describeResult.Reservations[0].Instances[0];
 
