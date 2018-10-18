@@ -1,6 +1,6 @@
-import { ICognitoUserPoolLocator } from './CognitoUserPoolLocator';
+import { ICognitoUserPoolLocator } from './ICognitoUserPoolLocator';
 import { UserManagementApi } from './UserManagementApi';
-import { ICognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
+import { ICognitoUserPoolApiModel } from './ICognitoUserPoolApiModel';
 
 export class CognitoUserPoolLocatorUserManagement implements ICognitoUserPoolLocator {
     private region: string;

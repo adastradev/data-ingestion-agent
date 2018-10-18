@@ -1,7 +1,7 @@
 import 'reflect-metadata';
-import { ICognitoUserPoolLocator } from './CognitoUserPoolLocator';
+import { ICognitoUserPoolLocator } from './ICognitoUserPoolLocator';
 import * as AWS from 'aws-sdk';
-import { ICognitoUserPoolApiModel } from './CognitoUserPoolApiModel';
+import { ICognitoUserPoolApiModel } from './ICognitoUserPoolApiModel';
 import { AuthenticationDetails, CognitoUser, CognitoUserPool, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../ioc.types';
