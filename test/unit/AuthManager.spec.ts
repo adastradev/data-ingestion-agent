@@ -2,6 +2,7 @@
 import 'reflect-metadata';
 import * as chai from 'chai';
 import sinon = require('sinon');
+import { stubInterface } from 'ts-sinon';
 import container from './test.inversify.config';
 import { AuthManager } from '../../source/astra-sdk/AuthManager';
 import { ICognitoUserPoolLocator } from '../../source/astra-sdk/ICognitoUserPoolLocator';
@@ -17,33 +18,17 @@ import {
 
 const expect = chai.expect;
 
-class MockCognitoUserPoolLocator implements ICognitoUserPoolLocator {
-    public getPoolForUsername(userName: string): Promise<ICognitoUserPoolApiModel> {
-        // tslint:disable-next-line:only-arrow-functions
-        return new Promise(function (resolve, reject) {
-            const result: ICognitoUserPoolApiModel = {
-                ClientId: '47ajgnlo93ucpk9r76rtlv66mj',
-                IdentityPoolId: 'us-east-1:5f4ff9f2-75f6-4ad8-84d5-d7955445a5df',
-                UserPoolId: 'us-east-1_aDe89j0zq'
-            };
-            resolve(result);
-        });
-    }
-}
-
 describe('AuthManager', () => {
 
     describe('when attempting to sign a cognito user in', () => {
         let sandbox: sinon.SinonSandbox;
-
-        // const locatorStub = sinon.createStubInstance(ICognitoUserPoolLocator);
-        // locatorStub.getPoolForUsername().returns(
-        //     {
-        //         ClientId: 'mockAppClientValue',
-        //         IdentityPoolId: 'mockIdentityPoolId',
-        //         UserPoolId: 'mockUserPoolId'
-        //     }
-        // );
+        const locatorStub = stubInterface<ICognitoUserPoolLocator>({
+            getPoolForUsername: Promise.resolve({
+                ClientId: '47ajgnlo93ucpk9r76rtlv66mj',
+                IdentityPoolId: 'us-east-1:5f4ff9f2-75f6-4ad8-84d5-d7955445a5df',
+                UserPoolId: 'us-east-1_aDe89j0zq'
+            })
+        });
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
@@ -67,7 +52,7 @@ describe('AuthManager', () => {
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
 
-            const authManager = new AuthManager(new MockCognitoUserPoolLocator(), 'us-east-1', logger);
+            const authManager = new AuthManager(locatorStub, 'us-east-1', logger);
             const session = await authManager.signIn('user@aais.com', '12345');
             expect(authenticateUserStub.calledOnce).to.be.true;
             expect(session.isValid()).to.be.true;
