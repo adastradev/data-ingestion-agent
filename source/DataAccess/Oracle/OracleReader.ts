@@ -1,6 +1,4 @@
 import * as stream from 'stream';
-import transform from 'stream-transform';
-import { Stringifier } from 'csv-stringify';
 import * as oracledb from 'oracledb';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
@@ -23,7 +21,7 @@ export default class OracleReader implements IDataReader {
     private connection: oracledb.IConnection;
 
     private readonly queries = [
-        'SELECT * FROM dummysisdata where rownum < 10000000',
+        'SELECT * FROM dummysisdata where rownum < 10000',
         'SELECT * FROM ALL_TABLES'
     ];
 
@@ -50,24 +48,24 @@ export default class OracleReader implements IDataReader {
             const options = {
               outFormat: oracledb.OBJECT // query result format
             };
-            // const result = await connection.execute(this.queries[0], binds, options);
+
+            // TODO: Make fetch array size configurable?
             const s = await this.connection.queryStream(this.queries[0], [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 150 } as any);
 
             const t = new stream.Transform( { objectMode: true });
-            // const lgr = this.logger;
+
             t._transform = function (chunk, encoding, done) {
+                // TODO: Decide on a format/encoding/structure - JSON for now
                 const data = JSON.stringify(chunk);
                 this.push(Buffer.from(data, encoding));
-                // this.push(Buffer.from('\n'));
-                // lgr.log('info', `Transforming row id: ${chunk.ID}`);
 
                 done();
             };
 
             // tslint:disable-next-line:only-arrow-functions
             t._flush = function (done) {
-                // lgr.log('info', `Flushing`);
+                // lgr.info(`Flushing`);
                 done();
             };
 
@@ -80,6 +78,9 @@ export default class OracleReader implements IDataReader {
         }
     }
 
+    // TODO: This is leaky, need a better abstraction while
+    // still allowing streams to fully process before closing
+    // a connection
     public async close(): Promise<void> {
         if (this.connection) {
             try {
@@ -92,7 +93,7 @@ export default class OracleReader implements IDataReader {
 
     public logQueries(): void {
         for (const query of this.queries) {
-            this.logger.log('info', query);
+            this.logger.info(query);
         }
     }
 

@@ -26,6 +26,6 @@ export default class DummyReader implements IDataReader {
     }
 
     public logQueries(): void {
-        this._logger.log('info', 'dummy query');
+        this._logger.info('dummy query');
     }
 }

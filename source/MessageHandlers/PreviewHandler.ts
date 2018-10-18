@@ -30,7 +30,7 @@ export default class PreviewHandler implements IMessageHandler {
     }
 
     public async handle(message: PreviewMessage) {
-        this._logger.log('info', `Handling message: ${message.receiptHandle}`);
+        this._logger.silly(`Handling message: ${message.receiptHandle}`);
         this._reader.logQueries();
     }
 }
