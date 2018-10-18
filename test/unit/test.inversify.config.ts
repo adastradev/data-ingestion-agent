@@ -8,7 +8,6 @@ import DummyReader from '../../source/DataAccess/Dummy/DummyReader';
 import DummyWriter from '../../source/DataAccess/Dummy/DummyWriter';
 
 // Services/cross-cutting concerns
-import { S3, SQS } from 'aws-sdk';
 import * as Winston from 'winston';
 
 // Factories
@@ -32,8 +31,6 @@ const logger: Winston.Logger = Winston.createLogger({
         new Winston.transports.Console({ silent: true })
     ]
 });
-
-const s3Config: S3.ClientConfiguration = { region: 'us-east-1' };
 
 container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
 container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();

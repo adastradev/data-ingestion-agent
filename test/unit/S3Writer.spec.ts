@@ -13,8 +13,7 @@ describe('S3Writer', () => {
     describe('when ingesting data', () => {
 
         it('should upload data to S3', async () => {
-            const s3Config = { region: 'us-east-1' };
-            const s3Writer = new S3Writer(s3Config, 'some_tenant_id', 'some_bucket');
+            const s3Writer = new S3Writer('some_tenant_id', 'some_bucket');
             let uploadCalls = 0;
             AWS.mock('S3', 'upload', (params, callback) => {
                 uploadCalls++;
