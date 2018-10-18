@@ -28,7 +28,7 @@ COPY --from=build-env /lib /lib
 RUN npm install && \
     node_modules/typescript/bin/tsc && \
     npm run test && \
-    npm run coveralls && \
+    if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi && \
     if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi
 
 # compile image intended for production use
