@@ -23,14 +23,12 @@ describe('PreviewHandler', () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const reader = container.get<IDataReader>(TYPES.DataReader);
 
-            const loggerSpy = sinon.spy(logger, 'log');
             const readerLogQuerySpy = sinon.spy(reader, 'logQueries');
             const readerReadSpy = sinon.spy(reader, 'read');
 
             const handler = new PreviewHandler(reader, logger);
             await handler.handle(message);
 
-            expect(loggerSpy.callCount).to.be.greaterThan(1);
             expect(readerLogQuerySpy.callCount).to.eq(1);
             expect(readerReadSpy.callCount).to.eq(0);
 

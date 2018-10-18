@@ -38,18 +38,23 @@ export default class S3Writer implements IDataWriter {
         const s3api = new S3(this._s3Config);
 
         const dataBody = stream;
-        const params = {
+        const parms = {
             Body: dataBody,
             Bucket:  this._bucket + '/' + this._tenantId,
             Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
         };
 
-        // Parallelize 5x10MB chunks at a time...or at least try to
+        // Parallelize 2x5MB chunks at a time...or at least try to
         // TODO: Make performance settings configurable? via config? via sqs? per table? per client?
-        const upload = new AWS.S3.ManagedUpload({ params, partSize: 1024 * 1024 * 5, queueSize: 2  });
+        const s3Obj = new AWS.S3();
+        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms, { partSize: 1024 * 1024 * 5, queueSize: 3  });
 
+        await this.waitForCompletion(managedUpload);
+    }
+
+    private async waitForCompletion(managedUpload: AWS.S3.ManagedUpload) {
         const ingestionCompletion = new Promise((resolve, reject) => {
-            upload.on('httpUploadProgress', (evt) => {
+            managedUpload.on('httpUploadProgress', (evt) => {
                 this._logger.info(`Progress: ${evt.loaded} bytes uploaded`);
 
                 // Only resolve when we're done
@@ -60,7 +65,7 @@ export default class S3Writer implements IDataWriter {
             });
         });
 
-        upload.send((err, data) => {
+        managedUpload.send((err, data) => {
             if (err) {
                 this._logger.error(err.message);
             } else {

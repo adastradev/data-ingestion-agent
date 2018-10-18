@@ -30,11 +30,11 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
 
             const oracleReader: OracleReader = new OracleReader(logger);
-            const spy = sandbox.spy(logger, 'log');
+            const spy = sandbox.spy(logger, 'info');
 
             oracleReader.logQueries();
 
-            expect(spy.calledOnce).to.be.true;
+            expect(spy.calledTwice).to.be.true;
         });
     });
 
@@ -48,11 +48,15 @@ describe('OracleReader', () => {
             sandbox.restore();
         });
 
-        it('should upload query result stream data to S3', async () => {
+        it('should return a stream representing the dataset', async () => {
 
             process.env.ORACLE_ENDPOINT = 'something';
             const executeFunc = async (query, binds, options) => {
-                return Promise.resolve({ rows: [{ col1: 'value', col2: 'value'}] });
+
+                const resultStream = new Readable({objectMode: true });
+                resultStream.push({ col1: 'value', col2: 'value'});
+                resultStream.push(null);
+                return Promise.resolve(resultStream);
             };
             const closeFunc = async () => {
                 return Promise.resolve();
@@ -62,7 +66,7 @@ describe('OracleReader', () => {
             const closeSpy = sandbox.spy(closeFunc);
 
             const getConnectionStub = sandbox.stub(oracledb, 'getConnection')
-                .returns({ execute: executeSpy, close: closeSpy });
+                .returns({ queryStream: executeSpy, close: closeSpy });
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger);
@@ -71,28 +75,21 @@ describe('OracleReader', () => {
 
             expect(getConnectionStub.calledOnce).to.be.true;
             expect(executeSpy.calledOnce).to.be.true;
-            expect(closeSpy.calledOnce).to.be.true;
+            expect(closeSpy.calledOnce).to.be.false;
             expect(readable).to.be.not.null;
-
-            let chunk;
-            let output = '';
-
-            while ((chunk = readable.read()) !== null) {
-                output += chunk.toString();
-            }
-
-            expect(output).to.eq('{"col1":"value","col2":"value"}\n');
 
             delete process.env.ORACLE_ENDPOINT;
         });
 
-        it('should upload test stream data to S3', async () => {
+        it('should not attempt to connect to Oracle when generating demo data', async () => {
             const executeFunc = async (query, binds, options) => {
-                return Promise.resolve({ rows: [{ col1: 'value', col2: 'value'}] });
+                const resultStream = new Readable({objectMode: true });
+                resultStream.push({ col1: 'value', col2: 'value'});
+                return Promise.resolve(resultStream);
             };
             const executeSpy = sandbox.spy(executeFunc);
 
-            const stub = sandbox.stub(oracledb, 'getConnection').returns({ execute: executeSpy});
+            const stub = sandbox.stub(oracledb, 'getConnection').returns({ queryStream: executeSpy});
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger);
 
@@ -101,15 +98,6 @@ describe('OracleReader', () => {
             expect(executeSpy.calledOnce).to.be.false;
             expect(stub.calledOnce).to.be.false;
             expect(readable).to.be.not.null;
-
-            let chunk;
-            let output = '';
-
-            while ((chunk = readable.read()) !== null) {
-                output += chunk.toString();
-            }
-
-            expect(output).to.eq('this is a test stream');
         });
     });
 });

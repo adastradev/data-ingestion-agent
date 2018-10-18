@@ -21,7 +21,7 @@ export default class OracleReader implements IDataReader {
     private connection: oracledb.IConnection;
 
     private readonly queries = [
-        'SELECT * FROM dummysisdata where rownum < 10000',
+        'SELECT * FROM dummysisdata where rownum < 100000',
         'SELECT * FROM ALL_TABLES'
     ];
 
@@ -51,7 +51,7 @@ export default class OracleReader implements IDataReader {
 
             // TODO: Make fetch array size configurable?
             const s = await this.connection.queryStream(this.queries[0], [],
-                { outFormat: oracledb.OBJECT, fetchArraySize: 150 } as any);
+                { outFormat: oracledb.OBJECT, fetchArraySize: 10000 } as any);
 
             const t = new stream.Transform( { objectMode: true });
 
