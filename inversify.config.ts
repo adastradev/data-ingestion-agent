@@ -32,7 +32,7 @@ import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
 
 // TODO: Make configurable?
 const REGION = 'us-east-1';
-const stage = 'prod';
+const stage = 'dev';
 
 const container = new Container();
 

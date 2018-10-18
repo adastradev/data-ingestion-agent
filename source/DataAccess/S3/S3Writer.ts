@@ -1,4 +1,4 @@
-import { Readable } from 'stream';
+import { Readable, Stream } from 'stream';
 import { S3 } from 'aws-sdk';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';

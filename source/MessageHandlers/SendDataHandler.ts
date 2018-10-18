@@ -43,5 +43,6 @@ export default class SendDataHandler implements IMessageHandler {
         //       process/thread, especially in just one pass...
         const readable: Readable = await this.reader.read();
         await this.writer.ingest(readable);
+        this.reader.close();
     }
 }
