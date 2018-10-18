@@ -40,6 +40,7 @@ class App {
             await command.invoke(args.splice(1));
         }
 
+        this.logger.log('info', `Proccess Id: ${process.pid}`);
         this.logger.log('info', 'Waiting for sqs schedule event');
         while (!shutdownRequested) {
             await sleep(1000);

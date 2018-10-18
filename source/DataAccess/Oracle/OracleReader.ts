@@ -1,4 +1,4 @@
-import { Readable, Transform } from 'stream';
+import * as stream from 'stream';
 import transform from 'stream-transform';
 import { Stringifier } from 'csv-stringify';
 import * as oracledb from 'oracledb';
@@ -18,11 +18,12 @@ import IDataReader from '../IDataReader';
  */
 @injectable()
 export default class OracleReader implements IDataReader {
+
     private logger: Logger;
     private connection: oracledb.IConnection;
 
     private readonly queries = [
-        'SELECT * FROM dummysisdata where rownum < 100',
+        'SELECT * FROM dummysisdata where rownum < 10000000',
         'SELECT * FROM ALL_TABLES'
     ];
 
@@ -31,7 +32,7 @@ export default class OracleReader implements IDataReader {
         this.logger = logger;
     }
 
-    public async read(): Promise<Readable> {
+    public async read(): Promise<stream.Readable> {
 
         if (process.env.ORACLE_ENDPOINT === undefined) {
             return this.createDemoSnapshot();
@@ -50,22 +51,29 @@ export default class OracleReader implements IDataReader {
               outFormat: oracledb.OBJECT // query result format
             };
             // const result = await connection.execute(this.queries[0], binds, options);
-            const stream = await this.connection.queryStream(this.queries[0], [],
-                { outFormat: oracledb.OBJECT } as any);
+            const s = await this.connection.queryStream(this.queries[0], [],
+                { outFormat: oracledb.OBJECT, fetchArraySize: 150 } as any);
 
-            const transformer = transform((data) => {
-                return
-            });
+            const t = new stream.Transform( { objectMode: true });
+            // const lgr = this.logger;
+            t._transform = function (chunk, encoding, done) {
+                const data = JSON.stringify(chunk);
+                this.push(Buffer.from(data, encoding));
+                // this.push(Buffer.from('\n'));
+                // lgr.log('info', `Transforming row id: ${chunk.ID}`);
 
-            // const stringifier = new Stringifier({
-            //     columns: ['Id', 'Name', 'City'],
-            //     delimiter: '\t',
-            //     header: true
-            //   });
+                done();
+            };
 
-            // const outStream = stream.pipe(stringifier);
+            // tslint:disable-next-line:only-arrow-functions
+            t._flush = function (done) {
+                // lgr.log('info', `Flushing`);
+                done();
+            };
 
-            return stream;
+            const result = s.pipe(t);
+
+            return result;
         } catch (err) {
             console.error(err);
             throw err;
@@ -89,7 +97,7 @@ export default class OracleReader implements IDataReader {
     }
 
     private createDemoSnapshot() {
-        const s = new Readable();
+        const s = new stream.Readable();
         s.push('this is a test stream');
         s.push(null);
         return s;
