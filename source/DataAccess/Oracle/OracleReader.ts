@@ -84,8 +84,16 @@ export default class OracleReader implements IDataReader {
     }
 
     public async close(): Promise<void> {
+        const sleep = (ms: number) => {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        };
         if (this._connectionPool) {
             try {
+
+                while (this._connectionPool.connectionsInUse > 0) {
+                    await sleep(1000);
+                }
+
                 await this._connectionPool.close();
             } catch (err) {
                 console.error(err);

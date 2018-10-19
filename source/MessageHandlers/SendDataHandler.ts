@@ -49,7 +49,7 @@ export default class SendDataHandler implements IMessageHandler {
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
 
         try {
-            this._reader.open();
+            await this._reader.open();
 
             // delegate each query statement to one Reader/Writer pair
             const statementExecutors: Array<Promise<boolean>> = [];
@@ -60,7 +60,7 @@ export default class SendDataHandler implements IMessageHandler {
                 (success: boolean) => { /* No action required here */ },
                 { concurrency: STATEMENT_CONCURRENCY });
         } finally {
-            this._reader.close();
+            await this._reader.close();
         }
     }
 
