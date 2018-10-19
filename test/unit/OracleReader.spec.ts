@@ -1,4 +1,3 @@
-// tslint:disable:no-conditional-assignment
 import 'reflect-metadata';
 import * as chai from 'chai';
 

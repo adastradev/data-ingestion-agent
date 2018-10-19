@@ -19,6 +19,12 @@ describe('oracledb', () => {
             await reader.open();
             const stream: Readable = await reader.read('SELECT * FROM ALL_TABLES');
             expect(stream.readable).to.be.equal(true);
+            let chunk;
+            let output = '';
+            // tslint:disable-next-line:no-conditional-assignment
+            while ((chunk = stream.read()) !== null) {
+                output += chunk.toString();
+            }
             await reader.close();
         });
     });
