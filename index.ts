@@ -8,6 +8,7 @@ import IMessage from './source/IMessage';
 import IMessageHandler from './source/IMessageHandler';
 import MessageFactory from './source/MessageFactory';
 import ICommand from './source/Commands/ICommand';
+import { AuthManager } from './source/astra-sdk/AuthManager';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -21,14 +22,12 @@ process.on('SIGTERM', () => {
 class App {
 
     public static async main() {
-
         this.container = await startup();
 
         this.logger = this.container.get<Winston.Logger>(TYPES.Logger);
         const queueUrl = this.container.get<string>(TYPES.QueueUrl);
-        const sqsConfig = this.container.get<SQS.ClientConfiguration>(TYPES.SQSConfig);
-
-        const sqs = new SQS(sqsConfig);
+        const authManager = this.container.get<AuthManager>(TYPES.AuthManager);
+        const sqs = new SQS();
         let isAdhoc = false;
 
         // Handle agent commands
@@ -45,6 +44,7 @@ class App {
         while (!shutdownRequested) {
             await sleep(1000);
 
+            await authManager.refreshCognitoCredentials();
             const result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
 
             if (result.Messages) {

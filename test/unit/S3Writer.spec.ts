@@ -17,9 +17,8 @@ describe('S3Writer', () => {
     describe('when ingesting data', () => {
 
         it('should upload data to S3', async () => {
-            const s3Config = { region: 'us-east-1' };
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const s3Writer = new S3Writer(s3Config, 'some_tenant_id', 'some_bucket', logger);
+            const s3Writer = new S3Writer('some_tenant_id', 'some_bucket', logger);
             let uploadCalls = 0;
 
             const waitForCompletionStub = sinon.stub(S3Writer.prototype, 'waitForCompletion' as any)

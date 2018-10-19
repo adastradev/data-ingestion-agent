@@ -1,4 +1,6 @@
 # data-ingestion-agent
+[![Coverage Status](https://coveralls.io/repos/github/adastradev/data-ingestion-agent/badge.svg?branch=master)](https://coveralls.io/github/adastradev/data-ingestion-agent?branch=master)
+
 Ad Astra Docker agent code base for cloud integration without VPN tunnels
 
 ## Pre-requisites
@@ -43,7 +45,7 @@ docker build \
 --build-arg ORACLE_ENDPOINT=hostname:port/service_name \
 --build-arg ORACLE_USER=user \
 --build-arg ORACLE_PASSWORD=password \
---build-arg TEST_TARGET=integration-test \
+--build-arg INTEGRATION_TESTS_ENABLED=true \
 -t data-ingestion-agent .
 ```
 

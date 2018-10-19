@@ -1,10 +1,8 @@
-// tslint:disable:no-unused-expression
 // tslint:disable:no-conditional-assignment
 import 'reflect-metadata';
 import * as chai from 'chai';
 import * as AWS from 'aws-sdk-mock';
 
-import S3Writer from '../../source/DataAccess/S3/S3Writer';
 import { Readable } from 'stream';
 import * as oracledb from 'oracledb';
 import sinon = require('sinon');
