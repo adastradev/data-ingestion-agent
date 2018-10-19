@@ -30,7 +30,25 @@ export default class IntegrationConfigFactory {
                 return {
                     queries: [
                         'SELECT * FROM dummysisdata where rownum < 100000',
-                        'SELECT * FROM ALL_TABLES'
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000',
+                        'SELECT * FROM ALL_TABLES',
+                        'SELECT * FROM dummysisdata where rownum < 100000'
                     ],
                     type: 'Banner'
                 };

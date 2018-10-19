@@ -3,6 +3,7 @@ import * as oracledb from 'oracledb';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
+import sleep from '../../Util/sleep';
 
 import IDataReader from '../IDataReader';
 
@@ -86,6 +87,10 @@ export default class OracleReader implements IDataReader {
     public async close(): Promise<void> {
         if (this._connectionPool) {
             try {
+                while (this._connectionPool.connectionsInUse > 0) {
+                    await sleep(1000);
+                }
+
                 await this._connectionPool.close();
             } catch (err) {
                 console.error(err);

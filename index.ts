@@ -9,10 +9,7 @@ import IMessageHandler from './source/IMessageHandler';
 import MessageFactory from './source/MessageFactory';
 import ICommand from './source/Commands/ICommand';
 import { AuthManager } from './source/astra-sdk/AuthManager';
-
-async function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import sleep from './source/Util/sleep';
 
 let shutdownRequested = false;
 process.on('SIGTERM', () => {
