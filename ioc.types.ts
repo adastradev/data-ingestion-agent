@@ -7,6 +7,7 @@ const TYPES = {
     DummyHandler: Symbol('DummyHandler'),
     DummyMessage: Symbol('DummyMessage'),
     INGEST: Symbol('Ingest'),
+    IntegrationConfigFactory: Symbol('IntegrationConfigFactory'),
     Logger: Symbol('Logger'),
     MessageFactory: Symbol('MessageFactory'),
     MessageHandlerFactory: Symbol('MessageHandlerFactory'),

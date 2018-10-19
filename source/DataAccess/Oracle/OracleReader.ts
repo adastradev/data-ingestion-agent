@@ -16,21 +16,15 @@ import IDataReader from '../IDataReader';
  */
 @injectable()
 export default class OracleReader implements IDataReader {
-
     private logger: Logger;
     private connection: oracledb.IConnection;
-
-    private readonly queries = [
-        'SELECT * FROM dummysisdata where rownum < 100000',
-        'SELECT * FROM ALL_TABLES'
-    ];
 
     constructor(
         @inject(TYPES.Logger) logger: Logger) {
         this.logger = logger;
     }
 
-    public async read(): Promise<stream.Readable> {
+    public async read(queryStatement: string): Promise<stream.Readable> {
 
         if (process.env.ORACLE_ENDPOINT === undefined) {
             return this.createDemoSnapshot();
@@ -50,7 +44,8 @@ export default class OracleReader implements IDataReader {
             };
 
             // TODO: Make fetch array size configurable?
-            const s = await this.connection.queryStream(this.queries[0], [],
+            this.logger.info('Executing statement: ' + queryStatement);
+            const s = await this.connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000 } as any);
 
             const t = new stream.Transform( { objectMode: true });
@@ -88,12 +83,6 @@ export default class OracleReader implements IDataReader {
             } catch (err) {
                 console.error(err);
             }
-        }
-    }
-
-    public logQueries(): void {
-        for (const query of this.queries) {
-            this.logger.info(query);
         }
     }
 

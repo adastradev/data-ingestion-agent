@@ -14,28 +14,6 @@ import TYPES from '../../ioc.types';
 const expect = chai.expect;
 
 describe('OracleReader', () => {
-    describe('when previewing queries', () => {
-        let sandbox: sinon.SinonSandbox;
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        it('should log the queries', () => {
-            const logger: Logger = container.get<Logger>(TYPES.Logger);
-
-            const oracleReader: OracleReader = new OracleReader(logger);
-            const spy = sandbox.spy(logger, 'info');
-
-            oracleReader.logQueries();
-
-            expect(spy.calledTwice).to.be.true;
-        });
-    });
-
     describe('when ingesting data', () => {
         let sandbox: sinon.SinonSandbox;
         beforeEach(() => {
@@ -69,7 +47,7 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger);
 
-            const readable: Readable = await oracleReader.read();
+            const readable: Readable = await oracleReader.read('Mock query statement');
 
             expect(getConnectionStub.calledOnce).to.be.true;
             expect(executeSpy.calledOnce).to.be.true;
@@ -91,7 +69,7 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger);
 
-            const readable: Readable = await oracleReader.read();
+            const readable: Readable = await oracleReader.read('Mock query statement');
 
             expect(executeSpy.calledOnce).to.be.false;
             expect(stub.calledOnce).to.be.false;

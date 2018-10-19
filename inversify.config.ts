@@ -29,6 +29,7 @@ import OracleReader from './source/DataAccess/Oracle/OracleReader';
 import ICommand from './source/Commands/ICommand';
 import AdHocIngestCommand from './source/Commands/AdHocIngestCommand';
 import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
+import IntegrationConfigFactory from './source/IntegrationConfigFactory';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -61,6 +62,8 @@ const s3Buckets = {
 
 const bucketName = s3Buckets[stage];
 
+const integrationConfigFactory = new IntegrationConfigFactory(logger);
+
 const startup = async () => {
     // Authentication & Resource lookups
     const endpoints = await sdk.lookupService('user-management', stage);
@@ -89,6 +92,7 @@ const startup = async () => {
     container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
     container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
     container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
+    container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory).toConstantValue(integrationConfigFactory);
 
     // Message Management
     container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();

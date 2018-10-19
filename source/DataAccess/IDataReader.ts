@@ -8,10 +8,8 @@ import { Readable } from 'stream';
  */
 export default interface IDataReader {
     read: QueryStreamFunction;
-    logQueries: LogQueriesFunction;
     close: CloseFunction;
 }
 
-export type QueryStreamFunction = () => Promise<Readable>;
-export type LogQueriesFunction = () => void;
+export type QueryStreamFunction = (queryStatement: string) => Promise<Readable>;
 export type CloseFunction = () => Promise<void>;
