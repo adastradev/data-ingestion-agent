@@ -45,30 +45,10 @@ export default class S3Writer implements IDataWriter {
         const s3Obj = new AWS.S3();
         const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms, { partSize: 1024 * 1024 * 5, queueSize: 3  });
 
-        await this.waitForCompletion(managedUpload);
-    }
-
-    private async waitForCompletion(managedUpload: AWS.S3.ManagedUpload) {
-        const ingestionCompletion = new Promise((resolve, reject) => {
-            managedUpload.on('httpUploadProgress', (evt) => {
-                this._logger.info(`Progress: ${evt.loaded} bytes uploaded`);
-
-                // Only resolve when we're done
-                // not sure of the reporting accuracy for bytes sent so leaving as gte
-                if (evt.loaded >= evt.total) {
-                    resolve(evt);
-                }
-            });
+        managedUpload.on('httpUploadProgress', (evt) => {
+            this._logger.info(`Progress: ${evt.loaded} bytes uploaded`);
         });
 
-        managedUpload.send((err, data) => {
-            if (err) {
-                this._logger.error(err.message);
-            } else {
-                this._logger.info(`Upload complete - Bucket Location: ${data.Location}`);
-            }
-        });
-
-        await ingestionCompletion;
+        await managedUpload.promise();
     }
 }
