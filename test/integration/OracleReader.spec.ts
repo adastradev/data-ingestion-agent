@@ -16,8 +16,10 @@ describe('oracledb', () => {
         it('should return sample query results', async () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const reader = new OracleReader(logger);
-            const stream: Readable = await reader.read();
+            await reader.open();
+            const stream: Readable = await reader.read('SELECT * FROM ALL_TABLES');
             expect(stream.readable).to.be.equal(true);
+            await reader.close();
         });
     });
 });

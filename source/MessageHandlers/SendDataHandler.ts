@@ -6,12 +6,14 @@ import { Logger } from 'winston';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
+import * as BluebirdPromise from 'bluebird';
 
 import SendDataMessage from '../Messages/SendDataMessage';
 import IDataReader from '../DataAccess/IDataReader';
 import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 
+const STATEMENT_CONCURRENCY = 5;
 /**
  * Handles messages received to instruct the agent to being its ingestion process
  *
@@ -46,16 +48,32 @@ export default class SendDataHandler implements IMessageHandler {
         const integrationType = 'Banner';
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
 
-        const startTime = Date.now();
+        try {
+            this._reader.open();
 
-        // TODO: delegate each query statement to one Reader/Writer pair
-        const readable: Readable = await this._reader.read(integrationConfig.queries[0]);
-        await this._writer.ingest(readable);
-        this._reader.close();
+            // delegate each query statement to one Reader/Writer pair
+            const statementExecutors: Array<Promise<boolean>> = [];
+            for (const statement of integrationConfig.queries) {
+                statementExecutors.push(this.getStatementExecutor(statement));
+            }
+            await BluebirdPromise.map(statementExecutors,
+                (success: boolean) => { /* No action required here */ },
+                { concurrency: STATEMENT_CONCURRENCY });
+        } finally {
+            this._reader.close();
+        }
+    }
 
-        const endTime = Date.now();
-        const diff = moment.duration(endTime - startTime);
+    private getStatementExecutor(queryStatement: string): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            const startTime = Date.now();
+            const readable: Readable = await this._reader.read(queryStatement);
+            await this._writer.ingest(readable);
+            const endTime = Date.now();
+            const diff = moment.duration(endTime - startTime);
 
-        this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
+            this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
+            resolve(true);
+        });
     }
 }

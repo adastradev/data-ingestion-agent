@@ -5,7 +5,9 @@ import * as AWS from 'aws-sdk-mock';
 
 import { Readable } from 'stream';
 import * as oracledb from 'oracledb';
+import { IConnection, IConnectionPool } from 'oracledb';
 import sinon = require('sinon');
+import { stubInterface } from 'ts-sinon';
 import OracleReader from '../../source/DataAccess/Oracle/OracleReader';
 import container from './test.inversify.config';
 import { Logger } from 'winston';
@@ -25,31 +27,37 @@ describe('OracleReader', () => {
         });
 
         it('should return a stream representing the dataset', async () => {
-
             process.env.ORACLE_ENDPOINT = 'something';
-            const executeFunc = async (query, binds, options) => {
 
+            // stub connection
+            const executeSpy = sandbox.spy(async (query, binds, options) => {
                 const resultStream = new Readable({objectMode: true });
                 resultStream.push({ col1: 'value', col2: 'value'});
                 resultStream.push(null);
                 return Promise.resolve(resultStream);
-            };
-            const closeFunc = async () => {
+            });
+            const connectionStub = stubInterface<IConnection>({
+                queryStream: executeSpy
+            });
+
+            // stub connection pool
+            const closeSpy = sandbox.spy(async () => {
                 return Promise.resolve();
-            };
-
-            const executeSpy = sandbox.spy(executeFunc);
-            const closeSpy = sandbox.spy(closeFunc);
-
-            const getConnectionStub = sandbox.stub(oracledb, 'getConnection')
-                .returns({ queryStream: executeSpy, close: closeSpy });
+            });
+            const getConnectionSpy = sandbox.spy(async () => {
+                return Promise.resolve(connectionStub as IConnection);
+            });
+            const createPoolStub = sandbox.stub(oracledb, 'createPool')
+                .returns({ close: closeSpy, getConnection: getConnectionSpy });
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger);
 
+            await oracleReader.open();
             const readable: Readable = await oracleReader.read('Mock query statement');
+            await oracleReader.close();
 
-            expect(getConnectionStub.calledOnce).to.be.true;
+            expect(createPoolStub.calledOnce).to.be.true;
             expect(executeSpy.calledOnce).to.be.true;
             expect(closeSpy.calledOnce).to.be.false;
             expect(readable).to.be.not.null;
@@ -57,7 +65,7 @@ describe('OracleReader', () => {
             delete process.env.ORACLE_ENDPOINT;
         });
 
-        it('should not attempt to connect to Oracle when generating demo data', async () => {
+        xit('should not attempt to connect to Oracle when generating demo data', async () => {
             const executeFunc = async (query, binds, options) => {
                 const resultStream = new Readable({objectMode: true });
                 resultStream.push({ col1: 'value', col2: 'value'});
@@ -69,7 +77,9 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger);
 
+            await oracleReader.open();
             const readable: Readable = await oracleReader.read('Mock query statement');
+            await oracleReader.close();
 
             expect(executeSpy.calledOnce).to.be.false;
             expect(stub.calledOnce).to.be.false;

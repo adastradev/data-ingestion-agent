@@ -6,6 +6,8 @@ import { Logger } from 'winston';
 
 import IDataReader from '../IDataReader';
 
+const POOL_SIZE = 5;
+
 /**
  * An interface through which data is queried using predefined queries for the
  * target Oracle database.
@@ -16,26 +18,22 @@ import IDataReader from '../IDataReader';
  */
 @injectable()
 export default class OracleReader implements IDataReader {
-    private logger: Logger;
-    private connection: oracledb.IConnection;
+    private _logger: Logger;
+    private _connectionPool: oracledb.IConnectionPool;
 
     constructor(
         @inject(TYPES.Logger) logger: Logger) {
-        this.logger = logger;
+        this._logger = logger;
     }
 
     public async read(queryStatement: string): Promise<stream.Readable> {
 
-        if (process.env.ORACLE_ENDPOINT === undefined) {
+        if (this._connectionPool === undefined) {
             return this.createDemoSnapshot();
         }
 
         try {
-            this.connection = await oracledb.getConnection({
-                connectString : process.env.ORACLE_ENDPOINT,
-                password      : process.env.ORACLE_PASSWORD,
-                user          : process.env.ORACLE_USER
-            });
+            const connection: oracledb.IConnection = await this._connectionPool.getConnection();
 
             // Query the data
             const binds = {};
@@ -44,8 +42,8 @@ export default class OracleReader implements IDataReader {
             };
 
             // TODO: Make fetch array size configurable?
-            this.logger.info('Executing statement: ' + queryStatement);
-            const s = await this.connection.queryStream(queryStatement, [],
+            this._logger.info('Executing statement: ' + queryStatement);
+            const s = await connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000 } as any);
 
             const t = new stream.Transform( { objectMode: true });
@@ -73,13 +71,22 @@ export default class OracleReader implements IDataReader {
         }
     }
 
-    // TODO: This is leaky, need a better abstraction while
-    // still allowing streams to fully process before closing
-    // a connection
+    public async open(): Promise<void> {
+        if (process.env.ORACLE_ENDPOINT === undefined) {
+            return;
+        }
+        this._connectionPool = await oracledb.createPool({
+            connectString : process.env.ORACLE_ENDPOINT,
+            password      : process.env.ORACLE_PASSWORD,
+            poolMax       : POOL_SIZE,
+            user          : process.env.ORACLE_USER
+        });
+    }
+
     public async close(): Promise<void> {
-        if (this.connection) {
+        if (this._connectionPool) {
             try {
-                await this.connection.close();
+                await this._connectionPool.close();
             } catch (err) {
                 console.error(err);
             }

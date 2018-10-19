@@ -7,9 +7,16 @@ import { Readable } from 'stream';
  * @interface IDataReader
  */
 export default interface IDataReader {
-    read: QueryStreamFunction;
+    open: OpenFunction;
     close: CloseFunction;
+    /**
+     * Note: the implementation of read must allow multiple calls on the same instance object.
+     * It can rely on state from open/close, but must not introduce new state that would cause collisions
+     * between multiple calls
+     */
+    read: QueryStreamFunction;
 }
 
 export type QueryStreamFunction = (queryStatement: string) => Promise<Readable>;
+export type OpenFunction = () => Promise<void>;
 export type CloseFunction = () => Promise<void>;
