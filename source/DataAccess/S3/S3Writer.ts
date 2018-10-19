@@ -31,8 +31,6 @@ export default class S3Writer implements IDataWriter {
     }
 
     public async ingest(stream: Readable) {
-        const s3api = new S3();
-
         const dataBody = stream;
         const parms = {
             Body: dataBody,
