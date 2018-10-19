@@ -1,13 +1,10 @@
 // tslint:disable:no-conditional-assignment
 import 'reflect-metadata';
 import * as chai from 'chai';
-import * as AWS from 'aws-sdk-mock';
 
 import { Readable } from 'stream';
 import * as oracledb from 'oracledb';
-import { IConnection, IConnectionPool } from 'oracledb';
 import sinon = require('sinon');
-import { stubInterface } from 'ts-sinon';
 import OracleReader from '../../source/DataAccess/Oracle/OracleReader';
 import container from './test.inversify.config';
 import { Logger } from 'winston';
@@ -36,16 +33,15 @@ describe('OracleReader', () => {
                 resultStream.push(null);
                 return Promise.resolve(resultStream);
             });
-            const connectionStub = stubInterface<IConnection>({
-                queryStream: executeSpy
-            });
 
             // stub connection pool
             const closeSpy = sandbox.spy(async () => {
                 return Promise.resolve();
             });
             const getConnectionSpy = sandbox.spy(async () => {
-                return Promise.resolve(connectionStub as IConnection);
+                return Promise.resolve({
+                    queryStream: executeSpy
+                });
             });
             const createPoolStub = sandbox.stub(oracledb, 'createPool')
                 .returns({ close: closeSpy, getConnection: getConnectionSpy });
@@ -59,13 +55,13 @@ describe('OracleReader', () => {
 
             expect(createPoolStub.calledOnce).to.be.true;
             expect(executeSpy.calledOnce).to.be.true;
-            expect(closeSpy.calledOnce).to.be.false;
+            expect(closeSpy.calledOnce).to.be.true;
             expect(readable).to.be.not.null;
 
             delete process.env.ORACLE_ENDPOINT;
         });
 
-        xit('should not attempt to connect to Oracle when generating demo data', async () => {
+        it('should not attempt to connect to Oracle when generating demo data', async () => {
             const executeFunc = async (query, binds, options) => {
                 const resultStream = new Readable({objectMode: true });
                 resultStream.push({ col1: 'value', col2: 'value'});

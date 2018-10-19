@@ -21,6 +21,10 @@ export default class DummyReader implements IDataReader {
         return s;
     }
 
+    public async open(): Promise<void> {
+        return Promise.resolve();
+    }
+
     public async close(): Promise<void> {
         return Promise.resolve();
     }
