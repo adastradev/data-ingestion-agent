@@ -29,12 +29,10 @@ import OracleReader from './source/DataAccess/Oracle/OracleReader';
 import ICommand from './source/Commands/ICommand';
 import AdHocIngestCommand from './source/Commands/AdHocIngestCommand';
 import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
-import { CognitoUserSession } from 'amazon-cognito-identity-js';
 
-// TODO: Make configurable?
-const REGION = 'us-east-1';
-const stage = 'dev';
-AWS.config.region = REGION;
+const region = process.env.AWS_REGION || 'us-east-1';
+const stage = process.env.DEFAULT_STAGE || 'prod';
+AWS.config.region = region;
 
 const container = new Container();
 
@@ -49,10 +47,10 @@ const logger: Winston.Logger = Winston.createLogger({
 // NOTE: updates to the discovery service itself would require pushing a new docker image.
 // This should still be an environment variable rather than hardcoded
 process.env.DISCOVERY_SERVICE = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
-const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
+const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region);
 
-const poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
-const authManager = new AuthManager(poolLocator, REGION, logger);
+const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
+const authManager = new AuthManager(poolLocator, region, logger);
 let queueUrl: string;
 let tenantId: string;
 
@@ -78,7 +76,7 @@ const startup = async () => {
     };
     const userManagementApi = new UserManagementApi(
         process.env.USER_MANAGEMENT_URI,
-        REGION,
+        region,
         credentialsBearerToken);
 
     const poolListResponse = await userManagementApi.getUserPools();

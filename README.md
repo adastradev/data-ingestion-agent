@@ -22,6 +22,12 @@ docker run -d -t \
 adastradev/data-ingestion-agent:<tag>
 ```
 
+The docker agent also supports the following optional arguments:
+```sh
+-e DEFAULT_STAGE=dev \
+-e AWS_REGION=us-east-1 \
+```
+
 ## Uninstall
 The data ingestion agent is a long running process that may be performing work when an uninstall occurs. To reduce negative side effects of immediately stopping the agent it is advised to always stop the container with a grace period as shown below. Outright usage of `docker kill` is discouraged.
 
