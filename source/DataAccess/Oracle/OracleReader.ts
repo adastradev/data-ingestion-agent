@@ -3,11 +3,9 @@ import * as oracledb from 'oracledb';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
-import sleep from '../../Util/sleep';
 
 import IDataReader from '../IDataReader';
-
-const POOL_SIZE = 5;
+import IConnectionPoolManager from '../IConnectionPoolManager';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -20,25 +18,24 @@ const POOL_SIZE = 5;
 @injectable()
 export default class OracleReader implements IDataReader {
     private _logger: Logger;
-    private _connectionPool: oracledb.IConnectionPool;
+    private _connectionPool: IConnectionPoolManager;
+    private _connection: oracledb.IConnection;
 
     constructor(
-        @inject(TYPES.Logger) logger: Logger) {
+        @inject(TYPES.Logger) logger: Logger,
+        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPoolManager) {
         this._logger = logger;
+        this._connectionPool = connectionPool;
     }
 
     public async read(queryStatement: string): Promise<stream.Readable> {
-
-        if (this._connectionPool === undefined) {
+        if (process.env.ORACLE_ENDPOINT === undefined) {
             return this.createDemoSnapshot();
         }
 
         try {
-            const connection: oracledb.IConnection = await this._connectionPool.getConnection();
-            (connection as any).subscribe('end', {}, async () => {
-                await sleep(1000);
-                await connection.close();
-            });
+            const oracleConnectionPool: oracledb.IConnectionPool = await this._connectionPool.get();
+            this._connection = await oracleConnectionPool.getConnection();
 
             // Query the data
             const binds = {};
@@ -48,7 +45,7 @@ export default class OracleReader implements IDataReader {
 
             // TODO: Make fetch array size configurable?
             this._logger.info('Executing statement: ' + queryStatement);
-            const s = await connection.queryStream(queryStatement, [],
+            const s = await this._connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000 } as any);
 
             const t = new stream.Transform( { objectMode: true });
@@ -76,23 +73,10 @@ export default class OracleReader implements IDataReader {
         }
     }
 
-    public async open(): Promise<void> {
-        if (process.env.ORACLE_ENDPOINT === undefined) {
-            return;
-        }
-        this._connectionPool = await (oracledb as any).createPool({
-            connectString : process.env.ORACLE_ENDPOINT,
-            events        : true,
-            password      : process.env.ORACLE_PASSWORD,
-            poolMax       : POOL_SIZE,
-            user          : process.env.ORACLE_USER
-        });
-    }
-
     public async close(): Promise<void> {
-        if (this._connectionPool) {
+        if (this._connection) {
             try {
-                await (this._connectionPool as any).close(30);
+                await this._connection.close();
             } catch (err) {
                 console.error(err);
             }
