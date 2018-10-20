@@ -35,6 +35,10 @@ export default class OracleReader implements IDataReader {
 
         try {
             const connection: oracledb.IConnection = await this._connectionPool.getConnection();
+            (connection as any).subscribe('end', {}, async () => {
+                await sleep(1000);
+                await connection.close();
+            });
 
             // Query the data
             const binds = {};
@@ -76,8 +80,9 @@ export default class OracleReader implements IDataReader {
         if (process.env.ORACLE_ENDPOINT === undefined) {
             return;
         }
-        this._connectionPool = await oracledb.createPool({
+        this._connectionPool = await (oracledb as any).createPool({
             connectString : process.env.ORACLE_ENDPOINT,
+            events        : true,
             password      : process.env.ORACLE_PASSWORD,
             poolMax       : POOL_SIZE,
             user          : process.env.ORACLE_USER
@@ -87,11 +92,7 @@ export default class OracleReader implements IDataReader {
     public async close(): Promise<void> {
         if (this._connectionPool) {
             try {
-                while (this._connectionPool.connectionsInUse > 0) {
-                    await sleep(1000);
-                }
-
-                await this._connectionPool.close();
+                await (this._connectionPool as any).close(30);
             } catch (err) {
                 console.error(err);
             }
