@@ -6,7 +6,6 @@ import { stubInterface } from 'ts-sinon';
 import IMessageHandler from '../../source/IMessageHandler';
 import DummyHandler from '../../source/MessageHandlers/DummyHandler';
 import DummyReader from '../../source/DataAccess/Dummy/DummyReader';
-import DummyWriter from '../../source/DataAccess/Dummy/DummyWriter';
 
 // Services/cross-cutting concerns
 import * as Winston from 'winston';
@@ -47,7 +46,8 @@ container.bind<IMessage>(TYPES.DummyMessage).to(DummyMessage);
 container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
 
 container.bind<IDataReader>(TYPES.DataReader).to(DummyReader);
-container.bind<IDataWriter>(TYPES.DataWriter).to(DummyWriter);
+const mockWriter = stubInterface<IDataWriter>();
+container.bind<IDataWriter>(TYPES.DataWriter).toConstantValue(mockWriter);
 
 container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
 

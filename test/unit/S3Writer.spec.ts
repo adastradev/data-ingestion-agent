@@ -39,10 +39,10 @@ describe('S3Writer', () => {
             const stream: Readable = new Readable();
             stream.push('test');
             stream.push(null);
-            await s3Writer.ingest(stream);
+            await s3Writer.ingest(stream, 'mockPath');
 
             expect(upload.calledOnce).to.be.true;
-            expect(upload.getCalls()[0].args[0].Bucket).to.eq('some_bucket/some_tenant_id');
+            expect(upload.getCalls()[0].args[0].Bucket).to.eq('some_bucket/some_tenant_id/mockPath');
             expect(upload.getCalls()[0].args[0].Key).to.contain('testUpload-');
             expect(upload.getCalls()[0].args[0].Body).to.be.instanceof(Readable);
         });

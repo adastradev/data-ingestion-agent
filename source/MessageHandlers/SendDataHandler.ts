@@ -49,11 +49,13 @@ export default class SendDataHandler implements IMessageHandler {
     }
 
     public async handle(message: SendDataMessage) {
+        const captureStart = moment();
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
         // TODO: add integration type to the SendDataMessage model
         const integrationType = 'Banner';
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
+        const folderPath = integrationType + '-' + captureStart.format(); // Uses moment.ISO_8601
 
         try {
             await this._connectionPool.open();
@@ -61,7 +63,7 @@ export default class SendDataHandler implements IMessageHandler {
             // delegate each query statement to one Reader/Writer pair
             const statementExecutors: Array<Promise<IQueryMetadata>> = [];
             for (const statement of integrationConfig.queries) {
-                statementExecutors.push(this.getStatementExecutor(statement));
+                statementExecutors.push(this.getStatementExecutor(statement, folderPath));
             }
 
             // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
@@ -75,13 +77,13 @@ export default class SendDataHandler implements IMessageHandler {
                 cs.append(queryMetadata);
             }
 
-            this._writer.ingest(cs);
+            this._writer.ingest(cs, folderPath);
         } finally {
             await this._connectionPool.close();
         }
     }
 
-    private getStatementExecutor(queryStatement: IQueryDefinition): Promise<IQueryMetadata> {
+    private getStatementExecutor(queryStatement: IQueryDefinition, folderPath: string): Promise<IQueryMetadata> {
         return new Promise(async (resolve, reject) => {
             let reader: IDataReader;
             let metadata: Readable;
@@ -91,7 +93,7 @@ export default class SendDataHandler implements IMessageHandler {
                 reader = this._container.get<IDataReader>(TYPES.DataReader);
                 const readable: IQueryResult = await reader.read(queryStatement.query);
                 metadata = readable.metadata;
-                await this._writer.ingest(readable.result);
+                await this._writer.ingest(readable.result, folderPath);
                 const endTime = Date.now();
                 const diff = moment.duration(endTime - startTime);
 
