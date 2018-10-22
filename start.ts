@@ -10,13 +10,13 @@ let child;
 const onExitHandler = (code, signal) => {
     restartCounter++;
 
-    if (restartCounter < 5) {
+    if (restartCounter < 5 && !args[0]) {
         child = spawnAgent();
     } else {
         childState.status = 'exited';
     }
 
-    if (args[0] === 'preview') {
+    if (args[0]) {
         if (server) {
             server.close();
         }

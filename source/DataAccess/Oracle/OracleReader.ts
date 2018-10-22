@@ -57,12 +57,6 @@ export default class OracleReader implements IDataReader {
                 done();
             };
 
-            // tslint:disable-next-line:only-arrow-functions
-            t._flush = function (done) {
-                // lgr.info(`Flushing`);
-                done();
-            };
-
             const result = s.pipe(t);
 
             return result;
