@@ -1,8 +1,10 @@
+// tslint:disable:no-string-literal
+
 import TYPES from '../ioc.types';
 import { Container, inject, injectable, tagged } from 'inversify';
 import 'reflect-metadata';
 import * as Winston from 'winston';
-import IIntegrationConfig from './IIntegrationConfig';
+import { IIntegrationConfig, IQueryDefinition } from './IIntegrationConfig';
 import { IntegrationType } from 'aws-sdk/clients/apigateway';
 
 /**
@@ -27,10 +29,18 @@ export default class IntegrationConfigFactory {
     public create(integrationType: IntegrationType): IIntegrationConfig {
         switch (integrationType) {
             case 'Banner': {
-                const BANNER_TEMPLATE_STATEMENTS = [
-                    'SELECT * FROM dummysisdata where rownum < 100000',
-                    'SELECT * FROM ALL_TABLES'
-                ];
+                const BANNER_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
+
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'dummysisdata',
+                    query: 'SELECT * FROM dummysisdata where rownum < 100000'
+                });
+
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'all_tables',
+                    query: 'SELECT * FROM ALL_TABLES'
+                });
+
                 return {
                     queries: BANNER_TEMPLATE_STATEMENTS,
                     type: 'Banner'

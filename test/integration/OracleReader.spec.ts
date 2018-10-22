@@ -7,6 +7,7 @@ import * as chai from 'chai';
 import { Readable } from 'stream';
 import OracleConnectionPoolProxy from '../../source/DataAccess/Oracle/OracleConnectionPoolProxy';
 import sleep from '../../source/Util/sleep';
+import { IQueryResult } from '../../source/DataAccess/IDataReader';
 
 const expect = chai.expect;
 const should = chai.should();
@@ -21,12 +22,13 @@ describe('oracledb', () => {
 
             await pool.open();
 
-            const stream: Readable = await reader.read('SELECT * FROM ALL_TABLES');
-            expect(stream.readable).to.be.equal(true);
+            const stream: IQueryResult = await reader.read('SELECT * FROM ALL_TABLES');
+            expect(stream.result.readable).to.be.equal(true);
+            expect(stream.metadata.readable).to.be.equal(true);
             let chunk;
             let output = '';
             // tslint:disable-next-line:no-conditional-assignment
-            while ((chunk = stream.read()) !== null) {
+            while ((chunk = stream.result.read()) !== null) {
                 output += chunk.toString();
             }
             // avoid invalid resultset error from closing the connection before consumption of the resultset

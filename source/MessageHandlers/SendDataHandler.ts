@@ -7,12 +7,15 @@ import { Container, inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
 import * as BluebirdPromise from 'bluebird';
+import * as CombinedStream from 'combined-stream';
 
 import SendDataMessage from '../Messages/SendDataMessage';
-import IDataReader from '../DataAccess/IDataReader';
+import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
 import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
+import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
+import { WriteStream } from 'tty';
 
 const STATEMENT_CONCURRENCY = 5;
 /**
@@ -56,29 +59,39 @@ export default class SendDataHandler implements IMessageHandler {
             await this._connectionPool.open();
 
             // delegate each query statement to one Reader/Writer pair
-            const statementExecutors: Array<Promise<boolean>> = [];
+            const statementExecutors: Array<Promise<IQueryMetadata>> = [];
             for (const statement of integrationConfig.queries) {
                 statementExecutors.push(this.getStatementExecutor(statement));
             }
 
             // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
+            const metadata: IQueryMetadata[] = new Array<IQueryMetadata>();
             await BluebirdPromise.map(statementExecutors,
-                (success: boolean) => { /* No action required here */ },
+                (success: IQueryMetadata) => { metadata.push(success); },
                 { concurrency: STATEMENT_CONCURRENCY });
+
+            const cs = CombinedStream.create();
+            for (const queryMetadata of metadata) {
+                cs.append(queryMetadata);
+            }
+
+            this._writer.ingest(cs);
         } finally {
             await this._connectionPool.close();
         }
     }
 
-    private getStatementExecutor(queryStatement: string): Promise<boolean> {
+    private getStatementExecutor(queryStatement: IQueryDefinition): Promise<IQueryMetadata> {
         return new Promise(async (resolve, reject) => {
-            let reader;
+            let reader: IDataReader;
+            let metadata: Readable;
             try {
                 const startTime = Date.now();
 
                 reader = this._container.get<IDataReader>(TYPES.DataReader);
-                const readable: Readable = await reader.read(queryStatement);
-                await this._writer.ingest(readable);
+                const readable: IQueryResult = await reader.read(queryStatement.query);
+                metadata = readable.metadata;
+                await this._writer.ingest(readable.result);
                 const endTime = Date.now();
                 const diff = moment.duration(endTime - startTime);
 
@@ -88,7 +101,7 @@ export default class SendDataHandler implements IMessageHandler {
                     await reader.close();
                 }
             }
-            resolve(true);
+            resolve({ name: queryStatement.name, data: metadata});
         });
     }
 }

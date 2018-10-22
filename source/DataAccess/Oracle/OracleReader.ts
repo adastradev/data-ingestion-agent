@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 
-import IDataReader from '../IDataReader';
+import IDataReader, { IQueryResult } from '../IDataReader';
 import IConnectionPool from '../IConnectionPool';
 
 /**
@@ -28,9 +28,9 @@ export default class OracleReader implements IDataReader {
         this._connectionPool = connectionPool;
     }
 
-    public async read(queryStatement: string): Promise<stream.Readable> {
+    public async read(queryStatement: string): Promise<IQueryResult> {
         if (process.env.ORACLE_ENDPOINT === undefined) {
-            return this.createDemoSnapshot();
+            return { result: this.createDemoSnapshot(), metadata: null };
         }
 
         try {
@@ -44,12 +44,14 @@ export default class OracleReader implements IDataReader {
 
             // TODO: Make fetch array size configurable?
             this._logger.info('Executing statement: ' + queryStatement);
-            const s = await this._connection.queryStream(queryStatement, [],
-                { outFormat: oracledb.OBJECT, fetchArraySize: 10000 } as any);
+            const objectStream = await this._connection.queryStream(queryStatement, [],
+                { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
-            const t = new stream.Transform( { objectMode: true });
+            const metadataStream = await this.getMetadata(objectStream);
 
-            t._transform = function (chunk, encoding, done) {
+            const jsonTransformer = new stream.Transform( { objectMode: true });
+
+            jsonTransformer._transform = function (chunk, encoding, done) {
                 // TODO: Decide on a format/encoding/structure - JSON for now
                 const data = JSON.stringify(chunk);
                 this.push(Buffer.from(data, encoding));
@@ -57,9 +59,10 @@ export default class OracleReader implements IDataReader {
                 done();
             };
 
-            const result = s.pipe(t);
+            const metadataJsonStream = metadataStream.pipe(jsonTransformer);
+            const resultStream = objectStream.pipe(jsonTransformer);
 
-            return result;
+            return { result: resultStream, metadata: metadataJsonStream };
         } catch (err) {
             this._logger.error(err);
             throw err;
@@ -75,6 +78,24 @@ export default class OracleReader implements IDataReader {
                 return Promise.reject(err);
             }
         }
+    }
+
+    private async getMetadata(queryStream: stream.Readable): Promise<stream.Readable> {
+        const metadataReceived = new Promise<any[]>((resolve, reject) => {
+            queryStream.on('metadata', (md: any[]) => {
+                resolve(md);
+            });
+        });
+
+        const queryMetadataResult = await metadataReceived;
+
+        const metadataStream = new stream.Readable({ objectMode: true });
+        for (const col of queryMetadataResult) {
+            metadataStream.push(col);
+        }
+        metadataStream.push(null);
+
+        return metadataStream;
     }
 
     private createDemoSnapshot() {

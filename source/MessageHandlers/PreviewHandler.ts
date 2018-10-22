@@ -8,6 +8,7 @@ import 'reflect-metadata';
 import PreviewMessage from '../Messages/PreviewMessage';
 import IDataReader from '../DataAccess/IDataReader';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
+import { IQueryDefinition } from '../IIntegrationConfig';
 
 /**
  * Handles messages received to instruct the agent to preview queries used by the agent
@@ -41,10 +42,10 @@ export default class PreviewHandler implements IMessageHandler {
         this.logQueries(integrationConfig.queries);
     }
 
-    public logQueries(queryStatements: string[]): void {
+    public logQueries(queryStatements: IQueryDefinition[]): void {
         this._logger.info('The following queries are configured to be run by the agent:');
         for (const query of queryStatements) {
-            this._logger.info(query);
+            this._logger.info(query.query);
         }
     }
 }

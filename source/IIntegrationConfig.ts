@@ -1,3 +1,5 @@
+import { Readable } from 'stream';
+
 export declare type IntegrationType = 'Banner' | 'DegreeWorks';
 
 /**
@@ -6,7 +8,7 @@ export declare type IntegrationType = 'Banner' | 'DegreeWorks';
  * @export
  * @interface IIntegrationConfig
  */
-export default interface IIntegrationConfig {
+export interface IIntegrationConfig {
     /**
      * The unique integration type descriptor
      *
@@ -20,7 +22,17 @@ export default interface IIntegrationConfig {
      * @type {string[]}
      * @memberof IIntegrationConfig
      */
-    queries: string[];
+    queries: IQueryDefinition[];
 
     // TODO: do we need to version the config and/or track it's state (authorized to run / newly updated)
+}
+
+export interface IQueryDefinition {
+    name: string;
+    query: string;
+}
+
+export interface IQueryMetadata {
+    name: string;
+    data: Readable;
 }

@@ -21,7 +21,7 @@ describe('SendDataHandler', () => {
         const integrationConfigFactory = sinon.createStubInstance(IntegrationConfigFactory);
         integrationConfigFactory.create.returns({
             queries: [
-                'SELECT * FROM ALL_TABLES'
+                { name: 'all_tables', query: 'SELECT * FROM ALL_TABLES' }
             ],
             type: 'Banner'
         });
