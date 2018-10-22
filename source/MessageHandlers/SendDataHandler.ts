@@ -46,11 +46,15 @@ export default class SendDataHandler implements IMessageHandler {
     }
 
     public async handle(message: SendDataMessage) {
+        const captureStart = moment();
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
         // TODO: add integration type to the SendDataMessage model
         const integrationType = 'Banner';
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
+        const folderPath = captureStart.format('YYYY-MM-DD') + '/'
+            + integrationType + '-'
+            + captureStart.format('HH:mm');
 
         try {
             await this._connectionPool.open();
@@ -58,7 +62,7 @@ export default class SendDataHandler implements IMessageHandler {
             // delegate each query statement to one Reader/Writer pair
             const statementExecutors: Array<Promise<boolean>> = [];
             for (const statement of integrationConfig.queries) {
-                statementExecutors.push(this.getStatementExecutor(statement));
+                statementExecutors.push(this.getStatementExecutor(statement, folderPath));
             }
 
             // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
@@ -70,7 +74,7 @@ export default class SendDataHandler implements IMessageHandler {
         }
     }
 
-    private getStatementExecutor(queryStatement: string): Promise<boolean> {
+    private getStatementExecutor(queryStatement: string, folderPath: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             let reader;
             try {
@@ -78,7 +82,7 @@ export default class SendDataHandler implements IMessageHandler {
 
                 reader = this._container.get<IDataReader>(TYPES.DataReader);
                 const readable: Readable = await reader.read(queryStatement);
-                await this._writer.ingest(readable);
+                await this._writer.ingest(readable, folderPath);
                 const endTime = Date.now();
                 const diff = moment.duration(endTime - startTime);
 

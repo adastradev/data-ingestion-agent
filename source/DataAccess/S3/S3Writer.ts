@@ -30,11 +30,11 @@ export default class S3Writer implements IDataWriter {
         this._logger = logger;
     }
 
-    public async ingest(stream: Readable) {
+    public async ingest(stream: Readable, folderPath: string) {
         const dataBody = stream;
         const parms = {
             Body: dataBody,
-            Bucket:  this._bucket + '/' + this._tenantId,
+            Bucket:  this._bucket + '/' + this._tenantId + '/' + folderPath,
             Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
         };
 
