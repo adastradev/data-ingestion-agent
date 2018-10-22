@@ -38,23 +38,10 @@ describe('OracleReader', () => {
                 return Promise.resolve();
             });
 
-            // const mockConnection = stubInterface<oracledb.IConnection>();
-            // const queryStreamStub = (mockConnection.queryStream as sinon.SinonStub);
-            // queryStreamStub.callsFake(sandbox.spy(async (query, binds, options) => {
-            //     const resultStream = new Readable({objectMode: true });
-            //     resultStream.push({ col1: 'value', col2: 'value'});
-            //     resultStream.push(null);
-            //     return Promise.resolve(resultStream);
-            // }));
-            // const closeConnectionStub = (mockConnection.close as sinon.SinonStub);
-
             // stub connection pool
             const mockPool = stubInterface<IConnectionPool>();
             const getConnectionStub = (mockPool.getConnection as sinon.SinonStub);
             getConnectionStub.returns({ close: closeConnectionSpy, queryStream: queryStreamSpy });
-            // getConnectionStub.callsFake(sandbox.spy(async () => {
-            //     return Promise.resolve(mockConnection);
-            // }));
             const releaseConnectionStub = (mockPool.releaseConnection as sinon.SinonStub);
             releaseConnectionStub.callsFake(sandbox.spy(async (connection: any) => {
                 await connection.close();
