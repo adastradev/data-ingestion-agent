@@ -27,11 +27,12 @@ export default class IntegrationConfigFactory {
     public create(integrationType: IntegrationType): IIntegrationConfig {
         switch (integrationType) {
             case 'Banner': {
+                const BANNER_TEMPLATE_STATEMENTS = [
+                    'SELECT * FROM dummysisdata where rownum < 100000',
+                    'SELECT * FROM ALL_TABLES'
+                ];
                 return {
-                    queries: [
-                        'SELECT * FROM dummysisdata where rownum < 100000',
-                        'SELECT * FROM ALL_TABLES'
-                    ],
+                    queries: BANNER_TEMPLATE_STATEMENTS,
                     type: 'Banner'
                 };
             }

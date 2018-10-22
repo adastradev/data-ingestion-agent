@@ -1,5 +1,6 @@
 import { Container } from 'inversify';
 import TYPES from '../../ioc.types';
+import { stubInterface } from 'ts-sinon';
 
 // Handlers
 import IMessageHandler from '../../source/IMessageHandler';
@@ -21,6 +22,7 @@ import DummyMessage from '../../source/Messages/DummyMessage';
 import IDataReader from '../../source/DataAccess/IDataReader';
 import IDataWriter from '../../source/DataAccess/IDataWriter';
 import SendDataHandler from '../../source/MessageHandlers/SendDataHandler';
+import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 
 const container = new Container();
 
@@ -34,6 +36,9 @@ const logger: Winston.Logger = Winston.createLogger({
 
 container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
 container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
+
+const mockPool = stubInterface<IConnectionPool>();
+container.bind<IConnectionPool>(TYPES.ConnectionPool).toConstantValue(mockPool);
 
 container.bind<IMessageHandler>(TYPES.DummyHandler).to(DummyHandler);
 container.bind<IMessageHandler>(TYPES.SendDataHandler).to(SendDataHandler);

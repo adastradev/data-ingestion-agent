@@ -1,6 +1,7 @@
 const TYPES = {
     AuthManager: Symbol('AuthService'),
     Bucket: Symbol('Bucket'),
+    ConnectionPool: Symbol('ConnectionPool'),
     Container: Symbol('Container'),
     DataReader: Symbol('IngestionReader'),
     DataWriter: Symbol('IngestionWriter'),

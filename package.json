@@ -41,6 +41,7 @@
   "license": "MIT",
   "dependencies": {
     "@adastradev/serverless-discovery-sdk": "0.0.7",
+    "@types/bluebird-global": "^3.5.9",
     "@types/chai": "^4.1.6",
     "@types/express": "^4.16.0",
     "@types/mocha": "^5.2.5",
@@ -53,6 +54,7 @@
     "aws-api-gateway-client": "^0.2.16",
     "aws-sdk": "^2.329.0",
     "aws-sdk-mock": "^4.2.0",
+    "bluebird": "^3.5.2",
     "crypto": "^1.0.1",
     "express": "^4.16.3",
     "inversify": "^4.13.0",

@@ -5,6 +5,7 @@ import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 
 import IDataReader from '../IDataReader';
+import IConnectionPool from '../IConnectionPool';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -16,26 +17,24 @@ import IDataReader from '../IDataReader';
  */
 @injectable()
 export default class OracleReader implements IDataReader {
-    private logger: Logger;
-    private connection: oracledb.IConnection;
+    private _logger: Logger;
+    private _connectionPool: IConnectionPool;
+    private _connection: oracledb.IConnection;
 
     constructor(
-        @inject(TYPES.Logger) logger: Logger) {
-        this.logger = logger;
+        @inject(TYPES.Logger) logger: Logger,
+        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool) {
+        this._logger = logger;
+        this._connectionPool = connectionPool;
     }
 
     public async read(queryStatement: string): Promise<stream.Readable> {
-
         if (process.env.ORACLE_ENDPOINT === undefined) {
             return this.createDemoSnapshot();
         }
 
         try {
-            this.connection = await oracledb.getConnection({
-                connectString : process.env.ORACLE_ENDPOINT,
-                password      : process.env.ORACLE_PASSWORD,
-                user          : process.env.ORACLE_USER
-            });
+            this._connection = await this._connectionPool.getConnection();
 
             // Query the data
             const binds = {};
@@ -44,8 +43,8 @@ export default class OracleReader implements IDataReader {
             };
 
             // TODO: Make fetch array size configurable?
-            this.logger.info('Executing statement: ' + queryStatement);
-            const s = await this.connection.queryStream(queryStatement, [],
+            this._logger.info('Executing statement: ' + queryStatement);
+            const s = await this._connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000 } as any);
 
             const t = new stream.Transform( { objectMode: true });
@@ -62,20 +61,18 @@ export default class OracleReader implements IDataReader {
 
             return result;
         } catch (err) {
-            console.error(err);
+            this._logger.error(err);
             throw err;
         }
     }
 
-    // TODO: This is leaky, need a better abstraction while
-    // still allowing streams to fully process before closing
-    // a connection
     public async close(): Promise<void> {
-        if (this.connection) {
+        if (this._connectionPool && this._connection) {
             try {
-                await this.connection.close();
+                await this._connectionPool.releaseConnection(this._connection);
             } catch (err) {
-                console.error(err);
+                this._logger.error(err);
+                return Promise.reject(err);
             }
         }
     }
