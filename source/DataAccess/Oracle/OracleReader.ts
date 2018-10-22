@@ -5,7 +5,7 @@ import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 
 import IDataReader from '../IDataReader';
-import IConnectionPoolManager from '../IConnectionPoolManager';
+import IConnectionPool from '../IConnectionPool';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -18,12 +18,12 @@ import IConnectionPoolManager from '../IConnectionPoolManager';
 @injectable()
 export default class OracleReader implements IDataReader {
     private _logger: Logger;
-    private _connectionPool: IConnectionPoolManager;
+    private _connectionPool: IConnectionPool;
     private _connection: oracledb.IConnection;
 
     constructor(
         @inject(TYPES.Logger) logger: Logger,
-        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPoolManager) {
+        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool) {
         this._logger = logger;
         this._connectionPool = connectionPool;
     }
@@ -34,8 +34,7 @@ export default class OracleReader implements IDataReader {
         }
 
         try {
-            const oracleConnectionPool: oracledb.IConnectionPool = await this._connectionPool.get();
-            this._connection = await oracleConnectionPool.getConnection();
+            this._connection = await this._connectionPool.getConnection();
 
             // Query the data
             const binds = {};
@@ -68,17 +67,18 @@ export default class OracleReader implements IDataReader {
 
             return result;
         } catch (err) {
-            console.error(err);
+            this._logger.error(err);
             throw err;
         }
     }
 
     public async close(): Promise<void> {
-        if (this._connection) {
+        if (this._connectionPool && this._connection) {
             try {
-                await this._connection.close();
+                await this._connectionPool.releaseConnection(this._connection);
             } catch (err) {
-                console.error(err);
+                this._logger.error(err);
+                return Promise.reject(err);
             }
         }
     }

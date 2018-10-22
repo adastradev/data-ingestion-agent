@@ -12,7 +12,7 @@ import SendDataMessage from '../Messages/SendDataMessage';
 import IDataReader from '../DataAccess/IDataReader';
 import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
-import IConnectionPoolManager from '../DataAccess/IConnectionPoolManager';
+import IConnectionPool from '../DataAccess/IConnectionPool';
 
 const STATEMENT_CONCURRENCY = 5;
 /**
@@ -27,22 +27,18 @@ export default class SendDataHandler implements IMessageHandler {
 
     private _logger: Logger;
     private _writer: IDataWriter;
-    private _reader: IDataReader;
     private _integrationConfigFactory: IntegrationConfigFactory;
-    private _connectionPool: IConnectionPoolManager;
+    private _connectionPool: IConnectionPool;
     private _container: Container;
 
     constructor(
-        // TODO: remove DataReader from constructor
-        @inject(TYPES.DataReader) reader: IDataReader,
         @inject(TYPES.DataWriter) writer: IDataWriter,
         @inject(TYPES.Logger) logger: Logger,
         @inject(TYPES.IntegrationConfigFactory) integrationConfigFactory: IntegrationConfigFactory,
-        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPoolManager,
+        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool,
         @inject(TYPES.Container) container: Container) {
 
         this._writer = writer;
-        this._reader = reader;
         this._logger = logger;
         this._integrationConfigFactory = integrationConfigFactory;
         this._connectionPool = connectionPool;
@@ -64,6 +60,8 @@ export default class SendDataHandler implements IMessageHandler {
             for (const statement of integrationConfig.queries) {
                 statementExecutors.push(this.getStatementExecutor(statement));
             }
+
+            // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
             await BluebirdPromise.map(statementExecutors,
                 (success: boolean) => { /* No action required here */ },
                 { concurrency: STATEMENT_CONCURRENCY });
@@ -74,17 +72,22 @@ export default class SendDataHandler implements IMessageHandler {
 
     private getStatementExecutor(queryStatement: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
-            const startTime = Date.now();
+            let reader;
+            try {
+                const startTime = Date.now();
 
-            // Create a separate reader instance for every query statement
-            const reader = this._container.get<IDataReader>(TYPES.DataReader);
-            const readable: Readable = await reader.read(queryStatement);
-            await this._writer.ingest(readable);
-            const endTime = Date.now();
-            const diff = moment.duration(endTime - startTime);
+                reader = this._container.get<IDataReader>(TYPES.DataReader);
+                const readable: Readable = await reader.read(queryStatement);
+                await this._writer.ingest(readable);
+                const endTime = Date.now();
+                const diff = moment.duration(endTime - startTime);
 
-            this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
-            await reader.close();
+                this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
+            } finally {
+                if (reader) {
+                    await reader.close();
+                }
+            }
             resolve(true);
         });
     }

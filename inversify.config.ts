@@ -30,8 +30,8 @@ import ICommand from './source/Commands/ICommand';
 import AdHocIngestCommand from './source/Commands/AdHocIngestCommand';
 import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
 import IntegrationConfigFactory from './source/IntegrationConfigFactory';
-import IConnectionPoolManager from './source/DataAccess/IConnectionPoolManager';
-import OracleConnectionPoolManager from './source/DataAccess/Oracle/OracleConnectionPoolManager';
+import IConnectionPool from './source/DataAccess/IConnectionPool';
+import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -95,7 +95,7 @@ const startup = async () => {
     container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
     container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
     container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory).toConstantValue(integrationConfigFactory);
-    container.bind<IConnectionPoolManager>(TYPES.ConnectionPool).to(OracleConnectionPoolManager).inSingletonScope();
+    container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();
 
     // Message Management
     container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();

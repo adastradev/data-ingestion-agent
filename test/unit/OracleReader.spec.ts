@@ -2,12 +2,13 @@ import 'reflect-metadata';
 import * as chai from 'chai';
 
 import { Readable } from 'stream';
-import * as oracledb from 'oracledb';
 import sinon = require('sinon');
+import { stubInterface } from 'ts-sinon';
 import OracleReader from '../../source/DataAccess/Oracle/OracleReader';
 import container from './test.inversify.config';
 import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
+import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 
 const expect = chai.expect;
 
@@ -32,28 +33,36 @@ describe('OracleReader', () => {
                 resultStream.push(null);
                 return Promise.resolve(resultStream);
             });
-
-            // stub connection pool
             const closeSpy = sandbox.spy(async () => {
                 return Promise.resolve();
             });
-            const getConnectionSpy = sandbox.spy(async () => {
-                return Promise.resolve({
-                    queryStream: executeSpy
-                });
+
+            // stub connection pool
+            const releaseConnectionSpy = sandbox.spy(async (connection: any) => {
+                await connection.close();
+                return Promise.resolve();
             });
-            const createPoolStub = sandbox.stub(oracledb, 'createPool')
-                .returns({ close: closeSpy, getConnection: getConnectionSpy });
+            const poolStub = stubInterface<IConnectionPool>({
+                close: Promise.resolve(),
+                getConnection: { close: closeSpy, queryStream: executeSpy },
+                open: Promise.resolve()
+            });
+            const releaseStub = (poolStub.releaseConnection as sinon.SinonStub);
+            releaseStub.callsFake(releaseConnectionSpy);
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const oracleReader: OracleReader = new OracleReader(logger);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
-            await oracleReader.open();
+            // expected use sequence for OracleReader
+            await poolStub.open();
+
             const readable: Readable = await oracleReader.read('Mock query statement');
             await oracleReader.close();
 
-            expect(createPoolStub.calledOnce).to.be.true;
+            await poolStub.close();
+
             expect(executeSpy.calledOnce).to.be.true;
+            expect(releaseConnectionSpy.calledOnce).to.be.true;
             expect(closeSpy.calledOnce).to.be.true;
             expect(readable).to.be.not.null;
 
@@ -61,23 +70,15 @@ describe('OracleReader', () => {
         });
 
         it('should not attempt to connect to Oracle when generating demo data', async () => {
-            const executeFunc = async (query, binds, options) => {
-                const resultStream = new Readable({objectMode: true });
-                resultStream.push({ col1: 'value', col2: 'value'});
-                return Promise.resolve(resultStream);
-            };
-            const executeSpy = sandbox.spy(executeFunc);
+            const poolStub = stubInterface<IConnectionPool>();
 
-            const stub = sandbox.stub(oracledb, 'getConnection').returns({ queryStream: executeSpy});
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const oracleReader: OracleReader = new OracleReader(logger);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
+            const closeSpy = sandbox.spy(oracleReader, 'close');
 
-            await oracleReader.open();
             const readable: Readable = await oracleReader.read('Mock query statement');
             await oracleReader.close();
-
-            expect(executeSpy.calledOnce).to.be.false;
-            expect(stub.calledOnce).to.be.false;
+            expect(closeSpy.calledOnce).to.be.true;
             expect(readable).to.be.not.null;
         });
     });
