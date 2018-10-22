@@ -46,13 +46,12 @@ export default class SendDataHandler implements IMessageHandler {
     }
 
     public async handle(message: SendDataMessage) {
-        const captureStart = moment();
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
         // TODO: add integration type to the SendDataMessage model
         const integrationType = 'Banner';
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
-        const folderPath = integrationType + '-' + captureStart.format(); // Uses moment.ISO_8601
+        const folderPath = integrationType + '-' + moment().toISOString();
 
         try {
             await this._connectionPool.open();

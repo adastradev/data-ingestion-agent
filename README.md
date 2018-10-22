@@ -65,7 +65,6 @@ ingest
 ```
 
 ## Root Access to a running agent container
-
 After starting the agent and confirming a healthy status you can use the containers name or ID to access the virtual machine via command line (bash) as follows:
 
 ```sh
@@ -119,3 +118,6 @@ cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
 # Start the system test
 npm run system-test
 ```
+
+## Dependencies
+Data ingestion agent uses the [node-oracledb driver](https://github.com/oracle/node-oracledb/blob/master/doc/api.md) by Oracle.
