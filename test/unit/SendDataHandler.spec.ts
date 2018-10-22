@@ -38,7 +38,7 @@ describe('SendDataHandler', () => {
             await handler.handle(message);
 
             expect(getStatementExecutorSpy.callCount).to.eq(1);
-            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(1);
+            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(2);
         });
     });
 });

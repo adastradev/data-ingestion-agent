@@ -49,20 +49,30 @@ export default class OracleReader implements IDataReader {
 
             const metadataStream = await this.getMetadata(objectStream);
 
-            const jsonTransformer = new stream.Transform( { objectMode: true });
+            // const jsonTransformer = new stream.Transform( { objectMode: true });
 
-            jsonTransformer._transform = function (chunk, encoding, done) {
+            // jsonTransformer._transform = function (chunk, encoding, done) {
+            //     // TODO: Decide on a format/encoding/structure - JSON for now
+            //     const data = JSON.stringify(chunk);
+            //     this.push(Buffer.from(data, encoding));
+
+            //     done();
+            // };
+
+            // const metadataJsonStream = metadataStream.pipe(jsonTransformer);
+
+            const jsonTransformer2 = new stream.Transform( { objectMode: true });
+
+            jsonTransformer2._transform = function (chunk, encoding, done) {
                 // TODO: Decide on a format/encoding/structure - JSON for now
                 const data = JSON.stringify(chunk);
                 this.push(Buffer.from(data, encoding));
 
                 done();
             };
+            const resultStream = objectStream.pipe(jsonTransformer2);
 
-            const metadataJsonStream = metadataStream.pipe(jsonTransformer);
-            const resultStream = objectStream.pipe(jsonTransformer);
-
-            return { result: resultStream, metadata: metadataJsonStream };
+            return { result: resultStream, metadata: metadataStream };
         } catch (err) {
             this._logger.error(err);
             throw err;

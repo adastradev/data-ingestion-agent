@@ -16,6 +16,7 @@ import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
 import { WriteStream } from 'tty';
+import { stringify } from 'querystring';
 
 const STATEMENT_CONCURRENCY = 5;
 /**
@@ -72,12 +73,25 @@ export default class SendDataHandler implements IMessageHandler {
                 (success: IQueryMetadata) => { metadata.push(success); },
                 { concurrency: STATEMENT_CONCURRENCY });
 
-            const cs = CombinedStream.create();
+            const compiledMetadata = new Readable();
+            const allMetadata = new Map<string, any>();
             for (const queryMetadata of metadata) {
-                cs.append(queryMetadata);
+                let columnMetadata;
+                const columns = [];
+                // tslint:disable-next-line:no-conditional-assignment
+                while ((columnMetadata = queryMetadata.data.read()) !== null) {
+                    columns.push(columnMetadata);
+                }
+
+                allMetadata[queryMetadata.name] = columns;
             }
 
-            this._writer.ingest(cs, folderPath);
+            compiledMetadata.push(JSON.stringify(allMetadata));
+            compiledMetadata.push(null);
+
+            // Write the metadata
+            await this._writer.ingest(compiledMetadata, folderPath, 'metadata');
+
         } finally {
             await this._connectionPool.close();
         }
@@ -93,7 +107,7 @@ export default class SendDataHandler implements IMessageHandler {
                 reader = this._container.get<IDataReader>(TYPES.DataReader);
                 const readable: IQueryResult = await reader.read(queryStatement.query);
                 metadata = readable.metadata;
-                await this._writer.ingest(readable.result, folderPath);
+                await this._writer.ingest(readable.result, folderPath, queryStatement.name);
                 const endTime = Date.now();
                 const diff = moment.duration(endTime - startTime);
 
