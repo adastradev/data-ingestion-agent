@@ -54,8 +54,7 @@ export default class SendDataHandler implements IMessageHandler {
     public async handle(message: SendDataMessage) {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
-        // TODO: add integration type to the SendDataMessage model
-        const integrationType = 'Banner';
+        const integrationType = process.env.INTEGRATION_TYPE || 'Banner';
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
         const folderPath = integrationType + '-' + moment().toISOString();
 

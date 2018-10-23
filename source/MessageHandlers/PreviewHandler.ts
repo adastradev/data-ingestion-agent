@@ -36,8 +36,7 @@ export default class PreviewHandler implements IMessageHandler {
 
     public async handle(message: PreviewMessage) {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
-        // TODO: add integration type to the PreviewMessage model
-        const integrationType = 'Banner';
+        const integrationType = process.env.INTEGRATION_TYPE || 'Banner';
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
         this.logQueries(integrationConfig.queries);
     }
