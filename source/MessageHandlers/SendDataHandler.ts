@@ -14,7 +14,10 @@ import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
 
-const STATEMENT_CONCURRENCY = process.env.CONCURRENT_CONNECTIONS || 5;
+let STATEMENT_CONCURRENCY = 5;
+if (process.env.CONCURRENT_CONNECTIONS) {
+    STATEMENT_CONCURRENCY = Number(process.env.CONCURRENT_CONNECTIONS);
+}
 /**
  * Handles messages received to instruct the agent to being its ingestion process
  *
