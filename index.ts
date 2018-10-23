@@ -9,10 +9,7 @@ import IMessageHandler from './source/IMessageHandler';
 import MessageFactory from './source/MessageFactory';
 import ICommand from './source/Commands/ICommand';
 import { AuthManager } from './source/astra-sdk/AuthManager';
-
-async function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import sleep from './source/Util/sleep';
 
 let shutdownRequested = false;
 process.on('SIGTERM', () => {
@@ -39,7 +36,8 @@ class App {
             await command.invoke(args.splice(1));
         }
 
-        this.logger.log('info', 'Waiting for sqs schedule event');
+        this.logger.info(`Proccess Id: ${process.pid}`);
+        this.logger.info('Waiting for sqs schedule event');
         while (!shutdownRequested) {
             await sleep(1000);
 
@@ -47,7 +45,6 @@ class App {
             const result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
 
             if (result.Messages) {
-                this.logger.log('info', `Message Received`);
 
                 let message: IMessage = null;
                 let messageHandler: IMessageHandler;
@@ -56,6 +53,8 @@ class App {
                     const messageFactory = this.container.get<MessageFactory>(TYPES.MessageFactory);
 
                     message = messageFactory.createFromJson(result.Messages[0].Body, result.Messages[0].ReceiptHandle);
+
+                    this.logger.info(`${message.type} Message Received`);
                     messageHandler = handlerFactory.getHandler(message);
 
                     // TODO: Async or block?
@@ -64,7 +63,7 @@ class App {
                     // TODO: Requeue/Dead-letter the message?
                     throw Error(error.message);
                 } finally {
-                    console.log(`Acknowledging message: ${message.receiptHandle}`);
+                    this.logger.silly(`Acknowledging message: ${message.receiptHandle}`);
                     await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
                 }
 

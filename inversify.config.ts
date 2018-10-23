@@ -4,6 +4,7 @@ import TYPES from './ioc.types';
 // Config
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
+import * as Transport from 'winston-transport';
 import { AuthManager } from './source/astra-sdk/AuthManager';
 import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
@@ -29,31 +30,41 @@ import OracleReader from './source/DataAccess/Oracle/OracleReader';
 import ICommand from './source/Commands/ICommand';
 import AdHocIngestCommand from './source/Commands/AdHocIngestCommand';
 import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
-import { CognitoUserSession } from 'amazon-cognito-identity-js';
+import IntegrationConfigFactory from './source/IntegrationConfigFactory';
+import IConnectionPool from './source/DataAccess/IConnectionPool';
+import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
+import { FileTransportOptions } from 'winston/lib/winston/transports';
 
-// TODO: Make configurable?
-const REGION = 'us-east-1';
-AWS.config.region = REGION;
-
-const stage = 'prod';
+const region = process.env.AWS_REGION || 'us-east-1';
+const stage = process.env.DEFAULT_STAGE || 'prod';
+AWS.config.region = region;
 
 const container = new Container();
+
+const transports: Transport[] = [
+    new Winston.transports.Console()
+];
+if (process.env.LOG_PATH !== undefined) {
+    const options: FileTransportOptions = {
+        dirname: process.env.LOG_PATH,
+        filename: 'dia.log'
+    };
+    transports.push(new Winston.transports.File(options));
+}
 
 const logger: Winston.Logger = Winston.createLogger({
     format: Winston.format.json(),
     level: 'info',
-    transports: [
-        new Winston.transports.Console()
-    ]
+    transports
 });
 
 // NOTE: updates to the discovery service itself would require pushing a new docker image.
 // This should still be an environment variable rather than hardcoded
 process.env.DISCOVERY_SERVICE = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
-const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, REGION);
+const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region);
 
-const poolLocator = new CognitoUserPoolLocatorUserManagement(REGION);
-const authManager = new AuthManager(poolLocator, REGION, logger);
+const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
+const authManager = new AuthManager(poolLocator, region, logger);
 let queueUrl: string;
 let tenantId: string;
 
@@ -63,6 +74,8 @@ const s3Buckets = {
 };
 
 const bucketName = s3Buckets[stage];
+
+const integrationConfigFactory = new IntegrationConfigFactory(logger);
 
 const startup = async () => {
     // Authentication & Resource lookups
@@ -79,7 +92,7 @@ const startup = async () => {
     };
     const userManagementApi = new UserManagementApi(
         process.env.USER_MANAGEMENT_URI,
-        REGION,
+        region,
         credentialsBearerToken);
 
     const poolListResponse = await userManagementApi.getUserPools();
@@ -92,6 +105,8 @@ const startup = async () => {
     container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
     container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
     container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
+    container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory).toConstantValue(integrationConfigFactory);
+    container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();
 
     // Message Management
     container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();

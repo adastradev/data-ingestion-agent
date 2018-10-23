@@ -37,7 +37,7 @@ export default class MessageFactory {
         let targetMessage: IMessage;
 
         try {
-            this._logger.log('info', `Handling message type: ${message.type}`);
+            this._logger.silly(`Handling message type: ${message.type}`);
             targetMessage = this._container.get<IMessage>(TYPES[`${message.type}Message`]);
         } catch (error) {
             const msg = `Unknown message type: ${message.type} - (inner) ${error}`;

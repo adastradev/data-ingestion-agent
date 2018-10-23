@@ -1,10 +1,11 @@
-import { Readable } from 'stream';
+import * as stream from 'stream';
 import * as oracledb from 'oracledb';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 
-import IDataReader from '../IDataReader';
+import IDataReader, { IQueryResult } from '../IDataReader';
+import IConnectionPool from '../IConnectionPool';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -16,67 +17,86 @@ import IDataReader from '../IDataReader';
  */
 @injectable()
 export default class OracleReader implements IDataReader {
-    private logger: Logger;
-
-    private readonly queries = [
-        'SELECT * FROM ALL_TABLES'
-    ];
+    private _logger: Logger;
+    private _connectionPool: IConnectionPool;
+    private _connection: oracledb.IConnection;
 
     constructor(
-        @inject(TYPES.Logger) logger: Logger) {
-        this.logger = logger;
+        @inject(TYPES.Logger) logger: Logger,
+        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool) {
+        this._logger = logger;
+        this._connectionPool = connectionPool;
     }
 
-    public async read(): Promise<Readable> {
-
+    public async read(queryStatement: string): Promise<IQueryResult> {
         if (process.env.ORACLE_ENDPOINT === undefined) {
-            return this.createDemoSnapshot();
+            return { result: this.createDemoSnapshot(), metadata: null };
         }
 
-        let connection;
         try {
-            connection = await oracledb.getConnection({
-                connectString : process.env.ORACLE_ENDPOINT,
-                password      : process.env.ORACLE_PASSWORD,
-                user          : process.env.ORACLE_USER
-            });
+            this._connection = await this._connectionPool.getConnection();
 
             // Query the data
             const binds = {};
             const options = {
               outFormat: oracledb.OBJECT // query result format
             };
-            const result = await connection.execute(this.queries[0], binds, options);
 
-            const s = new Readable();
-            result.rows.forEach((element) => {
-                s.push(JSON.stringify(element));
-                s.push('\n');
-            });
-            s.push(null);
-            return s;
+            // TODO: Make fetch array size configurable?
+            this._logger.info('Executing statement: ' + queryStatement);
+            const queryResultStream = await this._connection.queryStream(queryStatement, [],
+                { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
+
+            const metadataStream = await this.getMetadata(queryResultStream);
+
+            const jsonTransformer = new stream.Transform( { objectMode: true });
+            jsonTransformer._transform = function (chunk, encoding, done) {
+                // TODO: Decide on a format/encoding/structure - JSON for now
+                const data = JSON.stringify(chunk);
+                this.push(Buffer.from(data, encoding));
+
+                done();
+            };
+            const resultStream = queryResultStream.pipe(jsonTransformer);
+
+            return { result: resultStream, metadata: metadataStream };
         } catch (err) {
-            console.error(err);
+            this._logger.error(err);
             throw err;
-        } finally {
-            if (connection) {
-                try {
-                    await connection.close();
-                } catch (err) {
-                    console.error(err);
-                }
+        }
+    }
+
+    public async close(): Promise<void> {
+        if (this._connectionPool && this._connection) {
+            try {
+                await this._connectionPool.releaseConnection(this._connection);
+            } catch (err) {
+                this._logger.error(err);
+                return Promise.reject(err);
             }
         }
     }
 
-    public logQueries(): void {
-        for (const query of this.queries) {
-            this.logger.log('info', query);
+    private async getMetadata(queryStream: stream.Readable): Promise<stream.Readable> {
+        const columnMetadataEvent = new Promise<any[]>((resolve, reject) => {
+            queryStream.on('metadata', (md: any[]) => {
+                resolve(md);
+            });
+        });
+
+        const columnMetadata = await columnMetadataEvent;
+
+        const columnMetadataStream = new stream.Readable({ objectMode: true });
+        for (const col of columnMetadata) {
+            columnMetadataStream.push(col);
         }
+        columnMetadataStream.push(null);
+
+        return columnMetadataStream;
     }
 
     private createDemoSnapshot() {
-        const s = new Readable();
+        const s = new stream.Readable();
         s.push('this is a test stream');
         s.push(null);
         return s;

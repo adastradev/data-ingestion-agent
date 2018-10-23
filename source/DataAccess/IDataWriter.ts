@@ -10,4 +10,4 @@ export default interface IDataWriter {
     ingest: IngestionFunction;
 }
 
-export type IngestionFunction = (stream: Readable) => Promise<void>;
+export type IngestionFunction = (stream: Readable, folderPath: string, fileNamePrefix: string) => Promise<void>;
