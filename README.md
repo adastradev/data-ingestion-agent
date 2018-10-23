@@ -19,7 +19,6 @@ docker run -d -t \
 -e ORACLE_ENDPOINT=hostname:port/service_name \
 -e ORACLE_USER=user \
 -e ORACLE_PASSWORD=password \
--e INTEGRATION_TYPE=Banner \
 --network=bridge \
 adastradev/data-ingestion-agent:<tag>
 ```
@@ -28,6 +27,7 @@ To see a demo of the agent without connecting it to any data source, omit the OR
 
 The docker agent also supports the following optional arguments:
 ```sh
+-e INTEGRATION_TYPE=Banner \
 -e DEFAULT_STAGE=dev \
 -e AWS_REGION=us-east-1 \
 -e CONCURRENT_CONNECTIONS=5 \
@@ -45,7 +45,6 @@ Prior to sending any data you can run the following docker command to log each q
 docker run -i \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
--e INTEGRATION_TYPE=Banner \
 --network=bridge \
 adastradev/data-ingestion-agent:latest \
 preview
@@ -61,7 +60,6 @@ docker run -i \
 -e ORACLE_ENDPOINT=hostname:port/service_name \
 -e ORACLE_USER=user \
 -e ORACLE_PASSWORD=password \
--e INTEGRATION_TYPE=Banner \
 --network=bridge \
 adastradev/data-ingestion-agent:latest \
 ingest
