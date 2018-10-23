@@ -4,6 +4,7 @@ import TYPES from './ioc.types';
 // Config
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
+import * as Transport from 'winston-transport';
 import { AuthManager } from './source/astra-sdk/AuthManager';
 import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
@@ -32,6 +33,7 @@ import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
 import IntegrationConfigFactory from './source/IntegrationConfigFactory';
 import IConnectionPool from './source/DataAccess/IConnectionPool';
 import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
+import { FileTransportOptions } from 'winston/lib/winston/transports';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -39,12 +41,21 @@ AWS.config.region = region;
 
 const container = new Container();
 
+const transports: Transport[] = [
+    new Winston.transports.Console()
+];
+if (process.env.LOG_PATH !== undefined) {
+    const options: FileTransportOptions = {
+        dirname: process.env.LOG_PATH,
+        filename: 'dia.log'
+    };
+    transports.push(new Winston.transports.File(options));
+}
+
 const logger: Winston.Logger = Winston.createLogger({
     format: Winston.format.json(),
     level: 'info',
-    transports: [
-        new Winston.transports.Console()
-    ]
+    transports
 });
 
 // NOTE: updates to the discovery service itself would require pushing a new docker image.

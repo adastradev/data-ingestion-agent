@@ -14,7 +14,7 @@ import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
 
-const STATEMENT_CONCURRENCY = 5;
+const STATEMENT_CONCURRENCY = process.env.CONCURRENT_CONNECTIONS || 5;
 /**
  * Handles messages received to instruct the agent to being its ingestion process
  *

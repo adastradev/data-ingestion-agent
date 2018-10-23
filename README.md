@@ -19,25 +19,23 @@ docker run -d -t \
 -e ORACLE_ENDPOINT=hostname:port/service_name \
 -e ORACLE_USER=user \
 -e ORACLE_PASSWORD=password \
+--network=bridge \
 adastradev/data-ingestion-agent:<tag>
 ```
+
+To see a demo of the agent without connecting it to any data source, omit the ORACLE_* environment variables. In demo mode, the agent can verify connectivity to the Astra Cloud and push a mock dataset into S3.
 
 The docker agent also supports the following optional arguments:
 ```sh
 -e DEFAULT_STAGE=dev \
 -e AWS_REGION=us-east-1 \
+-e CONCURRENT_CONNECTIONS=5 \
 ```
 
-## Uninstall
-The data ingestion agent is a long running process that may be performing work when an uninstall occurs. To reduce negative side effects of immediately stopping the agent it is advised to always stop the container with a grace period as shown below. Outright usage of `docker kill` is discouraged.
+## Configure Network Access
+The Data Ingestion Agent requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
 
-If multiple versions of the ingestion agent exist be sure to specify the optional tag when removing an image.
-
-```sh
-docker stop --time 10 <container_name_or_id>
-docker rm <container_name_or_id>
-docker rmi <image>:<tag>
-```
+No *inbound* access to the agent is required.
 
 ## Query Preview
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
@@ -46,6 +44,7 @@ Prior to sending any data you can run the following docker command to log each q
 docker run -i \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
+--network=bridge \
 adastradev/data-ingestion-agent:latest \
 preview
 ```
@@ -60,8 +59,28 @@ docker run -i \
 -e ORACLE_ENDPOINT=hostname:port/service_name \
 -e ORACLE_USER=user \
 -e ORACLE_PASSWORD=password \
+--network=bridge \
 adastradev/data-ingestion-agent:latest \
 ingest
+```
+
+## View agent logs
+```sh
+# View console output from container host
+docker log dia
+# Copy/export logs from the container to the host
+docker cp dia:/var/log/dia /tmp/log/dia
+```
+
+## Uninstall
+The data ingestion agent is a long running process that may be performing work when an uninstall occurs. To reduce negative side effects of immediately stopping the agent it is advised to always stop the container with a grace period as shown below. Outright usage of `docker kill` is discouraged.
+
+If multiple versions of the ingestion agent exist be sure to specify the optional tag when removing an image.
+
+```sh
+docker stop --time 10 <container_name_or_id>
+docker rm <container_name_or_id>
+docker rmi <image>:<tag>
 ```
 
 ## Root Access to a running agent container

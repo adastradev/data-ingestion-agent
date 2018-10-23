@@ -4,7 +4,7 @@ import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 import IConnectionPool from '../IConnectionPool';
 
-const POOL_SIZE = 5;
+const POOL_SIZE = process.env.CONCURRENT_CONNECTIONS || 5;
 
 /**
  * A proxy class brokering Oracle Connections from an oracledb.IConnectionPool instance.
