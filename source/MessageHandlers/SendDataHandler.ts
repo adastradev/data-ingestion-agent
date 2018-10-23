@@ -7,7 +7,6 @@ import { Container, inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
 import * as BluebirdPromise from 'bluebird';
-import * as CombinedStream from 'combined-stream';
 
 import SendDataMessage from '../Messages/SendDataMessage';
 import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
