@@ -10,6 +10,7 @@ import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import oracledb = require('oracledb');
+import { IQueryResult } from '../../source/DataAccess/IDataReader';
 
 const expect = chai.expect;
 
@@ -32,6 +33,7 @@ describe('OracleReader', () => {
                 const resultStream = new Readable({objectMode: true });
                 resultStream.push({ col1: 'value', col2: 'value'});
                 resultStream.push(null);
+
                 return Promise.resolve(resultStream);
             });
             const closeConnectionSpy = sandbox.spy(async () => {
@@ -51,10 +53,18 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger, mockPool);
 
+            const readerGetMetadataStub = sinon.stub(oracleReader, 'getMetadata' as any);
+            readerGetMetadataStub.callsFake(sandbox.spy(async (stream) => {
+                const metadataStream = new Readable({objectMode: true });
+                metadataStream.push({ name: 'SOME_COLUMN', dbType: 2});
+                metadataStream.push(null);
+                return Promise.resolve(metadataStream);
+            }));
+
             // expected use sequence for OracleReader
             await mockPool.open();
 
-            const readable: Readable = await oracleReader.read('Mock query statement');
+            const readable: IQueryResult = await oracleReader.read('Mock query statement');
             await oracleReader.close();
 
             await mockPool.close();
@@ -75,10 +85,10 @@ describe('OracleReader', () => {
             const oracleReader: OracleReader = new OracleReader(logger, poolStub);
             const closeSpy = sandbox.spy(oracleReader, 'close');
 
-            const readable: Readable = await oracleReader.read('Mock query statement');
+            const readable: IQueryResult = await oracleReader.read('Mock query statement');
             await oracleReader.close();
             expect(closeSpy.calledOnce).to.be.true;
-            expect(readable).to.be.not.null;
+            expect(readable.result).to.be.not.null;
         });
     });
 });
