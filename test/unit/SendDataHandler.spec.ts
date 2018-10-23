@@ -21,7 +21,7 @@ describe('SendDataHandler', () => {
         const integrationConfigFactory = sinon.createStubInstance(IntegrationConfigFactory);
         integrationConfigFactory.create.returns({
             queries: [
-                'SELECT * FROM ALL_TABLES'
+                { name: 'all_tables', query: 'SELECT * FROM ALL_TABLES' }
             ],
             type: 'Banner'
         });
@@ -38,7 +38,7 @@ describe('SendDataHandler', () => {
             await handler.handle(message);
 
             expect(getStatementExecutorSpy.callCount).to.eq(1);
-            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(1);
+            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(2);
         });
     });
 });

@@ -30,12 +30,12 @@ export default class S3Writer implements IDataWriter {
         this._logger = logger;
     }
 
-    public async ingest(stream: Readable, folderPath: string) {
+    public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
         const dataBody = stream;
         const parms = {
             Body: dataBody,
             Bucket:  this._bucket + '/' + this._tenantId + '/' + folderPath,
-            Key: 'testUpload-' + crypto.randomBytes(8).toString('hex')
+            Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex')
         };
 
         // Parallelize 2x5MB chunks at a time...or at least try to

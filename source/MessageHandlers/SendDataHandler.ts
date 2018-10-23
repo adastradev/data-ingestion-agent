@@ -9,10 +9,13 @@ import * as moment from 'moment';
 import * as BluebirdPromise from 'bluebird';
 
 import SendDataMessage from '../Messages/SendDataMessage';
-import IDataReader from '../DataAccess/IDataReader';
+import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
 import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
+import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
+import { WriteStream } from 'tty';
+import { stringify } from 'querystring';
 
 const STATEMENT_CONCURRENCY = process.env.CONCURRENT_CONNECTIONS || 5;
 /**
@@ -57,29 +60,58 @@ export default class SendDataHandler implements IMessageHandler {
             await this._connectionPool.open();
 
             // delegate each query statement to one Reader/Writer pair
-            const statementExecutors: Array<Promise<boolean>> = [];
+            const statementExecutors: Array<Promise<IQueryMetadata>> = [];
             for (const statement of integrationConfig.queries) {
                 statementExecutors.push(this.getStatementExecutor(statement, folderPath));
             }
 
             // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
+            const metadata: IQueryMetadata[] = new Array<IQueryMetadata>();
             await BluebirdPromise.map(statementExecutors,
-                (success: boolean) => { /* No action required here */ },
+                (queryMetadata: IQueryMetadata) => { metadata.push(queryMetadata); },
                 { concurrency: STATEMENT_CONCURRENCY });
+
+            await this.ingestMetadata(metadata, folderPath);
+
         } finally {
             await this._connectionPool.close();
         }
     }
 
-    private getStatementExecutor(queryStatement: string, folderPath: string): Promise<boolean> {
+    private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
+        // First build a common structure to store each queries metadata in so it
+        // can be consumed later during the restoration process
+        const allTableMetadata = new Map<string, any>();
+        for (const queryMetadata of metadata) {
+            let columnMetadata;
+            const columns = [];
+            // tslint:disable-next-line:no-conditional-assignment
+            while ((columnMetadata = queryMetadata.data.read()) !== null) {
+                columns.push(columnMetadata);
+            }
+
+            allTableMetadata[queryMetadata.name] = columns;
+        }
+
+        // Then prepare it to stream to the destination
+        const compiledMetadataStream = new Readable();
+        compiledMetadataStream.push(JSON.stringify(allTableMetadata));
+        compiledMetadataStream.push(null);
+
+        await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
+    }
+
+    private getStatementExecutor(queryStatement: IQueryDefinition, folderPath: string): Promise<IQueryMetadata> {
         return new Promise(async (resolve, reject) => {
-            let reader;
+            let reader: IDataReader;
+            let metadata: Readable;
             try {
                 const startTime = Date.now();
 
                 reader = this._container.get<IDataReader>(TYPES.DataReader);
-                const readable: Readable = await reader.read(queryStatement);
-                await this._writer.ingest(readable, folderPath);
+                const readable: IQueryResult = await reader.read(queryStatement.query);
+                metadata = readable.metadata;
+                await this._writer.ingest(readable.result, folderPath, queryStatement.name);
                 const endTime = Date.now();
                 const diff = moment.duration(endTime - startTime);
 
@@ -89,7 +121,7 @@ export default class SendDataHandler implements IMessageHandler {
                     await reader.close();
                 }
             }
-            resolve(true);
+            resolve({ name: queryStatement.name, data: metadata});
         });
     }
 }
