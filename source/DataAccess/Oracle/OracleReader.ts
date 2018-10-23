@@ -44,33 +44,20 @@ export default class OracleReader implements IDataReader {
 
             // TODO: Make fetch array size configurable?
             this._logger.info('Executing statement: ' + queryStatement);
-            const objectStream = await this._connection.queryStream(queryStatement, [],
+            const queryResultStream = await this._connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
-            const metadataStream = await this.getMetadata(objectStream);
+            const metadataStream = await this.getMetadata(queryResultStream);
 
-            // const jsonTransformer = new stream.Transform( { objectMode: true });
-
-            // jsonTransformer._transform = function (chunk, encoding, done) {
-            //     // TODO: Decide on a format/encoding/structure - JSON for now
-            //     const data = JSON.stringify(chunk);
-            //     this.push(Buffer.from(data, encoding));
-
-            //     done();
-            // };
-
-            // const metadataJsonStream = metadataStream.pipe(jsonTransformer);
-
-            const jsonTransformer2 = new stream.Transform( { objectMode: true });
-
-            jsonTransformer2._transform = function (chunk, encoding, done) {
+            const jsonTransformer = new stream.Transform( { objectMode: true });
+            jsonTransformer._transform = function (chunk, encoding, done) {
                 // TODO: Decide on a format/encoding/structure - JSON for now
                 const data = JSON.stringify(chunk);
                 this.push(Buffer.from(data, encoding));
 
                 done();
             };
-            const resultStream = objectStream.pipe(jsonTransformer2);
+            const resultStream = queryResultStream.pipe(jsonTransformer);
 
             return { result: resultStream, metadata: metadataStream };
         } catch (err) {
@@ -91,21 +78,21 @@ export default class OracleReader implements IDataReader {
     }
 
     private async getMetadata(queryStream: stream.Readable): Promise<stream.Readable> {
-        const metadataReceived = new Promise<any[]>((resolve, reject) => {
+        const columnMetadataEvent = new Promise<any[]>((resolve, reject) => {
             queryStream.on('metadata', (md: any[]) => {
                 resolve(md);
             });
         });
 
-        const queryMetadataResult = await metadataReceived;
+        const columnMetadata = await columnMetadataEvent;
 
-        const metadataStream = new stream.Readable({ objectMode: true });
-        for (const col of queryMetadataResult) {
-            metadataStream.push(col);
+        const columnMetadataStream = new stream.Readable({ objectMode: true });
+        for (const col of columnMetadata) {
+            columnMetadataStream.push(col);
         }
-        metadataStream.push(null);
+        columnMetadataStream.push(null);
 
-        return metadataStream;
+        return columnMetadataStream;
     }
 
     private createDemoSnapshot() {

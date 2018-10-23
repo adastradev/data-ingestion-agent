@@ -70,31 +70,37 @@ export default class SendDataHandler implements IMessageHandler {
             // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
             const metadata: IQueryMetadata[] = new Array<IQueryMetadata>();
             await BluebirdPromise.map(statementExecutors,
-                (success: IQueryMetadata) => { metadata.push(success); },
+                (queryMetadata: IQueryMetadata) => { metadata.push(queryMetadata); },
                 { concurrency: STATEMENT_CONCURRENCY });
 
-            const compiledMetadata = new Readable();
-            const allMetadata = new Map<string, any>();
-            for (const queryMetadata of metadata) {
-                let columnMetadata;
-                const columns = [];
-                // tslint:disable-next-line:no-conditional-assignment
-                while ((columnMetadata = queryMetadata.data.read()) !== null) {
-                    columns.push(columnMetadata);
-                }
-
-                allMetadata[queryMetadata.name] = columns;
-            }
-
-            compiledMetadata.push(JSON.stringify(allMetadata));
-            compiledMetadata.push(null);
-
-            // Write the metadata
-            await this._writer.ingest(compiledMetadata, folderPath, 'metadata');
+            await this.ingestMetadata(metadata, folderPath);
 
         } finally {
             await this._connectionPool.close();
         }
+    }
+
+    private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
+        // First build a common structure to store each queries metadata in so it
+        // can be consumed later during the restoration process
+        const allTableMetadata = new Map<string, any>();
+        for (const queryMetadata of metadata) {
+            let columnMetadata;
+            const columns = [];
+            // tslint:disable-next-line:no-conditional-assignment
+            while ((columnMetadata = queryMetadata.data.read()) !== null) {
+                columns.push(columnMetadata);
+            }
+
+            allTableMetadata[queryMetadata.name] = columns;
+        }
+
+        // Then prepare it to stream to the destination
+        const compiledMetadataStream = new Readable();
+        compiledMetadataStream.push(JSON.stringify(allTableMetadata));
+        compiledMetadataStream.push(null);
+
+        await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
     }
 
     private getStatementExecutor(queryStatement: IQueryDefinition, folderPath: string): Promise<IQueryMetadata> {
