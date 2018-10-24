@@ -21,6 +21,7 @@ ARG ORACLE_ENDPOINT=
 ARG ORACLE_USER=
 ARG ORACLE_PASSWORD=
 ARG COVERALLS_REPO_TOKEN=false
+ARG COVERALLS_GIT_COMMIT=
 WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
