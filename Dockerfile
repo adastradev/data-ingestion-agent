@@ -39,7 +39,8 @@ WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
 COPY --from=build-env /lib /lib
-RUN npm install --production && \
+RUN mkdir /var/log/dia && \
+    npm install --production && \
     node_modules/typescript/bin/tsc
 
 # Report to docker the health status so we can possibly use that information
