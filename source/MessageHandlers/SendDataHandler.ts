@@ -116,13 +116,16 @@ export default class SendDataHandler implements IMessageHandler {
                 await this._writer.ingest(readable.result, folderPath, queryStatement.name);
                 const endTime = Date.now();
                 const diff = moment.duration(endTime - startTime);
-
                 this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
             } finally {
+                this._logger.info(`In finally`);
                 if (reader) {
                     await reader.close();
+                } else {
+                    this._logger.info(`Reader not defined`);
                 }
             }
+            this._logger.info(`Resolving`);
             resolve({ name: queryStatement.name, data: metadata});
         });
     }
