@@ -20,7 +20,6 @@ ARG INTEGRATION_TESTS_ENABLED=false
 ARG ORACLE_ENDPOINT=
 ARG ORACLE_USER=
 ARG ORACLE_PASSWORD=
-ARG COVERALLS_REPO_TOKEN=false
 WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
@@ -28,7 +27,6 @@ COPY --from=build-env /lib /lib
 RUN npm install && \
     node_modules/typescript/bin/tsc && \
     npm run test && \
-    if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi && \
     if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi
 
 # compile image intended for production use

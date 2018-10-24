@@ -9,6 +9,4 @@ sed -e "s|TEST_INSTANCE_SSH_KEY_NAME|$TEST_INSTANCE_SSH_KEY_NAME|" test/system/i
 sed -i "s|TEST_INSTANCE_SECURITYGROUP|$TEST_INSTANCE_SECURITYGROUP|" test/system/instanceConfig.json
 sed -i "s|TEST_INSTANCE_SUBNETID|$TEST_INSTANCE_SUBNETID|" test/system/instanceConfig.json
 
-npm install
-node_modules/typescript/bin/tsc
 npm run system-test
