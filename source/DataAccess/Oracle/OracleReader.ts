@@ -47,6 +47,11 @@ export default class OracleReader implements IDataReader {
             const queryResultStream = await this._connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
+            // Must handle errors to gracefully react otherwise the process may become unstable
+            queryResultStream.on('error', (error) => {
+                    this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
+            });
+
             const metadataStream = await this.getMetadata(queryResultStream);
 
             const jsonTransformer = new stream.Transform( { objectMode: true });
