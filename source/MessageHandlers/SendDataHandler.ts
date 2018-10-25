@@ -81,6 +81,7 @@ export default class SendDataHandler implements IMessageHandler {
                     if (reader) {
                         await reader.close();
                     }
+<<<<<<< HEAD
                 }
                 queryCollback(null, { name: queryStatement.name, data: itemMetadata});
             },
@@ -89,6 +90,11 @@ export default class SendDataHandler implements IMessageHandler {
                     await this._connectionPool.close();
                 } else {
                     await this._connectionPool.close();
+=======
+                    queryCollback(null, { name: queryStatement.name, data: itemMetadata});
+                },
+                (err, results) => { // async.mapLimit callback
+>>>>>>> ec519ed52525698e65bb3140f4fa1bbac3eb0389
                     results.forEach((queryResult) => {
                         aggregateMetadata.push(queryResult.data);
                     });
