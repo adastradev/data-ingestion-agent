@@ -54,6 +54,9 @@ class App {
 
                     message = messageFactory.createFromJson(result.Messages[0].Body, result.Messages[0].ReceiptHandle);
 
+                    this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
+                    await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
+
                     this.logger.info(`${message.type} Message Received`);
                     messageHandler = handlerFactory.getHandler(message);
 
@@ -61,10 +64,9 @@ class App {
                     await messageHandler.handle(message);
                 } catch (error) {
                     // TODO: Requeue/Dead-letter the message?
-                    throw Error(error.message);
-                } finally {
                     this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
                     await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
+                    throw Error(error.message);
                 }
 
                 // Bail after completing adhoc requests
