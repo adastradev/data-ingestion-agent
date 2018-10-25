@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 
-export declare type IntegrationType = 'Banner' | 'DegreeWorks';
+export declare type IntegrationType = 'Banner' | 'DegreeWorks' | 'Demo';
 
 /**
  * Represents a set of statements or queries that need to be run for a given integration
