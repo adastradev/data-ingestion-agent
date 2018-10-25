@@ -30,10 +30,14 @@ To see a demo of the agent without connecting it to any data source, omit the OR
 
 The docker agent also supports the following optional arguments:
 ```sh
+# [Demo, Banner]
 -e INTEGRATION_TYPE=Banner \
+# [dev, prod]
 -e DEFAULT_STAGE=prod \
 -e AWS_REGION=us-east-1 \
 -e CONCURRENT_CONNECTIONS=5 \
+# [error, warn, info, verbose, debug, silly]
+-e LOG_LEVEL=info
 ```
 
 ### Configure Network Access

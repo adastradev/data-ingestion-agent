@@ -56,7 +56,7 @@ if (process.env.LOG_PATH !== undefined) {
 
 const logger: Winston.Logger = Winston.createLogger({
     format: Winston.format.json(),
-    level: 'silly',
+    level: process.env.LOG_LEVEL || 'info',
     transports
 });
 
