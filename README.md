@@ -99,6 +99,11 @@ The data ingestion agent periodically informs docker of its current health. Usin
 docker inspect --format='{{json .State.Health.Status}}' <container_name_or_id>
 ```
 
+To monitor container resource usage run the following:
+```sh
+docker stats <container_name_or_id>
+```
+
 ### View agent logs
 ```sh
 # View console output from container host

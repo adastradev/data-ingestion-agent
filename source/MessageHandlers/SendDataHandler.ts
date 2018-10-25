@@ -60,6 +60,14 @@ export default class SendDataHandler implements IMessageHandler {
 
         const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
 
+        const gcFunc = () => {
+            if (global.gc) {
+            global.gc();
+            } else {
+            console.warn('No GC hook! Start your program as `node --expose-gc file.js`.');
+            }
+        };
+
         return new Promise<void>((resolve, reject) => {
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
                 async (queryStatement: IQueryDefinition, queryCollback: any) => { // iterator value callback
@@ -78,6 +86,7 @@ export default class SendDataHandler implements IMessageHandler {
                             `Ingestion for '${queryStatement.name}' ` +
                             `took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`
                         );
+                        gcFunc();
                     } catch (err) {
                         queryCollback(err);
                     } finally {
