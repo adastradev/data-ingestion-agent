@@ -14,6 +14,7 @@ import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
+import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from 'constants';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -56,46 +57,45 @@ export default class SendDataHandler implements IMessageHandler {
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
         const folderPath = integrationType + '-' + moment().toISOString();
 
-        try {
-            await this._connectionPool.open();
+        await this._connectionPool.open();
 
-            const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
+        const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
 
-            mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
-                async (queryStatement: IQueryDefinition, queryCollback: any) => { // iterator value callback
-                    let reader: IDataReader;
-                    let itemMetadata: Readable;
-                    try {
-                        const startTime = Date.now();
+        mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
+            async (queryStatement: IQueryDefinition, queryCollback: any) => { // iterator value callback
+                let reader: IDataReader;
+                let itemMetadata: Readable;
+                try {
+                    const startTime = Date.now();
 
-                        reader = this._container.get<IDataReader>(TYPES.DataReader);
-                        const readable: IQueryResult = await reader.read(queryStatement.query);
-                        itemMetadata = readable.metadata;
-                        await this._writer.ingest(readable.result, folderPath, queryStatement.name);
-                        const endTime = Date.now();
-                        const diff = moment.duration(endTime - startTime);
-                        this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
-                    } catch (err) {
-                        queryCollback(err);
-                    } finally {
-                        if (reader) {
-                            await reader.close();
-                        }
+                    reader = this._container.get<IDataReader>(TYPES.DataReader);
+                    const readable: IQueryResult = await reader.read(queryStatement.query);
+                    itemMetadata = readable.metadata;
+                    await this._writer.ingest(readable.result, folderPath, queryStatement.name);
+                    const endTime = Date.now();
+                    const diff = moment.duration(endTime - startTime);
+                    this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
+                } catch (err) {
+                    queryCollback(err);
+                } finally {
+                    if (reader) {
+                        await reader.close();
                     }
-                    queryCollback(null, { name: queryStatement.name, data: itemMetadata});
-                },
-                (err, results) => { // async.mapLimit callback
-                    results.array.forEach((queryResult) => {
+                }
+                queryCollback(null, { name: queryStatement.name, data: itemMetadata});
+            },
+            async (err, results) => { // async.mapLimit callback
+                if (err) {
+                    await this._connectionPool.close();
+                } else {
+                    await this._connectionPool.close();
+                    results.forEach((queryResult) => {
                         aggregateMetadata.push(queryResult.data);
                     });
+                    await this.ingestMetadata(aggregateMetadata, folderPath);
                 }
-            );
-
-            await this.ingestMetadata(aggregateMetadata, folderPath);
-
-        } finally {
-            await this._connectionPool.close();
-        }
+            }
+        );
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
