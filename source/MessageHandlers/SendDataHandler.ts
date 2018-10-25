@@ -62,7 +62,7 @@ export default class SendDataHandler implements IMessageHandler {
 
         return new Promise<void>((resolve, reject) => {
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
-                async (queryStatement: IQueryDefinition, queryCollback: any) => { // iterator value callback
+                async (queryStatement: IQueryDefinition, queryCallback: any) => { // iterator value callback
                     let reader: IDataReader;
                     let itemMetadata: Readable;
                     try {
@@ -79,13 +79,13 @@ export default class SendDataHandler implements IMessageHandler {
                             `took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
-                        queryCollback(err);
+                        queryCallback(err);
                     } finally {
                         if (reader) {
                             await reader.close();
                         }
                     }
-                    queryCollback(null, { name: queryStatement.name, data: itemMetadata});
+                    queryCallback(null, { name: queryStatement.name, data: itemMetadata});
                 },
                 async (err, results) => { // async.mapLimit callback
                     if (err) {
