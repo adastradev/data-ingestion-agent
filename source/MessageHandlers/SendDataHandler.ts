@@ -6,7 +6,6 @@ import { Logger } from 'winston';
 import { Container, inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
-import * as BluebirdPromise from 'bluebird';
 
 import SendDataMessage from '../Messages/SendDataMessage';
 import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
@@ -14,8 +13,7 @@ import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
-import { WriteStream } from 'tty';
-import { stringify } from 'querystring';
+import { mapLimit } from 'async';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -61,19 +59,39 @@ export default class SendDataHandler implements IMessageHandler {
         try {
             await this._connectionPool.open();
 
-            // delegate each query statement to one Reader/Writer pair
-            const statementExecutors: Array<Promise<IQueryMetadata>> = [];
-            for (const statement of integrationConfig.queries) {
-                statementExecutors.push(this.getStatementExecutor(statement, folderPath));
-            }
+            const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
 
-            // execute the query statements in parallel, limiting to avoid too much CPU/RAM consumption
-            const metadata: IQueryMetadata[] = new Array<IQueryMetadata>();
-            await BluebirdPromise.map(statementExecutors,
-                (queryMetadata: IQueryMetadata) => { metadata.push(queryMetadata); },
-                { concurrency: STATEMENT_CONCURRENCY });
+            mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
+                async (queryStatement: IQueryDefinition, queryCollback: any) => { // iterator value callback
+                    let reader: IDataReader;
+                    let itemMetadata: Readable;
+                    try {
+                        const startTime = Date.now();
 
-            await this.ingestMetadata(metadata, folderPath);
+                        reader = this._container.get<IDataReader>(TYPES.DataReader);
+                        const readable: IQueryResult = await reader.read(queryStatement.query);
+                        itemMetadata = readable.metadata;
+                        await this._writer.ingest(readable.result, folderPath, queryStatement.name);
+                        const endTime = Date.now();
+                        const diff = moment.duration(endTime - startTime);
+                        this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
+                    } catch (err) {
+                        queryCollback(err);
+                    } finally {
+                        if (reader) {
+                            await reader.close();
+                        }
+                    }
+                    queryCollback(null, { name: queryStatement.name, data: itemMetadata});
+                },
+                (err, results) => { // async.mapLimit callback
+                    results.array.forEach((queryResult) => {
+                        aggregateMetadata.push(queryResult.data);
+                    });
+                }
+            );
+
+            await this.ingestMetadata(aggregateMetadata, folderPath);
 
         } finally {
             await this._connectionPool.close();
@@ -101,32 +119,5 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(null);
 
         await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
-    }
-
-    private getStatementExecutor(queryStatement: IQueryDefinition, folderPath: string): Promise<IQueryMetadata> {
-        return new Promise(async (resolve, reject) => {
-            let reader: IDataReader;
-            let metadata: Readable;
-            try {
-                const startTime = Date.now();
-
-                reader = this._container.get<IDataReader>(TYPES.DataReader);
-                const readable: IQueryResult = await reader.read(queryStatement.query);
-                metadata = readable.metadata;
-                await this._writer.ingest(readable.result, folderPath, queryStatement.name);
-                const endTime = Date.now();
-                const diff = moment.duration(endTime - startTime);
-                this._logger.info(`Ingestion took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`);
-            } finally {
-                this._logger.info(`In finally`);
-                if (reader) {
-                    await reader.close();
-                } else {
-                    this._logger.info(`Reader not defined`);
-                }
-            }
-            this._logger.info(`Resolving`);
-            resolve({ name: queryStatement.name, data: metadata});
-        });
     }
 }
