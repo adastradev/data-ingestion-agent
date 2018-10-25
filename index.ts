@@ -36,8 +36,8 @@ class App {
             await command.invoke(args.splice(1));
         }
 
-        this.logger.silly(`Proccess Id: ${process.pid}`);
-        this.logger.silly('Waiting for schedule event');
+        this.logger.debug(`Proccess Id: ${process.pid}`);
+        this.logger.debug('Waiting for schedule event');
         while (!shutdownRequested) {
             await sleep(1000);
 
@@ -63,7 +63,7 @@ class App {
                     // TODO: Requeue/Dead-letter the message?
                     throw Error(error.message);
                 } finally {
-                    this.logger.silly(`Acknowledging message: ${message.receiptHandle}`);
+                    this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
                     await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
                 }
 
