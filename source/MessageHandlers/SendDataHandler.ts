@@ -85,7 +85,7 @@ export default class SendDataHandler implements IMessageHandler {
                     queryCollback(null, { name: queryStatement.name, data: itemMetadata});
                 },
                 (err, results) => { // async.mapLimit callback
-                    results.array.forEach((queryResult) => {
+                    results.forEach((queryResult) => {
                         aggregateMetadata.push(queryResult.data);
                     });
                 }
