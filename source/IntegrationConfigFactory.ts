@@ -553,20 +553,15 @@ export default class IntegrationConfigFactory {
                 };
             }
             case 'Demo': {
-                const BANNER_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
+                const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'dummysisdata',
-                    query: 'SELECT * FROM dummysisdata where rownum < 100000'
-                });
-
-                BANNER_TEMPLATE_STATEMENTS.push({
+                DEMO_TEMPLATE_STATEMENTS.push({
                     name: 'all_tables',
                     query: 'SELECT * FROM ALL_TABLES'
                 });
                 return {
-                    queries: BANNER_TEMPLATE_STATEMENTS,
-                    type: 'Banner'
+                    queries: DEMO_TEMPLATE_STATEMENTS,
+                    type: 'Demo'
                 };
             }
             default: {
