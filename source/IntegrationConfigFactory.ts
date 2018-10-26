@@ -117,7 +117,8 @@ export default class IntegrationConfigFactory {
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SFRSTCR',
-                    query: 'select SFRSTCR_PIDM, SFRSTCR_ACTIVITY_DATE, SFRSTCR_CREDIT_HR, SFRSTCR_CRN, SFRSTCR_LEVL_CODE, SFRSTCR_RSTS_CODE, SFRSTCR_TERM_CODE, ROWID from SFRSTCR'
+                    query: 'select SFRSTCR_PIDM, SFRSTCR_ACTIVITY_DATE, SFRSTCR_CREDIT_HR, SFRSTCR_CRN, '
+                    + 'SFRSTCR_LEVL_CODE, SFRSTCR_RSTS_CODE, SFRSTCR_TERM_CODE, ROWID from SFRSTCR'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SGRCLSR',
@@ -137,35 +138,47 @@ export default class IntegrationConfigFactory {
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRDGMR',
-                    query: 'select SHRDGMR_PIDM, SHRDGMR_DEGC_CODE, SHRDGMR_DEGS_CODE, SHRDGMR_SEQ_NO, SHRDGMR_TERM_CODE_GRAD from SHRDGMR'
+                    query: 'select SHRDGMR_PIDM, SHRDGMR_DEGC_CODE, SHRDGMR_DEGS_CODE, SHRDGMR_SEQ_NO, '
+                    + 'SHRDGMR_TERM_CODE_GRAD from SHRDGMR'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRGRDE',
-                    query: 'Select SHRGRDE_CODE, SHRGRDE_GPA_IND, SHRGRDE_COMPLETED_IND, SHRGRDE_LEVL_CODE, SHRGRDE_QUALITY_POINTS, SHRGRDE_TERM_CODE_EFFECTIVE, SHRGRDE_ACTIVITY_DATE, SHRGRDE_GRDE_STATUS_IND FROM SHRGRDE'
+                    query: 'Select SHRGRDE_CODE, SHRGRDE_GPA_IND, SHRGRDE_COMPLETED_IND, SHRGRDE_LEVL_CODE, '
+                    + 'SHRGRDE_QUALITY_POINTS, SHRGRDE_TERM_CODE_EFFECTIVE, SHRGRDE_ACTIVITY_DATE, '
+                    + 'SHRGRDE_GRDE_STATUS_IND FROM SHRGRDE'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRTATT',
-                    query: 'select SHRTATT_PIDM, SHRTATT_TRIT_SEQ_NO, SHRTATT_TRAM_SEQ_NO, SHRTATT_TRCR_SEQ_NO, SHRTATT_TRCE_SEQ_NO, SHRTATT_ATTR_CODE from SHRTATT'
+                    query: 'select SHRTATT_PIDM, SHRTATT_TRIT_SEQ_NO, SHRTATT_TRAM_SEQ_NO, SHRTATT_TRCR_SEQ_NO, '
+                    + 'SHRTATT_TRCE_SEQ_NO, SHRTATT_ATTR_CODE from SHRTATT'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRTCKG',
-                    query: 'select SHRTCKG_PIDM, SHRTCKG_TERM_CODE, SHRTCKG_TCKN_SEQ_NO, SHRTCKG_SEQ_NO, SHRTCKG_CREDIT_HOURS, SHRTCKG_GRDE_CODE_FINAL, SHRTCKG_ACTIVITY_DATE from SHRTCKG'
+                    query: 'select SHRTCKG_PIDM, SHRTCKG_TERM_CODE, SHRTCKG_TCKN_SEQ_NO, SHRTCKG_SEQ_NO, '
+                    + 'SHRTCKG_CREDIT_HOURS, SHRTCKG_GRDE_CODE_FINAL, SHRTCKG_ACTIVITY_DATE from SHRTCKG'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRTCKL',
-                    query: 'select SHRTCKL_PIDM, SHRTCKL_TERM_CODE, SHRTCKL_TCKN_SEQ_NO, SHRTCKL_LEVL_CODE, SHRTCKL_ACTIVITY_DATE, ROWID from SHRTCKL'
+                    query: 'select SHRTCKL_PIDM, SHRTCKL_TERM_CODE, SHRTCKL_TCKN_SEQ_NO, SHRTCKL_LEVL_CODE, '
+                    + 'SHRTCKL_ACTIVITY_DATE, ROWID from SHRTCKL'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRTCKN',
-                    query: 'select SHRTCKN_PIDM, SHRTCKN_CRN, SHRTCKN_TERM_CODE, SHRTCKN_SEQ_NO, SHRTCKN_SUBJ_CODE, SHRTCKN_CRSE_NUMB, SHRTCKN_REPEAT_COURSE_IND, SHRTCKN_CRSE_TITLE, SHRTCKN_ACTIVITY_DATE from SHRTCKN'
+                    query: 'select SHRTCKN_PIDM, SHRTCKN_CRN, SHRTCKN_TERM_CODE, SHRTCKN_SEQ_NO, SHRTCKN_SUBJ_CODE, '
+                    + 'SHRTCKN_CRSE_NUMB, SHRTCKN_REPEAT_COURSE_IND, SHRTCKN_CRSE_TITLE, '
+                    + 'SHRTCKN_ACTIVITY_DATE from SHRTCKN'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRTGPA',
-                    query: 'select SHRTGPA_PIDM, SHRTGPA_TERM_CODE, SHRTGPA_HOURS_EARNED, SHRTGPA_GPA_TYPE_IND from SHRTGPA'
+                    query: 'select SHRTGPA_PIDM, SHRTGPA_TERM_CODE, SHRTGPA_HOURS_EARNED, SHRTGPA_GPA_TYPE_IND '
+                    + 'from SHRTGPA'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SHRTRCE',
-                    query: 'select SHRTRCE_PIDM, SHRTRCE_TERM_CODE_EFF, SHRTRCE_GRDE_CODE, SHRTRCE_LEVL_CODE, SHRTRCE_SUBJ_CODE,SHRTRCE_CRSE_NUMB, SHRTRCE_CREDIT_HOURS, SHRTRCE_REPEAT_COURSE, SHRTRCE_CRSE_TITLE, SHRTRCE_TRIT_SEQ_NO, SHRTRCE_TRAM_SEQ_NO, SHRTRCE_SEQ_NO, SHRTRCE_ACTIVITY_DATE, ROWID from SHRTRCE '
+                    query: 'select SHRTRCE_PIDM, SHRTRCE_TERM_CODE_EFF, SHRTRCE_GRDE_CODE, SHRTRCE_LEVL_CODE, '
+                    + 'SHRTRCE_SUBJ_CODE,SHRTRCE_CRSE_NUMB, SHRTRCE_CREDIT_HOURS, SHRTRCE_REPEAT_COURSE, '
+                    + 'SHRTRCE_CRSE_TITLE, SHRTRCE_TRIT_SEQ_NO, SHRTRCE_TRAM_SEQ_NO, SHRTRCE_SEQ_NO, '
+                    + 'SHRTRCE_ACTIVITY_DATE, ROWID from SHRTRCE'
                 });
 
                 BANNER_TEMPLATE_STATEMENTS.push({
@@ -434,7 +447,8 @@ export default class IntegrationConfigFactory {
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SPRID',
-                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRID'
+                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, '
+                    + 'NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRID'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'GTVMTYP',
@@ -510,11 +524,17 @@ export default class IntegrationConfigFactory {
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'STVMAJR',
-                    query: 'Select STVMAJR_CODE, STVMAJR_DESC, STVMAJR_CIPC_CODE, STVMAJR_VALID_MAJOR_IND, STVMAJR_VALID_MINOR_IND, STVMAJR_VALID_CONCENTRATN_IND, STVMAJR_ACTIVITY_DATE, STVMAJR_OCCUPATION_IND, STVMAJR_AID_ELIGIBILITY_IND, STVMAJR_SYSTEM_REQ_IND, STVMAJR_VR_MSG_NO, STVMAJR_SEVIS_EQUIV, STVMAJR_SURROGATE_ID, STVMAJR_VERSION, STVMAJR_USER_ID, STVMAJR_DATA_ORIGIN, STVMAJR_VPDI_CODE from STVMAJR'
+                    query: 'Select STVMAJR_CODE, STVMAJR_DESC, STVMAJR_CIPC_CODE, STVMAJR_VALID_MAJOR_IND, '
+                    + 'STVMAJR_VALID_MINOR_IND, STVMAJR_VALID_CONCENTRATN_IND, STVMAJR_ACTIVITY_DATE, '
+                    + 'STVMAJR_OCCUPATION_IND, STVMAJR_AID_ELIGIBILITY_IND, STVMAJR_SYSTEM_REQ_IND, '
+                    + 'STVMAJR_VR_MSG_NO, STVMAJR_SEVIS_EQUIV, STVMAJR_SURROGATE_ID, STVMAJR_VERSION, STVMAJR_USER_ID, '
+                    + 'STVMAJR_DATA_ORIGIN, STVMAJR_VPDI_CODE from STVMAJR'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'STVRESD',
-                    query: 'Select STVRESD_CODE, STVRESD_DESC, STVRESD_IN_STATE_IND, STVRESD_ACTIVITY_DATE, STVRESD_SYSTEM_REQ_IND, STVRESD_VR_MSG_NO, STVRESD_EDI_EQUIV, STVRESD_SURROGATE_ID, STVRESD_VERSION, STVRESD_USER_ID, STVRESD_DATA_ORIGIN, STVRESD_VPDI_CODE from STVRESD'
+                    query: 'Select STVRESD_CODE, STVRESD_DESC, STVRESD_IN_STATE_IND, STVRESD_ACTIVITY_DATE, '
+                    + 'STVRESD_SYSTEM_REQ_IND, STVRESD_VR_MSG_NO, STVRESD_EDI_EQUIV, STVRESD_SURROGATE_ID, '
+                    + 'STVRESD_VERSION, STVRESD_USER_ID, STVRESD_DATA_ORIGIN, STVRESD_VPDI_CODE from STVRESD'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'STVRSTS',
@@ -545,7 +565,7 @@ export default class IntegrationConfigFactory {
                     query: 'Select * from STVPTRM'
                 });
 
-                //Consider using: DBMS_METADATA.GET_DDL('TABLE','<tableName>','SATURN') FROM DUAL' for DDL information
+                // Consider using: DBMS_METADATA.GET_DDL('TABLE','<tableName>','SATURN') FROM DUAL' for DDL information
 
                 return {
                     queries: BANNER_TEMPLATE_STATEMENTS,
