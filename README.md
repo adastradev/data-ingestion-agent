@@ -6,8 +6,19 @@ Ad Astra Docker agent code base for cloud integration without VPN tunnels
 ## Pre-requisites
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
-## Host System Requirements
-TBD
+## Resource Requirements
+
+#### Docker Host
+
+Memory:
+
+* 8GB (Recommended)
+
+#### Container
+
+Memory:
+
+* 4GB (Recommended)
 
 ## Install
 ```sh
@@ -15,8 +26,14 @@ docker pull adastradev/data-ingestion-agent:latest
 ```
 
 ## Run
+
 ```sh
+# See Host System Requirements above for agent resource requirements
+PROCESS_MAX_MEMORY_SIZE_MB=4096
+
 docker run -d -t \
+-m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
+-e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
 -e ORACLE_ENDPOINT=hostname:port/service_name \
@@ -61,7 +78,12 @@ preview
 To immediately begin the ingestion process you can run the following with the 'ingest' flag. This command will terminate the container once the process has completed.
 
 ```sh
+# See Host System Requirements above for agent resource requirements
+PROCESS_MAX_MEMORY_SIZE_MB=4096
+
 docker run -i \
+-m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
+-e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
 -e ORACLE_ENDPOINT=hostname:port/service_name \

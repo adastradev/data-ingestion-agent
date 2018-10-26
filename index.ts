@@ -12,25 +12,15 @@ import { AuthManager } from './source/astra-sdk/AuthManager';
 import sleep from './source/Util/sleep';
 import * as v8 from 'v8';
 
-const shutdownRequested = false;
-// process.on('SIGTERM', () => {
-//     shutdownRequested = true;
-// });
+let shutdownRequested = false;
+process.on('SIGTERM', () => {
+    shutdownRequested = true;
+});
 
 class App {
 
     public static async main() {
         this.container = await startup();
-
-        process
-            .on('unhandledRejection', (reason, p) => {
-                console.error(reason, 'Unhandled Rejection at Promise', p);
-                process.exit(1);
-            })
-            .on('uncaughtException', (err) => {
-                console.error(err, 'Uncaught Exception thrown');
-                process.exit(1);
-            });
 
         this.logger = this.container.get<Winston.Logger>(TYPES.Logger);
         const queueUrl = this.container.get<string>(TYPES.QueueUrl);
@@ -85,8 +75,7 @@ class App {
                     // TODO: Requeue/Dead-letter the message?
                     this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
                     await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
-                    await sleep(1000);
-                    throw Error(error.message);
+                    this.logger.error(error.message);
                 }
 
                 // Bail after completing adhoc requests
