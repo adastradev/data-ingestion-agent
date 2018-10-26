@@ -3,7 +3,7 @@ import * as shell from 'child_process';
 
 // optional args
 const args = process.argv.slice(2);
-const target = ['--expose-gc', '--max-old-space-size=8192', 'dist/index.js'].concat(args);
+const target = ['--max-old-space-size=8192', 'dist/index.js'].concat(args);
 let restartCounter = 0;
 let child;
 

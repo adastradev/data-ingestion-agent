@@ -17,7 +17,6 @@ if (process.env.S3_QUEUE_SIZE) {
     S3_QUEUE_SIZE = Number(process.env.S3_QUEUE_SIZE);
 }
 
-
 /**
  * Given a readable stream ingest data into an S3 bucket
  *
