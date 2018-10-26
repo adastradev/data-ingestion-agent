@@ -32,18 +32,6 @@ export default class IntegrationConfigFactory {
                 const BANNER_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'SZGBTPAR',
-                    query: 'Select * from SZGBTPAR'
-                });
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'STVSSTS',
-                    query: 'Select * from STVSSTS'
-                });
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'SFRTHST',
-                    query: 'Select * from SFRTHST'
-                });
-                BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SORCONT',
                     query: 'Select * from SORCONT'
                 });
@@ -435,14 +423,6 @@ export default class IntegrationConfigFactory {
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SPRID',
                     query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRID'
-                });
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'GTVMTYP',
-                    query: 'select * from GTVMTYP'
-                });
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'STVSESS',
-                    query: 'select * from STVSESS'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBSECT',
