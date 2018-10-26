@@ -8,6 +8,16 @@ import IDataWriter from '../IDataWriter';
 import { Logger } from 'winston';
 import AWS = require('aws-sdk');
 
+let S3_PART_SIZE_MB = 10;
+if (process.env.S3_PART_SIZE_MB) {
+    S3_PART_SIZE_MB = Number(process.env.S3_PART_SIZE_MB);
+}
+let S3_QUEUE_SIZE = 10;
+if (process.env.S3_QUEUE_SIZE) {
+    S3_QUEUE_SIZE = Number(process.env.S3_QUEUE_SIZE);
+}
+
+
 /**
  * Given a readable stream ingest data into an S3 bucket
  *
@@ -38,10 +48,10 @@ export default class S3Writer implements IDataWriter {
             Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex')
         };
 
-        // Parallelize 2x5MB chunks at a time...or at least try to
-        // TODO: Make performance settings configurable? via config? via sqs? per table? per client?
+        // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
-        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms, { partSize: 1024 * 1024 * 5, queueSize: 3  });
+        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms,
+            { partSize: 1024 * 1024 * S3_PART_SIZE_MB, queueSize: S3_QUEUE_SIZE });
 
         managedUpload.on('httpUploadProgress', (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${parms.Key})`);
