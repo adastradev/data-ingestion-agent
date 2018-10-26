@@ -10,6 +10,7 @@ import MessageFactory from './source/MessageFactory';
 import ICommand from './source/Commands/ICommand';
 import { AuthManager } from './source/astra-sdk/AuthManager';
 import sleep from './source/Util/sleep';
+import * as v8 from 'v8';
 
 const shutdownRequested = false;
 // process.on('SIGTERM', () => {
@@ -37,6 +38,14 @@ class App {
         const sqs = new SQS();
         let isAdhoc = false;
 
+        const heapStats = v8.getHeapStatistics();
+        this.logger.debug(JSON.stringify(heapStats));
+
+        const heapSpaceStats: v8.HeapSpaceInfo[] = v8.getHeapSpaceStatistics();
+        heapSpaceStats.forEach((heapSpaceInfo) => {
+            this.logger.debug(JSON.stringify(heapSpaceInfo));
+        });
+
         // Handle agent commands
         const args = process.argv.splice(2);
         if (args.length > 0) {
@@ -46,7 +55,7 @@ class App {
             await command.invoke(args.splice(1));
         }
 
-        this.logger.debug(`Proccess Id: ${process.pid}`);
+        this.logger.debug(`Process Id: ${process.pid}`);
         this.logger.debug('Waiting for schedule event');
         while (!shutdownRequested) {
             await sleep(1000);
