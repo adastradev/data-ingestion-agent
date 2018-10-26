@@ -75,8 +75,7 @@ class App {
                     // TODO: Requeue/Dead-letter the message?
                     this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
                     await sqs.deleteMessage({ QueueUrl: queueUrl, ReceiptHandle: message.receiptHandle }).promise();
-                    await sleep(1000);
-                    throw Error(error.message);
+                    this.logger.error(error.message);
                 }
 
                 // Bail after completing adhoc requests
