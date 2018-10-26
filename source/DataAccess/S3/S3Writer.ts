@@ -1,5 +1,4 @@
 import { Readable, Stream } from 'stream';
-import { S3 } from 'aws-sdk';
 import { inject, injectable } from 'inversify';
 import TYPES from '../../../ioc.types';
 import * as crypto from 'crypto';
@@ -16,7 +15,6 @@ let S3_QUEUE_SIZE = 10;
 if (process.env.S3_QUEUE_SIZE) {
     S3_QUEUE_SIZE = Number(process.env.S3_QUEUE_SIZE);
 }
-
 
 /**
  * Given a readable stream ingest data into an S3 bucket
