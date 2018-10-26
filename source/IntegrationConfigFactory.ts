@@ -430,7 +430,7 @@ export default class IntegrationConfigFactory {
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SPRIDEN',
-                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRIDEN s where SPRIDEN_CHANGE_IND IS NULL'
+                    query: 'select * from SPRIDEN s where SPRIDEN_CHANGE_IND IS NULL'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SPRID',
@@ -446,7 +446,7 @@ export default class IntegrationConfigFactory {
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBSECT',
-                    query: 'select SSBSECT_TERM_CODE, SSBSECT_CRN, SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB, SSBSECT_GRADABLE_IND, SSBSECT_ACTIVITY_DATE, SSBSECT_CRSE_TITLE, ssbsect_PTRM_Code, ssbsect_camp_code, ssbsect_seq_numb, ssbsect_prnt_ind, ssbsect_voice_avail,ssbsect_enrl, ssbsect_max_enrl, ssbsect_census_enrl, ssbsect_wait_count, ssbsect_wait_avail, ssbsect_wait_capacity, ssbsect_ssts_code, ssbsect_Link_Ident, ssbsect_schd_code, ssbsect_proj_enrl, SSBSECT_SESS_CODE, SSBSECT_INSM_CODE From SSBSECT'
+                    query: 'select * From SSBSECT'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBXLST',
