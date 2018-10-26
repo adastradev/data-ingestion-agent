@@ -32,6 +32,26 @@ export default class IntegrationConfigFactory {
                 const BANNER_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SZGBTPAR',
+                    query: 'Select * from SZGBTPAR'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'STVSSTS',
+                    query: 'Select * from STVSSTS'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SFRTHST',
+                    query: 'Select * from SFRTHST'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SORCONT',
+                    query: 'Select * from SORCONT'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'STVTMST',
+                    query: 'Select * from STVTMST'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SCBCRKY',
                     query: 'Select * from SCBCRKY'
                 });
@@ -54,6 +74,10 @@ export default class IntegrationConfigFactory {
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SCRLEVL',
                     query: 'Select * from SCRLEVL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SCRRARE',
+                    query: 'Select * from SCRRARE'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SCRRCAM',
@@ -156,24 +180,273 @@ export default class IntegrationConfigFactory {
                     name: 'SLBRDEF',
                     query: 'Select * from SLBRDEF'
                 });
-
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBAGEN',
+                    query: 'Select * from SMBAGEN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBARUL',
+                    query: 'Select * from SMBARUL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBGGEN',
+                    query: 'Select * from SMBGGEN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBGRUL',
+                    query: 'Select * from SMBGRUL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBPGEN',
+                    query: 'Select * from SMBPGEN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBSAGN',
+                    query: 'Select * from SMBSAGN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBSARU',
+                    query: 'Select * from SMBSARU'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBSGGN',
+                    query: 'Select * from SMBSGGN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBSGRU',
+                    query: 'Select * from SMBSGRU'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBSLIB',
+                    query: 'Select * from SMBSLIB'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMBSPGN',
+                    query: 'Select * from SMBSPGN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRACAA',
+                    query: 'Select * from SMRACAA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRACCM',
+                    query: 'Select * from SMRACCM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRACMT',
+                    query: 'Select * from SMRACMT'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRAEXL',
+                    query: 'Select * from SMRAEXL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRAGAM',
+                    query: 'Select * from SMRAGAM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRALIB',
+                    query: 'Select * from SMRALIB'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRAQUA',
+                    query: 'Select * from SMRAQUA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRAREX',
+                    query: 'Select * from SMRAREX'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRARSA',
+                    query: 'Select * from SMRARSA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRARUL',
+                    query: 'Select * from SMRARUL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGCAA',
+                    query: 'Select * from SMRGCAA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGCCM',
+                    query: 'Select * from SMRGCCM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGCMT',
+                    query: 'Select * from SMRGCMT'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGEXL',
+                    query: 'Select * from SMRGEXL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGLIB',
+                    query: 'Select * from SMRGLIB'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGRCM',
+                    query: 'Select * from SMRGRCM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGREX',
+                    query: 'Select * from SMRGREX'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGRSA',
+                    query: 'Select * from SMRGRSA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRGRUL',
+                    query: 'Select * from SMRGRUL'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIEAT',
+                    query: 'Select * from SMRIEAT'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIECC',
+                    query: 'Select * from SMRIECC'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIECO',
+                    query: 'Select * from SMRIECO'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIECP',
+                    query: 'Select * from SMRIECP'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIEDG',
+                    query: 'Select * from SMRIEDG'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIEDP',
+                    query: 'Select * from SMRIEDP'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIEMJ',
+                    query: 'Select * from SMRIEMJ'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRIEMN',
+                    query: 'Select * from SMRIEMN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRPAAP',
+                    query: 'Select * from SMRPAAP'
+                });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SMRPRLE',
                     query: 'Select * from SMRPRLE'
                 });
-
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRPRSA',
+                    query: 'Select * from SMRPRSA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSACA',
+                    query: 'Select * from SMRSACA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSACE',
+                    query: 'Select * from SMRSACE'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSACM',
+                    query: 'Select * from SMRSACM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSACT',
+                    query: 'Select * from SMRSACT'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSAGM',
+                    query: 'Select * from SMRSAGM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSARE',
+                    query: 'Select * from SMRSARE'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSARS',
+                    query: 'Select * from SMRSARS'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSARU',
+                    query: 'Select * from SMRSARU'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGAV',
+                    query: 'Select * from SMRSGAV'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGCA',
+                    query: 'Select * from SMRSGCA'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGCE',
+                    query: 'Select * from SMRSGCE'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGCM',
+                    query: 'Select * from SMRSGCM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGCT',
+                    query: 'Select * from SMRSGCT'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGRE',
+                    query: 'Select * from SMRSGRE'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGRS',
+                    query: 'Select * from SMRSGRS'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSGRU',
+                    query: 'Select * from SMRSGRU'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSPRS',
+                    query: 'Select * from SMRSPRS'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSSUB',
+                    query: 'Select * from SMRSSUB'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSTRG',
+                    query: 'Select * from SMRSTRG'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SMRSWAV',
+                    query: 'Select * from SMRSWAV'
+                });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SOBPTRM',
                     query: 'Select * from SOBPTRM'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SPRIDEN',
-                    query: 'select * from SPRIDEN'
+                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRIDEN s where SPRIDEN_CHANGE_IND IS NULL'
                 });
-                
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SPRID',
+                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRID'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'GTVMTYP',
+                    query: 'select * from GTVMTYP'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'STVSESS',
+                    query: 'select * from STVSESS'
+                });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBSECT',
-                    query: 'select * From SSBSECT'
+                    query: 'select SSBSECT_TERM_CODE, SSBSECT_CRN, SSBSECT_SUBJ_CODE, SSBSECT_CRSE_NUMB, SSBSECT_GRADABLE_IND, SSBSECT_ACTIVITY_DATE, SSBSECT_CRSE_TITLE, ssbsect_PTRM_Code, ssbsect_camp_code, ssbsect_seq_numb, ssbsect_prnt_ind, ssbsect_voice_avail,ssbsect_enrl, ssbsect_max_enrl, ssbsect_census_enrl, ssbsect_wait_count, ssbsect_wait_avail, ssbsect_wait_capacity, ssbsect_ssts_code, ssbsect_Link_Ident, ssbsect_schd_code, ssbsect_proj_enrl, SSBSECT_SESS_CODE, SSBSECT_INSM_CODE From SSBSECT'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBXLST',
@@ -255,7 +528,10 @@ export default class IntegrationConfigFactory {
                     name: 'STVSTST',
                     query: 'Select * from STVSTST'
                 });
-
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'STVSTYP',
+                    query: 'Select * from STVSTYP'
+                });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'STVSUBJ',
                     query: 'Select * from STVSUBJ'
