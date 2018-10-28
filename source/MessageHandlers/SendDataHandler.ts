@@ -79,6 +79,7 @@ export default class SendDataHandler implements IMessageHandler {
                             `took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
+                        this._logger.error(err);
                         queryCallback(err);
                     } finally {
                         if (reader) {

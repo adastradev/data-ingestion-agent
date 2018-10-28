@@ -30,7 +30,7 @@ export default class OracleReader implements IDataReader {
 
     public async read(queryStatement: string): Promise<IQueryResult> {
         if (process.env.ORACLE_ENDPOINT === undefined) {
-            return { result: this.createDemoSnapshot(), metadata: null };
+            return Promise.resolve({ result: this.createDemoSnapshot(), metadata: null });
         }
 
         try {
@@ -47,24 +47,37 @@ export default class OracleReader implements IDataReader {
             const queryResultStream = await this._connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
-            // Must handle errors to gracefully react otherwise the process may become unstable
-            queryResultStream.on('error', (error) => {
-                    this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
-            });
-
-            const metadataStream = await this.getMetadata(queryResultStream);
-
             const jsonTransformer = new stream.Transform( { objectMode: true });
             jsonTransformer._transform = function (chunk, encoding, done) {
                 // TODO: Decide on a format/encoding/structure - JSON for now
                 const data = JSON.stringify(chunk);
                 this.push(Buffer.from(data, encoding));
-
                 done();
             };
             const resultStream = queryResultStream.pipe(jsonTransformer);
 
-            return { result: resultStream, metadata: metadataStream };
+            const beginStreamingEvent = new Promise<any>((resolve, reject) => {
+                const result = { result: null, metadata: null };
+
+                queryResultStream.on('metadata', (md: any[]) => {
+                    result.metadata = this.getMetadataAsStream(md);
+                    result.result = resultStream;
+                    resolve(result);
+                });
+
+                queryResultStream.on('error', (error: any) => {
+                    this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
+                    queryResultStream.destroy();
+                    reject(error);
+                });
+
+                queryResultStream.on('end', () => {
+                    // Don't block waiting on completion; this is for informational purposes
+                    this._logger.info(`end event received for query: '${queryStatement}'`);
+                });
+            });
+
+            return await beginStreamingEvent;
         } catch (err) {
             this._logger.error(err);
             throw err;
@@ -82,15 +95,7 @@ export default class OracleReader implements IDataReader {
         }
     }
 
-    private async getMetadata(queryStream: stream.Readable): Promise<stream.Readable> {
-        const columnMetadataEvent = new Promise<any[]>((resolve, reject) => {
-            queryStream.on('metadata', (md: any[]) => {
-                resolve(md);
-            });
-        });
-
-        const columnMetadata = await columnMetadataEvent;
-
+    private getMetadataAsStream(columnMetadata: any[]): stream.Readable {
         const columnMetadataStream = new stream.Readable({ objectMode: true });
         for (const col of columnMetadata) {
             columnMetadataStream.push(col);
