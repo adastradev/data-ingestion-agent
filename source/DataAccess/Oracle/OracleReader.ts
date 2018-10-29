@@ -65,7 +65,7 @@ export default class OracleReader implements IDataReader {
         }
     }
 
-    private async subscribeToStreamEvents(queryStream: stream.Readable, queryStatement): Promise<IQueryResult> {
+    private async subscribeToStreamEvents(queryStream: stream.Readable, queryStatement: string): Promise<IQueryResult> {
         const streamEvents = new Promise<any>((resolve, reject) => {
             const result = { result: null, metadata: null };
 

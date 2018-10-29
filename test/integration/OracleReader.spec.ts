@@ -5,19 +5,16 @@ import { Logger } from 'winston';
 
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { Readable } from 'stream';
 import OracleConnectionPoolProxy from '../../source/DataAccess/Oracle/OracleConnectionPoolProxy';
-import sleep from '../../source/Util/sleep';
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
 
 const expect = chai.expect;
-const should = chai.should();
 chai.use(chaiAsPromised);
 
 describe('oracledb', () => {
 
     describe('When connecting to an Oracle database', () => {
-        xit('should return sample query results', async () => {
+        it('should return sample query results', async () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const pool = new OracleConnectionPoolProxy(logger);
             const reader = new OracleReader(logger, pool);
@@ -33,15 +30,17 @@ describe('oracledb', () => {
             while ((chunk = queryResult.result.read()) !== null) {
                 output += chunk.toString();
             }
-            // avoid invalid resultset error from closing the connection before consumption of the resultset
-            await sleep(1000);
+
+            // tslint:disable-next-line:no-conditional-assignment
+            while ((chunk = queryResult.metadata.read()) !== null) {
+                output += chunk.toString();
+            }
 
             await reader.close();
             await pool.close();
         });
 
-        // tslint:disable-next-line:max-line-length
-        it('should return empty streams without crashing when attempting to pull records from a table that does not exist', async () => {
+        it('should throw an exception when attempting to query a table that does not exist', async () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const pool = new OracleConnectionPoolProxy(logger);
             const reader = new OracleReader(logger, pool);

@@ -53,18 +53,19 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger, mockPool);
 
-            const readerGetMetadataStub = sinon.stub(oracleReader, 'getMetadata' as any);
-            readerGetMetadataStub.callsFake(sandbox.spy(async (stream) => {
+            const readerSubscribeStub = sinon.stub(oracleReader, 'subscribeToStreamEvents' as any);
+            readerSubscribeStub.callsFake(sandbox.spy(async (args) => {
                 const metadataStream = new Readable({objectMode: true });
                 metadataStream.push({ name: 'SOME_COLUMN', dbType: 2});
                 metadataStream.push(null);
-                return Promise.resolve(metadataStream);
+                // pass through the input stream without transforming; add mock metadata stream
+                return Promise.resolve({ result: args[0], metadata: metadataStream });
             }));
 
             // expected use sequence for OracleReader
             await mockPool.open();
 
-            const readable: IQueryResult = await oracleReader.read('Mock query statement');
+            const queryResult: IQueryResult = await oracleReader.read('Mock query statement');
             await oracleReader.close();
 
             await mockPool.close();
@@ -73,7 +74,7 @@ describe('OracleReader', () => {
             expect(queryStreamSpy.calledOnce).to.be.true;
             expect(releaseConnectionStub.calledOnce).to.be.true;
             expect(closeConnectionSpy.calledOnce).to.be.true;
-            expect(readable).to.be.not.null;
+            expect(queryResult).to.be.not.null;
 
             delete process.env.ORACLE_ENDPOINT;
         });
@@ -85,10 +86,10 @@ describe('OracleReader', () => {
             const oracleReader: OracleReader = new OracleReader(logger, poolStub);
             const closeSpy = sandbox.spy(oracleReader, 'close');
 
-            const readable: IQueryResult = await oracleReader.read('Mock query statement');
+            const queryResult: IQueryResult = await oracleReader.read('Mock query statement');
             await oracleReader.close();
             expect(closeSpy.calledOnce).to.be.true;
-            expect(readable.result).to.be.not.null;
+            expect(queryResult.result).to.be.not.null;
         });
     });
 });
