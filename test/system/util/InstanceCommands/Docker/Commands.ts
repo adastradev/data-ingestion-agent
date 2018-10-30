@@ -54,6 +54,7 @@ export class RunDataIngestionAgent implements ICommand<string> {
             '-t',
             `-e ASTRA_CLOUD_USERNAME=${astraCloudUserName}`,
             `-e ASTRA_CLOUD_PASSWORD=${astraCloudPassword}`,
+            `-e PROCESS_MAX_MEMORY_SIZE_MB=512`,
             `-e INTEGRATION_TYPE=Demo`,
             `adastradev/data-ingestion-agent:${normalizedDockerTag}`
         ].join(' ')];
@@ -79,6 +80,7 @@ export class RunDataIngestionAgentWithPreview implements ICommand<string> {
             '-i',
             `-e ASTRA_CLOUD_USERNAME=${astraCloudUserName}`,
             `-e ASTRA_CLOUD_PASSWORD=${astraCloudPassword}`,
+            `-e PROCESS_MAX_MEMORY_SIZE_MB=512`,
             `-e INTEGRATION_TYPE=Demo`,
             `adastradev/data-ingestion-agent:${normalizedDockerTag}`,
             'preview'
