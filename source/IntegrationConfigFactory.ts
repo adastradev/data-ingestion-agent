@@ -436,7 +436,7 @@ export default class IntegrationConfigFactory {
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SPRID',
                     query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, '
-                    + 'NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRID'
+                    + 'NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI from SPRID'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBSECT',

@@ -4,13 +4,10 @@ import TYPES from '../../ioc.types';
 import { Logger } from 'winston';
 
 import * as chai from 'chai';
-import { Readable } from 'stream';
 import OracleConnectionPoolProxy from '../../source/DataAccess/Oracle/OracleConnectionPoolProxy';
-import sleep from '../../source/Util/sleep';
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
 
 const expect = chai.expect;
-const should = chai.should();
 
 describe('oracledb', () => {
 
@@ -22,20 +19,45 @@ describe('oracledb', () => {
 
             await pool.open();
 
-            const stream: IQueryResult = await reader.read('SELECT * FROM ALL_TABLES');
-            expect(stream.result.readable).to.be.equal(true);
-            expect(stream.metadata.readable).to.be.equal(true);
+            const queryResult: IQueryResult = await reader.read('SELECT * FROM ALL_TABLES');
+            expect(queryResult.result.readable).to.be.equal(true);
+            expect(queryResult.metadata.readable).to.be.equal(true);
             let chunk;
             let output = '';
             // tslint:disable-next-line:no-conditional-assignment
-            while ((chunk = stream.result.read()) !== null) {
+            while ((chunk = queryResult.result.read()) !== null) {
                 output += chunk.toString();
             }
-            // avoid invalid resultset error from closing the connection before consumption of the resultset
-            await sleep(1000);
+
+            // tslint:disable-next-line:no-conditional-assignment
+            while ((chunk = queryResult.metadata.read()) !== null) {
+                output += chunk.toString();
+            }
 
             await reader.close();
             await pool.close();
+        });
+
+        it('should throw an exception when attempting to query a table that does not exist', async () => {
+            const logger = container.get<Logger>(TYPES.Logger);
+            const pool = new OracleConnectionPoolProxy(logger);
+            const reader = new OracleReader(logger, pool);
+
+            await pool.open();
+
+            // TODO: simplify with .should.be.rejected
+            let rejected = false;
+            const readPromise = reader.read('SELECT * FROM tableDNE');
+            try {
+                await readPromise;
+            } catch (err) {
+                console.log(err);
+                rejected = true;
+            } finally {
+                await reader.close();
+                await pool.close();
+                expect(rejected).to.be.true;
+            }
         });
     });
 });

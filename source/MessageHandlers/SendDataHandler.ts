@@ -14,6 +14,7 @@ import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
+import { TableNotFoundException } from '../TableNotFoundException';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -79,7 +80,16 @@ export default class SendDataHandler implements IMessageHandler {
                             `took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
-                        queryCallback(err);
+                        if (err instanceof TableNotFoundException) {
+                            // ignore query statements that fail due to missing tables/views
+                            this._logger.warn(err);
+                            queryCallback(null, { name: queryStatement.name, data: null});
+                            return;
+                        } else {
+                            this._logger.error(err);
+                            queryCallback(err);
+                            return;
+                        }
                     } finally {
                         if (reader) {
                             await reader.close();
@@ -93,8 +103,11 @@ export default class SendDataHandler implements IMessageHandler {
                         reject(err);
                     } else {
                         await this._connectionPool.close();
+
                         results.forEach((queryResult) => {
-                            aggregateMetadata.push(queryResult);
+                            if (queryResult.data) {
+                                aggregateMetadata.push(queryResult);
+                            }
                         });
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
