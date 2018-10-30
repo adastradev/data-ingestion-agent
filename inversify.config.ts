@@ -39,6 +39,8 @@ const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
 AWS.config.region = region;
 
+process.env.UV_THREADPOOL_SIZE = process.env.CONCURRENT_CONNECTIONS || '5';
+
 const container = new Container();
 
 const transports: Transport[] = [
@@ -54,7 +56,7 @@ if (process.env.LOG_PATH !== undefined) {
 
 const logger: Winston.Logger = Winston.createLogger({
     format: Winston.format.json(),
-    level: 'info',
+    level: process.env.LOG_LEVEL || 'info',
     transports
 });
 

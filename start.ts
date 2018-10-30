@@ -3,16 +3,27 @@ import * as shell from 'child_process';
 
 // optional args
 const args = process.argv.slice(2);
-const target = ['dist/index.js'].concat(args);
+
+if (!process.env.PROCESS_MAX_MEMORY_SIZE_MB) {
+    throw Error('PROCESS_MAX_MEMORY_SIZE_MB environment variable is required but was not specified');
+}
+
+// allow space for the kernel
+const nodeProcessMaxSpaceSize: number = Math.round((process.env.PROCESS_MAX_MEMORY_SIZE_MB as any) * 0.75);
+const target = [`--max-old-space-size=${nodeProcessMaxSpaceSize}`, 'dist/index.js'].concat(args);
 let restartCounter = 0;
 let child;
 
 const onExitHandler = (code, signal) => {
     restartCounter++;
 
+    console.log(`Child Process exited with code ${code}; signal: ${signal}`);
+
     if (restartCounter < 5 && !args[0]) {
+        console.log(`Spawning new agent`);
         child = spawnAgent();
     } else {
+        console.log(`Retry max encountered, exiting.`);
         childState.status = 'exited';
     }
 

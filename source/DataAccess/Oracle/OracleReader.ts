@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 
 import IDataReader, { IQueryResult } from '../IDataReader';
 import IConnectionPool from '../IConnectionPool';
+import { TableNotFoundException } from '../../TableNotFoundException';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -30,7 +31,7 @@ export default class OracleReader implements IDataReader {
 
     public async read(queryStatement: string): Promise<IQueryResult> {
         if (process.env.ORACLE_ENDPOINT === undefined) {
-            return { result: this.createDemoSnapshot(), metadata: null };
+            return Promise.resolve({ result: this.createDemoSnapshot(), metadata: null });
         }
 
         try {
@@ -47,24 +48,7 @@ export default class OracleReader implements IDataReader {
             const queryResultStream = await this._connection.queryStream(queryStatement, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
-            // Must handle errors to gracefully react otherwise the process may become unstable
-            queryResultStream.on('error', (error) => {
-                    this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
-            });
-
-            const metadataStream = await this.getMetadata(queryResultStream);
-
-            const jsonTransformer = new stream.Transform( { objectMode: true });
-            jsonTransformer._transform = function (chunk, encoding, done) {
-                // TODO: Decide on a format/encoding/structure - JSON for now
-                const data = JSON.stringify(chunk);
-                this.push(Buffer.from(data, encoding));
-
-                done();
-            };
-            const resultStream = queryResultStream.pipe(jsonTransformer);
-
-            return { result: resultStream, metadata: metadataStream };
+            return await this.subscribeToStreamEvents(queryResultStream, queryStatement);
         } catch (err) {
             this._logger.error(err);
             throw err;
@@ -82,15 +66,37 @@ export default class OracleReader implements IDataReader {
         }
     }
 
-    private async getMetadata(queryStream: stream.Readable): Promise<stream.Readable> {
-        const columnMetadataEvent = new Promise<any[]>((resolve, reject) => {
+    private async subscribeToStreamEvents(queryStream: stream.Readable, queryStatement: string): Promise<IQueryResult> {
+        const streamEvents = new Promise<any>((resolve, reject) => {
+            const result = { result: null, metadata: null };
+
             queryStream.on('metadata', (md: any[]) => {
-                resolve(md);
+                result.metadata = this.getMetadataAsStream(md);
+                result.result = this.getTransformStream(queryStream);
+                resolve(result);
+            });
+
+            queryStream.on('error', (error: any) => {
+                this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
+                queryStream.destroy();
+                // Translate - ORA-00942: table or view does not exist
+                if (error.errorNum && error.errorNum === 942) {
+                    reject(new TableNotFoundException(queryStatement, error.message));
+                } else {
+                    reject(error);
+                }
+            });
+
+            queryStream.on('end', () => {
+                // Don't block waiting on completion; this is for informational purposes
+                this._logger.info(`end event received for query: '${queryStatement}'`);
             });
         });
 
-        const columnMetadata = await columnMetadataEvent;
+        return await streamEvents;
+    }
 
+    private getMetadataAsStream(columnMetadata: any[]): stream.Readable {
         const columnMetadataStream = new stream.Readable({ objectMode: true });
         for (const col of columnMetadata) {
             columnMetadataStream.push(col);
@@ -98,6 +104,18 @@ export default class OracleReader implements IDataReader {
         columnMetadataStream.push(null);
 
         return columnMetadataStream;
+    }
+
+    private getTransformStream(queryStream: stream.Readable): stream.Readable {
+        const jsonTransformer = new stream.Transform( { objectMode: true });
+        jsonTransformer._transform = function (chunk, encoding, done) {
+            // TODO: Decide on a format/encoding/structure - JSON for now
+            const data = JSON.stringify(chunk);
+            this.push(Buffer.from(data, encoding));
+            done();
+        };
+        const resultStream = queryStream.pipe(jsonTransformer);
+        return resultStream;
     }
 
     private createDemoSnapshot() {

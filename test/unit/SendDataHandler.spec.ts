@@ -34,10 +34,8 @@ describe('SendDataHandler', () => {
             const pool = container.get<IConnectionPool>(TYPES.ConnectionPool);
 
             const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container);
-            const getStatementExecutorSpy = sinon.spy(handler, 'getStatementExecutor' as any);
             await handler.handle(message);
 
-            expect(getStatementExecutorSpy.callCount).to.eq(1);
             expect((writer.ingest as sinon.SinonStub).callCount).to.eq(2);
         });
     });
