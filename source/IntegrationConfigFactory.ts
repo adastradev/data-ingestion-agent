@@ -433,11 +433,11 @@ export default class IntegrationConfigFactory {
                     name: 'SPRIDEN',
                     query: 'select * from SPRIDEN s where SPRIDEN_CHANGE_IND IS NULL'
                 });
-                // BANNER_TEMPLATE_STATEMENTS.push({
-                //     name: 'SPRID',
-                //     query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, '
-                //     + 'NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI, from SPRID'
-                // });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SPRID',
+                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, '
+                    + 'NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI from SPRID'
+                });
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBSECT',
                     query: 'select * From SSBSECT'
