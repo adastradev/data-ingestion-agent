@@ -9,7 +9,6 @@ import container from './test.inversify.config';
 import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
-import oracledb = require('oracledb');
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
 
 const expect = chai.expect;

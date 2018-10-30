@@ -4,12 +4,10 @@ import TYPES from '../../ioc.types';
 import { Logger } from 'winston';
 
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
 import OracleConnectionPoolProxy from '../../source/DataAccess/Oracle/OracleConnectionPoolProxy';
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
 
 const expect = chai.expect;
-chai.use(chaiAsPromised);
 
 describe('oracledb', () => {
 
