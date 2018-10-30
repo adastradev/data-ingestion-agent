@@ -67,6 +67,8 @@ Prior to sending any data you can run the following docker command to log each q
 
 ```sh
 docker run -i \
+-m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
+-e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
 --network=bridge \

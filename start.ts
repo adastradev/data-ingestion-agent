@@ -17,13 +17,14 @@ let child;
 const onExitHandler = (code, signal) => {
     restartCounter++;
 
-    console.log(`Child Process exited with code ${code}; signal: ${signal}`);
+    console.log(`Agent Process exited with code ${code}; signal: ${signal}`);
 
     if (restartCounter < 5 && !args[0]) {
-        console.log(`Spawning new agent`);
         child = spawnAgent();
     } else {
+        if (!args[0]) {
         console.log(`Retry max encountered, exiting.`);
+        }
         childState.status = 'exited';
     }
 
