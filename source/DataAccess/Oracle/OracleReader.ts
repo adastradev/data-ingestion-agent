@@ -114,7 +114,7 @@ export default class OracleReader implements IDataReader {
         const jsonTransformer = new stream.Transform( { objectMode: true });
         jsonTransformer._transform = function (chunk, encoding, done) {
             // TODO: Decide on a format/encoding/structure - JSON for now
-            const data = JSON.stringify(chunk);
+            const data = JSON.stringify(chunk) + '\n';
             this.push(Buffer.from(data, encoding));
             done();
         };

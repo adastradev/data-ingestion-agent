@@ -451,7 +451,7 @@ export default class IntegrationConfigFactory {
                     query: 'Select * from SSRMEET'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'SSRXLST',
+                    name: 'SSRXLST',        
                     query: 'Select * from SSRXLST'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
@@ -564,7 +564,7 @@ export default class IntegrationConfigFactory {
                     'SELECT 2 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'INDEX\',u.index_name) as ddl ' +
                     'FROM USER_INDEXES u ' +
                     `WHERE u.table_name in (${tableFilter})`  +
-                    'ORDER BY "priority", table_name';
+                    'ORDER BY table_name, "priority"';
 
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: `ddl`,
