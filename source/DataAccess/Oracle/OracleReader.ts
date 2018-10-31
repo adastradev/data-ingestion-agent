@@ -27,6 +27,10 @@ export default class OracleReader implements IDataReader {
         @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool) {
         this._logger = logger;
         this._connectionPool = connectionPool;
+
+        // TS recognizes oracledb.fetchAsString as a const/readonly and
+        // thus complains. Getting around the issue requires a cast to <any>
+        (oracledb as any).fetchAsString = [ oracledb.CLOB ];
     }
 
     public async read(queryStatement: string): Promise<IQueryResult> {
