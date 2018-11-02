@@ -196,6 +196,9 @@ Note that NodeJS is throwing an error for security reasons, as the development p
 
 ### Certificate trust test
 For a connectivity purposes, we'll run the ingest command one more time with another environment variable to deterine how NodeJS should handle this certificate failure. The `NODE_TLS_REJECT_UNAUTHORIZED` environment variable can be used to change the handling of self-signed certificates.
+
+This is not recommended for production, and shouldn't be necessary when pointing to a production-grade internet proxy.
+
 ```
 docker run -it \
 -e LOG_LEVEL=debug \
@@ -208,5 +211,17 @@ docker run -it \
 --network=dockerProxyNetwork --memory=512m adastradev/data-ingestion-agent:latest
 ```
 
-This is not recommended for production, and shouldn't be necessary when pointing to a production-grade internet proxy.
+NOTE: at current, mitmproxy seems to have some trouble with HTTPS over HTTP proxy mode, yielding the following error:
+```html
+<html>
+    <head>
+        <title>400 Bad Request</title>
+    </head>
+    <body>
+    <h1>400 Bad Request</h1>
+    <p>HttpException(&#x27;Invalid request scheme: https&#x27;,)</p>
+    </body>
+</html>
+```
 
+See [Requesting complete URL over https proxy results in "Invalid request scheme: https](https://github.com/mitmproxy/mitmproxy/issues/848) for more information
