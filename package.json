@@ -52,7 +52,7 @@
     "@types/ssh2": "^0.5.36",
     "amazon-cognito-identity-js": "^3.0.2",
     "async": "^2.6.1",
-    "aws-api-gateway-client": "^0.2.16",
+    "aws-api-gateway-client": "git+https://github.com/aregier/aws-api-gateway-client.git#issue/67",
     "aws-sdk": "^2.329.0",
     "aws-sdk-mock": "^4.2.0",
     "axios": "^0.19.0-beta.1",

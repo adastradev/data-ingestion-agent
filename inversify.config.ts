@@ -34,7 +34,6 @@ import IntegrationConfigFactory from './source/IntegrationConfigFactory';
 import IConnectionPool from './source/DataAccess/IConnectionPool';
 import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
 import { FileTransportOptions } from 'winston/lib/winston/transports';
-import { DiscoveryServiceApi } from './source/astra-sdk/DiscoveryServiceApi';
 
 import axios, { AxiosRequestConfig } from 'axios';
 
