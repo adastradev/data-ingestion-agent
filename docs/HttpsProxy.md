@@ -1,8 +1,10 @@
 
-# Running Data Ingestion Agent behind an HTTPS proxy
+# Running Data Ingestion Agent behind an HTTPS proxy (Reference Example)
 This guide documents how to proxy internet traffic from a running docker container. It is not intended to replace the official docker documentation, but provides some steps for how to get started with respect to the Data Ingestion Agent.
 
-For purposes of this article, we will be using [mitmproxy](https://hub.docker.com/r/mitmproxy/mitmproxy/) as a Docker container, for minimal change to the host operating system. This guide carries no such recommendation that this proxy be used for production purposes.
+For purposes of this article, we will be using [Fiddler](https://www.telerik.com/fiddler) as a proxy server.
+
+This guide carries no such recommendation that any configuration below be used for production purposes.
 
 ```sh
 # First, let's run the image and point it to a proxy address
@@ -23,15 +25,11 @@ docker run -it \
 Always start with a test that fails, I say. Looks like the running docker container is not able to go out to the internet. Let's proceed with setting up a proxy server.
 
 ## Pre-requisites
+* Install Fiddler (done on a separate machine than the docker host for the purposes of this article)
+* Setup Fiddler for [capturing traffic from another machine](https://docs.telerik.com/fiddler/Configure-Fiddler/Tasks/MonitorRemoteMachine)
 
 ### Host machine steps
 ```sh
-https://hub.docker.com/r/mitmproxy/mitmproxy/
-n --rm -it -p 8080:8080 mitmproxy/mitmproxy
-# Test whether basic traffic is passing through the proxy
-http_proxy=http://localhost:8080/ curl http://example.com/
-https_proxy=http://localhost:8080/ curl -k https://example.com/
-
 # Note that "localhost" has different meaning on the host vs guest container network. Let's set up a named bridge network to help make sure we have a routable path to the intended proxy server from the guest image. This will allow docker guests to reference the host ("localhost") via 192.168.0.1
 docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 dockerProxyNetwork
 
@@ -162,7 +160,7 @@ root@445dc9b01354:/app# curl -k https://example.com
 
 ### Docker container steps
 ```sh
-# Let's start by doing a connectivity test that doesn't involve Data Ingestion Agent code. Launch the container with a /bin/bash shell instead of loading the DIA code:
+# Now let's run the data ingestion preview
 docker run -it \
 -e LOG_LEVEL=debug \
 -e ASTRA_CLOUD_USERNAME=mailbox@domain.com \
@@ -170,11 +168,11 @@ docker run -it \
 -e PROCESS_MAX_MEMORY_SIZE_MB=512 \
 --env HTTPS_PROXY="http://192.168.0.1:8080" \
 --env HTTP_PROXY="http://192.168.0.1:8080" \
---network=dockerProxyNetwork --memory=512m adastradev/data-ingestion-agent:latest
+--network=dockerProxyNetwork --memory=512m adastradev/data-ingestion-agent:latest preview
 ```
 
 <details>
-<summary>Expected ingest results</summary>
+<summary>Expected preview results</summary>
 > @adastradev/data-ingestion-agent@1.0.0 start /app
 > node dist/start.js "ingest"
 
@@ -208,20 +206,10 @@ docker run -it \
 -e NODE_TLS_REJECT_UNAUTHORIZED=0 \
 --env HTTPS_PROXY="http://192.168.0.1:8080" \
 --env HTTP_PROXY="http://192.168.0.1:8080" \
---network=dockerProxyNetwork --memory=512m adastradev/data-ingestion-agent:latest
+--network=dockerProxyNetwork --memory=512m adastradev/data-ingestion-agent:latest preview
 ```
 
-NOTE: at current, mitmproxy seems to have some trouble with HTTPS over HTTP proxy mode, yielding the following error:
-```html
-<html>
-    <head>
-        <title>400 Bad Request</title>
-    </head>
-    <body>
-    <h1>400 Bad Request</h1>
-    <p>HttpException(&#x27;Invalid request scheme: https&#x27;,)</p>
-    </body>
-</html>
-```
+Output showing preview queries will indicate that the agent is able to authenticate and connect to AWS successfully.
 
-See [Requesting complete URL over https proxy results in "Invalid request scheme: https](https://github.com/mitmproxy/mitmproxy/issues/848) for more information
+## Notes
+* Running [mitmproxy](https://hub.docker.com/r/mitmproxy/mitmproxy/) as a Docker container also looked useful for test purpose, but there is an issue with it currently. See [Requesting complete URL over https proxy results in "Invalid request scheme: https](https://github.com/mitmproxy/mitmproxy/issues/848) for more information
