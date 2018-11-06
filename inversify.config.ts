@@ -35,6 +35,8 @@ import IConnectionPool from './source/DataAccess/IConnectionPool';
 import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
 import { FileTransportOptions } from 'winston/lib/winston/transports';
 
+import axios, { AxiosRequestConfig } from 'axios';
+
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
 AWS.config.region = region;
@@ -80,7 +82,31 @@ const bucketName = s3Buckets[stage];
 const integrationConfigFactory = new IntegrationConfigFactory(logger);
 
 const startup = async () => {
+    if (logger.level === 'silly') { // truly silly debugging for testing proxy operation
+        logger.silly('test GET http://example.com (via axios)');
+        const exampleResponse = await axios.get('http://example.com');
+        if (exampleResponse.status === 200) {
+            logger.silly('SUCCESS: GET http://example.com');
+        }
+
+        logger.silly('test GET https://example.com (via axios)');
+        const exampleHttpsResponse = await axios.get('https://example.com');
+        if (exampleHttpsResponse.status === 200) {
+            logger.silly('SUCCESS: GET https://example.com');
+        }
+
+        logger.silly('Looking up user management service address via raw axios request');
+        const requestConfig: AxiosRequestConfig = {
+            params: { ServiceName: 'user-management', StageName: stage }
+        };
+        const response = await axios.get(process.env.DISCOVERY_SERVICE + '/catalog/service', requestConfig);
+        if (response.status === 200) {
+            logger.silly('Located user management service via axios');
+        }
+    }
+
     // Authentication & Resource lookups
+    logger.info('Looking up user management service address');
     const endpoints = await sdk.lookupService('user-management', stage);
     process.env.USER_MANAGEMENT_URI = endpoints[0];
     const cognitoSession =
@@ -97,6 +123,7 @@ const startup = async () => {
         region,
         credentialsBearerToken);
 
+    logger.info('Looking up tenant configuration info');
     const poolListResponse = await userManagementApi.getUserPools();
     queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
     tenantId = poolListResponse.data[0].tenant_id;

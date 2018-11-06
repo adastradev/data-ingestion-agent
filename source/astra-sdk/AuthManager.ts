@@ -32,6 +32,7 @@ export class AuthManager {
     public signIn(email: string, password: string, newPassword: string = ''): Promise<CognitoUserSession> {
         return new Promise(async function (resolve, reject) {
             // get the pool data from the response
+            this.logger.debug(`Signing into AWS Cognito`);
             this.poolData = await this.locator.getPoolForUsername(email);
 
             // construct a user pool object
@@ -77,10 +78,11 @@ export class AuthManager {
             if (cognitoIdentityCredentials.needsRefresh()) {
                 const authenticator = `cognito-idp.${this.region}.amazonaws.com/${this.poolData.UserPoolId}`;
                 const that = this;
+                this.logger.debug('Refreshing Cognito credentials');
                 // tslint:disable-next-line:max-line-length
                 this.cognitoUser.refreshSession(this.cognitoUserSession.getRefreshToken(), (refreshCognitoErr, newSession) => {
                     if (refreshCognitoErr) {
-                        this.logger.log('error', refreshCognitoErr);
+                        this.logger.error(refreshCognitoErr);
                         reject(refreshCognitoErr);
                     } else {
                         that.cognitoUserSession = newSession;
@@ -88,10 +90,10 @@ export class AuthManager {
                         cognitoIdentityCredentials.params['Logins'][authenticator]  = newSession.getIdToken().getJwtToken();
                         cognitoIdentityCredentials.refresh((refreshIamErr) => {
                             if (refreshIamErr) {
-                                this.logger.log('error', refreshIamErr);
+                                this.logger.error(refreshIamErr);
                                 reject(refreshIamErr);
                             } else {
-                                this.logger.log('info', 'Cognito token successfully updated');
+                                this.logger.info('Cognito token successfully updated');
                                 resolve(true);
                             }
                         });

@@ -62,6 +62,8 @@ The Data Ingestion Agent requires *outbound* internet access over HTTPS to Amazo
 
 No *inbound* access to the agent is required.
 
+See [Getting started with HTTPS proxies](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/HttpsProxy.md) for more information.
+
 ### Query Preview
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
 
@@ -137,4 +139,4 @@ docker cp dia:/var/log/dia /tmp/log/dia
 ```
 
 ## Development
-See the [Development guide for Data Ingestion Agent](https://github.com/adastradev/data-ingestion-agent/blob/master/DevelopmentGuide.md)
+See the [Development guide for Data Ingestion Agent](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DevelopmentGuide.md)
