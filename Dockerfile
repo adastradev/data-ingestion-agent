@@ -31,7 +31,7 @@ RUN apt-get update && apt-get -y install git-core && \
     node_modules/typescript/bin/tsc && \
     npm run test && \
     if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi && \
-    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi \
+    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi && \
     apt-get -y remove git-core && \
     apt-get clean
 
@@ -46,7 +46,7 @@ COPY --from=build-env /lib /lib
 RUN apt-get update && apt-get -y install git-core && \
     mkdir /var/log/dia && \
     npm install --production && \
-    node_modules/typescript/bin/tsc \
+    node_modules/typescript/bin/tsc && \
     apt-get -y remove git-core && \
     apt-get clean
 
