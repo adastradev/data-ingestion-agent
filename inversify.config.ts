@@ -99,9 +99,17 @@ const startup = async () => {
         const requestConfig: AxiosRequestConfig = {
             params: { ServiceName: 'user-management', StageName: stage }
         };
-        const response = await axios.get(process.env.DISCOVERY_SERVICE + '/catalog/service', requestConfig);
-        if (response.status === 200) {
-            logger.silly('Located user management service via axios');
+        try {
+            const response = await axios.get(process.env.DISCOVERY_SERVICE + '/catalog/service', requestConfig);
+            if (response.status === 200) {
+                logger.silly('Located user management service via axios');
+            }
+        } catch (error) {
+            logger.silly(error.message);
+            logger.silly(error.stack);
+            if (error.response !== undefined) {
+                logger.silly(error.response);
+            }
         }
     }
 
