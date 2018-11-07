@@ -26,11 +26,14 @@ WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
 COPY --from=build-env /lib /lib
-RUN npm install && \
+RUN apt-get update && apt-get -y install git-core && \
+    npm install && \
     node_modules/typescript/bin/tsc && \
     npm run test && \
     if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi && \
-    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi
+    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi && \
+    apt-get -y remove git-core && \
+    apt-get clean
 
 # compile image intended for production use
 FROM node:8-slim
@@ -40,9 +43,12 @@ WORKDIR /app
 COPY --from=build-env /app .
 COPY --from=build-env /usr/lib /usr/lib
 COPY --from=build-env /lib /lib
-RUN mkdir /var/log/dia && \
+RUN apt-get update && apt-get -y install git-core && \
+    mkdir /var/log/dia && \
     npm install --production && \
-    node_modules/typescript/bin/tsc
+    node_modules/typescript/bin/tsc && \
+    apt-get -y remove git-core && \
+    apt-get clean
 
 # Report to docker the health status so we can possibly use that information
 # For now mark unhealthy after 25 sec (interval*retries)
