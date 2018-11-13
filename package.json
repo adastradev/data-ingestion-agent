@@ -41,6 +41,7 @@
   "license": "MIT",
   "dependencies": {
     "@adastradev/serverless-discovery-sdk": "0.0.7",
+    "@adastradev/user-management-sdk": "file:../user-management-sdk-js",
     "@types/bluebird-global": "^3.5.9",
     "@types/chai": "^4.1.6",
     "@types/express": "^4.16.0",

@@ -8,9 +8,13 @@ import IMessage from './source/IMessage';
 import IMessageHandler from './source/IMessageHandler';
 import MessageFactory from './source/MessageFactory';
 import ICommand from './source/Commands/ICommand';
-import { AuthManager } from './source/astra-sdk/AuthManager';
+import { AuthManager } from '@adastradev/user-management-sdk';
 import sleep from './source/Util/sleep';
 import * as v8 from 'v8';
+
+import fetch from 'fetch-with-proxy';
+// tslint:disable-next-line:no-string-literal
+global['fetch'] = fetch;
 
 let shutdownRequested = false;
 process.on('SIGTERM', () => {
