@@ -451,7 +451,7 @@ export default class IntegrationConfigFactory {
                     query: 'Select * from SSRMEET'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'SSRXLST',        
+                    name: 'SSRXLST',
                     query: 'Select * from SSRXLST'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
@@ -543,6 +543,34 @@ export default class IntegrationConfigFactory {
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'STVPTRM',
                     query: 'Select * from STVPTRM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SORTEST',
+                    query: 'Select * from SORTEST'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'SGBSTDN',
+                    query: 'Select * from SGBSTDN'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'STVSESS',
+                    query: 'Select * from STVSESS'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'STVSSTS',
+                    query: 'Select * from STVSSTS'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'GTVMTYP',
+                    query: 'Select * from GTVMTYP'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'GTVINSM',
+                    query: 'Select * from GTVINSM'
+                });
+                BANNER_TEMPLATE_STATEMENTS.push({
+                    name: 'GOREMAL',
+                    query: 'Select * from GOREMAL'
                 });
 
                 const tableFilter =
