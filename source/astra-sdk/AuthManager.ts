@@ -7,8 +7,9 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../ioc.types';
 import { Logger } from 'winston';
 
-// tslint:disable-next-line:no-string-literal no-var-requires
-global['fetch'] = require('node-fetch');
+import fetch from 'fetch-with-proxy';
+// tslint:disable-next-line:no-string-literal
+global['fetch'] = fetch;
 
 @injectable()
 export class AuthManager {
