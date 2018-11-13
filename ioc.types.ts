@@ -3,6 +3,7 @@ const TYPES = {
     Bucket: Symbol('Bucket'),
     ConnectionPool: Symbol('ConnectionPool'),
     Container: Symbol('Container'),
+    DDLHelper: Symbol('DDLHelper'),
     DataReader: Symbol('IngestionReader'),
     DataWriter: Symbol('IngestionWriter'),
     DummyHandler: Symbol('DummyHandler'),

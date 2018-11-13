@@ -33,7 +33,10 @@ import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
 import IntegrationConfigFactory from './source/IntegrationConfigFactory';
 import IConnectionPool from './source/DataAccess/IConnectionPool';
 import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
+import OracleDDLHelper from './source/DataAccess/Oracle/OracleDDLHelper';
+import IDDLHelper from './source/DataAccess/IDDLHelper';
 import { FileTransportOptions } from 'winston/lib/winston/transports';
+import { IntegrationType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -158,6 +161,7 @@ const startup = async () => {
     // Data Access
     container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
     container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
+    container.bind<IDDLHelper<string[], string>>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetTagged('Oracle', true);
 
     // Agent Commands
     container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);

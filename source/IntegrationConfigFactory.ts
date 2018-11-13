@@ -4,8 +4,9 @@ import TYPES from '../ioc.types';
 import { Container, inject, injectable, tagged } from 'inversify';
 import 'reflect-metadata';
 import * as Winston from 'winston';
-import { IIntegrationConfig, IQueryDefinition } from './IIntegrationConfig';
-import { IntegrationType } from 'aws-sdk/clients/apigateway';
+import { IIntegrationConfig, IntegrationType, IQueryDefinition } from './IIntegrationConfig';
+import container from '../test/unit/test.inversify.config';
+import IDDLHelper from './DataAccess/IDDLHelper';
 
 /**
  * Given an integration type, return a set of integration queries to run
@@ -15,15 +16,15 @@ import { IntegrationType } from 'aws-sdk/clients/apigateway';
  */
 @injectable()
 export default class IntegrationConfigFactory {
-    private _logger: Winston.Logger;
-
     /**
      * Creates specifically typed messages given a json string
      * @param {Container} container The IOC container used to resolve other dependencies
      * @memberof MessageHandlerFactory
      */
-    constructor(@inject(TYPES.Logger) logger: Winston.Logger) {
-        this._logger = logger;
+    constructor(
+        @inject(TYPES.DDLHelper)
+        @tagged('Oracle', true)
+        private readonly oracleDDLHelper: IDDLHelper<string, string>) {
     }
 
     public create(integrationType: IntegrationType): IIntegrationConfig {
@@ -573,26 +574,8 @@ export default class IntegrationConfigFactory {
                     query: 'Select * from GOREMAL'
                 });
 
-                const tableFilter =
-                    BANNER_TEMPLATE_STATEMENTS
-                        .map((definition) => {
-                            return `'${definition.name}'`;
-                        }).join(',');
-
-                // Having the ability to use DBMS_METADATA.SET_TRANSFORM_PARAM would help here to remove things like
-                // disabling the scripting of the 'user' in create statements but this system function does not seem
-                // to always be available despite 'GET_DDL' working
-                // NOTE: Scripting dependencies (FKs etc) via simple commands such as GET_DDL does not seem to be
-                // possible and would require some extra overhead to implement
-                const ddlQuery =
-                    'SELECT 1 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'TABLE\',u.table_name) as ddl ' +
-                    'FROM USER_TABLES u ' +
-                    `WHERE u.table_name in (${tableFilter})` +
-                    'union all ' +
-                    'SELECT 2 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'INDEX\',u.index_name) as ddl ' +
-                    'FROM USER_INDEXES u ' +
-                    `WHERE u.table_name in (${tableFilter})`  +
-                    'ORDER BY table_name, "priority"';
+                const tableNameList = BANNER_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
+                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
 
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: `ddl`,
@@ -603,6 +586,86 @@ export default class IntegrationConfigFactory {
                     queries: BANNER_TEMPLATE_STATEMENTS,
                     type: 'Banner'
                 };
+            }
+            case 'DegreeWorks': {
+                const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'DAP_EXCEPT_DTL',
+                    query: 'Select * from DWSCHEMA.DAP_EXCEPT_DTL'
+                });
+
+                // TODO: Should this be limited to N years prior? Probably LOTS of data in this table...
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'dap_result_dtl',
+                    query: `SELECT
+                        DAP_STU_ID,
+                        DAP_AUDIT_TYPE,
+                        DAP_DEGREE,
+                        DAP_BLOCK_SEQ_NUM,
+                        DAP_RESULT_SEQ_NUM,
+                        DAP_REQ_ID,
+                        DAP_RULE_ID,
+                        DAP_RESULT_TYPE,
+                        DAP_VALUE1,
+                        DAP_SCHOOL,
+                        DAP_VALUE2,
+                        DAP_VALUE3,
+                        DAP_VALUE4,
+                        DAP_FREETEXT,
+                        DAP_CREATE_DATE,
+                        Unique_ID,
+                        DAP_NODE_TYPE
+                    FROM dap_result_dtl`
+                });
+
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'CPA_CLASSNEEDED',
+                    query: `SELECT
+                        STU_ID,
+                        REQ_ID,
+                        RULE_ID,
+                        RESULT_TYPE
+                        WITH_ADVICE,
+                        RESULT_SEQ_NUM
+                    FROM CPA_CLASSNEEDED`
+                });
+
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'sep_tmpl_mst',
+                    query: `SELECT * from dwschema.sep_tmpl_mst`
+                });
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'sep_tmpl_term',
+                    query: `SELECT * from dwschema.sep_tmpl_term`
+                });
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'sep_tmpl_class',
+                    query: `SELECT * from dwschema.sep_tmpl_class`
+                });
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'sep_tmpl_group',
+                    query: `SELECT * from dwschema.sep_tmpl_group`
+                });
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'sep_tmpl_tag',
+                    query: `SELECT * from dwschema.sep_tmpl_tag`
+                });
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'DAP_REQ_MST',
+                    query: `Select * from DWSCHEMA.DAP_REQ_MST`
+                });
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'DAP_REQ_TEXT_DTL',
+                    query: `Select * from DWSCHEMA.DAP_REQ_TEXT_DTL`
+                });
+
+                const tableNameList = DW_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
+                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
+
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: `ddl`,
+                    query: ddlQuery
+                });
             }
             case 'Demo': {
                 const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
