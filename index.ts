@@ -11,6 +11,8 @@ import ICommand from './source/Commands/ICommand';
 import { AuthManager } from '@adastradev/user-management-sdk';
 import sleep from './source/Util/sleep';
 import * as v8 from 'v8';
+import AWS = require('aws-sdk');
+import proxy = require('proxy-agent');
 
 import fetch from 'fetch-with-proxy';
 // tslint:disable-next-line:no-string-literal
@@ -24,6 +26,16 @@ process.on('SIGTERM', () => {
 class App {
 
     public static async main() {
+        if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
+            let proxyUri = process.env.HTTP_PROXY;
+            if (proxyUri === undefined) {
+                proxyUri = process.env.HTTPS_PROXY;
+            }
+            AWS.config.update({
+                httpOptions: { agent: proxy(proxyUri) }
+            });
+        }
+
         this.container = await startup();
 
         this.logger = this.container.get<Winston.Logger>(TYPES.Logger);
