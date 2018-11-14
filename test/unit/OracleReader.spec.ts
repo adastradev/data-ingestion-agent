@@ -31,7 +31,7 @@ describe('OracleReader', () => {
             process.env.ORACLE_ENDPOINT = 'something';
 
             // stub connection
-            const queryStreamSpy = sandbox.spy(async (query, binds, options) => {
+            const queryStreamSpy = sandbox.spy(async () => {
                 const resultStream = new Readable({objectMode: true });
                 resultStream.push({ col1: 'value', col2: 'value'});
                 resultStream.push(null);
@@ -156,7 +156,7 @@ describe('OracleReader', () => {
                 .subscribeToStreamEvents(queryStream, 'some statement') as Promise<IQueryResult>)
                 .then((queryResult: IQueryResult) => {
                     expect(getMetadataStreamStub.calledOnce).to.be.true;
-                    expect(getMetadataStreamStub.calledOnce).to.be.true;
+                    expect(getTransformStreamStub.calledOnce).to.be.true;
                     done();
                 });
 
