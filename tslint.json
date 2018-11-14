@@ -5,6 +5,8 @@
   ],
   "jsRules": {},
   "rules": {
+    "max-line-length": [ false ],
+    "object-literal-sort-keys": [ false ],
     "no-console": [ false, "error" ],
     "quotemark": [ true, "single", "avoid-escape" ],
     "semicolon": [ true, "always" ],
@@ -18,7 +20,8 @@
       "named-imports-order": "case-insensitive"
     }],
     "no-unused-expression": false,
-    "no-unused-expression-chai": true
+    "no-unused-expression-chai": true,
+    "no-empty": false
   },
   "rulesDirectory": []
 }

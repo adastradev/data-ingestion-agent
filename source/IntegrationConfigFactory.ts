@@ -588,7 +588,6 @@ export default class IntegrationConfigFactory {
             case IntegrationType.DegreeWorks: {
                 const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
-                // TODO: Should this be limited to N years prior? Probably LOTS of data in this table...
                 DW_TEMPLATE_STATEMENTS.push({
                     name: 'dap_result_dtl',
                     query: `SELECT

@@ -1,4 +1,5 @@
 const TYPES = {
+    Agent: Symbol('Agent'),
     AuthManager: Symbol('AuthService'),
     Bucket: Symbol('Bucket'),
     ConnectionPool: Symbol('ConnectionPool'),

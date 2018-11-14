@@ -39,6 +39,7 @@ import { FileTransportOptions } from 'winston/lib/winston/transports';
 import { IntegrationSystemType, IntegrationType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
+import Agent from './source/Agent';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -136,6 +137,9 @@ const startup = async () => {
     const poolListResponse = await userManagementApi.getUserPools();
     queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
     tenantId = poolListResponse.data[0].tenant_id;
+
+    // App
+    container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
 
     // Config injection
     container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
