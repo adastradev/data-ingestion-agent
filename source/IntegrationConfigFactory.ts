@@ -587,10 +587,6 @@ export default class IntegrationConfigFactory {
             }
             case IntegrationType.DegreeWorks: {
                 const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'DAP_EXCEPT_DTL',
-                    query: 'Select * from DWSCHEMA.DAP_EXCEPT_DTL'
-                });
 
                 // TODO: Should this be limited to N years prior? Probably LOTS of data in this table...
                 DW_TEMPLATE_STATEMENTS.push({
@@ -626,35 +622,6 @@ export default class IntegrationConfigFactory {
                         WITH_ADVICE,
                         RESULT_SEQ_NUM
                     FROM CPA_CLASSNEEDED`
-                });
-
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'sep_tmpl_mst',
-                    query: `SELECT * from dwschema.sep_tmpl_mst`
-                });
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'sep_tmpl_term',
-                    query: `SELECT * from dwschema.sep_tmpl_term`
-                });
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'sep_tmpl_class',
-                    query: `SELECT * from dwschema.sep_tmpl_class`
-                });
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'sep_tmpl_group',
-                    query: `SELECT * from dwschema.sep_tmpl_group`
-                });
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'sep_tmpl_tag',
-                    query: `SELECT * from dwschema.sep_tmpl_tag`
-                });
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'DAP_REQ_MST',
-                    query: `Select * from DWSCHEMA.DAP_REQ_MST`
-                });
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: 'DAP_REQ_TEXT_DTL',
-                    query: `Select * from DWSCHEMA.DAP_REQ_TEXT_DTL`
                 });
 
                 const tableNameList = DW_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
