@@ -22,6 +22,9 @@ import IDataReader from '../../source/DataAccess/IDataReader';
 import IDataWriter from '../../source/DataAccess/IDataWriter';
 import SendDataHandler from '../../source/MessageHandlers/SendDataHandler';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
+import IDDLHelper from '../../source/DataAccess/IDDLHelper';
+import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
+import { IntegrationSystemType } from '../../source/IIntegrationConfig';
 
 const container = new Container();
 
@@ -54,6 +57,8 @@ container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
 container.bind<string>(TYPES.QueueUrl).toConstantValue('http://www.someurl.com');
 container.bind<string>(TYPES.TenantId).toConstantValue('74c23bda-a496-4ccb-b08f-a9ab80e407b6');
 container.bind<string>(TYPES.Bucket).toConstantValue('some-bucket');
+
+container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
 
 container.bind<Container>(TYPES.Container).toConstantValue(container);
 

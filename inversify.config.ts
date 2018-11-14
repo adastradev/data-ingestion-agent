@@ -36,7 +36,7 @@ import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnecti
 import OracleDDLHelper from './source/DataAccess/Oracle/OracleDDLHelper';
 import IDDLHelper from './source/DataAccess/IDDLHelper';
 import { FileTransportOptions } from 'winston/lib/winston/transports';
-import { IntegrationType } from './source/IIntegrationConfig';
+import { IntegrationSystemType, IntegrationType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -81,8 +81,6 @@ const s3Buckets = {
 };
 
 const bucketName = s3Buckets[stage];
-
-const integrationConfigFactory = new IntegrationConfigFactory(logger);
 
 const startup = async () => {
     if (logger.level === 'silly') { // truly silly debugging for testing proxy operation
@@ -145,7 +143,8 @@ const startup = async () => {
     container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
     container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
     container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
-    container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory).toConstantValue(integrationConfigFactory);
+    container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
+        .to(IntegrationConfigFactory).inSingletonScope();
     container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();
 
     // Message Management
@@ -161,7 +160,7 @@ const startup = async () => {
     // Data Access
     container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
     container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
-    container.bind<IDDLHelper<string[], string>>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetTagged('Oracle', true);
+    container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
 
     // Agent Commands
     container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);

@@ -8,7 +8,7 @@ import 'reflect-metadata';
 import PreviewMessage from '../Messages/PreviewMessage';
 import IDataReader from '../DataAccess/IDataReader';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
-import { IQueryDefinition } from '../IIntegrationConfig';
+import { IntegrationType, IQueryDefinition } from '../IIntegrationConfig';
 
 /**
  * Handles messages received to instruct the agent to preview queries used by the agent
@@ -36,8 +36,8 @@ export default class PreviewHandler implements IMessageHandler {
 
     public async handle(message: PreviewMessage) {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
-        const integrationType = process.env.INTEGRATION_TYPE || 'Banner';
-        const integrationConfig = this._integrationConfigFactory.create(integrationType);
+        const integrationType = process.env.INTEGRATION_TYPE || IntegrationType.Banner;
+        const integrationConfig = this._integrationConfigFactory.create(IntegrationType[integrationType]);
         this.logQueries(integrationConfig.queries);
     }
 

@@ -12,7 +12,7 @@ import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
 import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
-import { IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
+import { IntegrationType, IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
 
@@ -53,7 +53,7 @@ export default class SendDataHandler implements IMessageHandler {
     public async handle(message: SendDataMessage) {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
-        const integrationType = process.env.INTEGRATION_TYPE || 'Banner';
+        const integrationType = IntegrationType[process.env.INTEGRATION_TYPE] || IntegrationType.Banner;
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
         const folderPath = integrationType + '-' + moment().toISOString();
 

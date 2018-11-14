@@ -1,11 +1,9 @@
 // tslint:disable:no-string-literal
 
 import TYPES from '../ioc.types';
-import { Container, inject, injectable, tagged } from 'inversify';
+import { inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
-import * as Winston from 'winston';
-import { IIntegrationConfig, IntegrationType, IQueryDefinition } from './IIntegrationConfig';
-import container from '../test/unit/test.inversify.config';
+import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from './IIntegrationConfig';
 import IDDLHelper from './DataAccess/IDDLHelper';
 
 /**
@@ -23,13 +21,13 @@ export default class IntegrationConfigFactory {
      */
     constructor(
         @inject(TYPES.DDLHelper)
-        @tagged('Oracle', true)
-        private readonly oracleDDLHelper: IDDLHelper<string, string>) {
+        @named(IntegrationSystemType.Oracle)
+        private readonly oracleDDLHelper: IDDLHelper) {
     }
 
     public create(integrationType: IntegrationType): IIntegrationConfig {
         switch (integrationType) {
-            case 'Banner': {
+            case IntegrationType.Banner: {
                 const BANNER_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 BANNER_TEMPLATE_STATEMENTS.push({
@@ -584,10 +582,10 @@ export default class IntegrationConfigFactory {
 
                 return {
                     queries: BANNER_TEMPLATE_STATEMENTS,
-                    type: 'Banner'
+                    type: integrationType
                 };
             }
-            case 'DegreeWorks': {
+            case IntegrationType.DegreeWorks: {
                 const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
                 DW_TEMPLATE_STATEMENTS.push({
                     name: 'DAP_EXCEPT_DTL',
@@ -666,8 +664,12 @@ export default class IntegrationConfigFactory {
                     name: `ddl`,
                     query: ddlQuery
                 });
+                return {
+                    queries: DW_TEMPLATE_STATEMENTS,
+                    type: integrationType
+                };
             }
-            case 'Demo': {
+            case IntegrationType.Demo: {
                 const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 DEMO_TEMPLATE_STATEMENTS.push({
@@ -676,7 +678,7 @@ export default class IntegrationConfigFactory {
                 });
                 return {
                     queries: DEMO_TEMPLATE_STATEMENTS,
-                    type: 'Demo'
+                    type: integrationType
                 };
             }
             default: {

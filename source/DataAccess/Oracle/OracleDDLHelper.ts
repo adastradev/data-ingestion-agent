@@ -2,13 +2,9 @@ import IDDLHelper from '../IDDLHelper';
 import { injectable } from 'inversify';
 
 @injectable()
-export default class OracleDDLHelper implements IDDLHelper<string[], string> {
-    public getDDLQuery(tableList): string {
-        const tableFilter = tableList.map((tbl) => `'${tbl}`).join(',');
-                    // BANNER_TEMPLATE_STATEMENTS
-                    //     .map((definition) => {
-                    //         return `'${definition.name}'`;
-                    //     }).join(',');
+export default class OracleDDLHelper implements IDDLHelper {
+    public getDDLQuery(tableNames: string[]): string {
+        const tableFilter = tableNames.map((tbl) => `'${tbl}'`).join(',');
 
         // Having the ability to use DBMS_METADATA.SET_TRANSFORM_PARAM would help here to remove things like
         // disabling the scripting of the 'user' in create statements but this system function does not seem
