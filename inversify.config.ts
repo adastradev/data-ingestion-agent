@@ -5,10 +5,8 @@ import TYPES from './ioc.types';
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
-import { AuthManager } from './source/astra-sdk/AuthManager';
-import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
+import { AuthManager, CognitoUserPoolLocatorUserManagement, UserManagementApi } from '@adastradev/user-management-sdk';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
-import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 
 // Message Management
 import MessageHandlerFactory from './source/MessageHandlerFactory';
@@ -68,7 +66,7 @@ process.env.DISCOVERY_SERVICE = 'https://4w35qhpotd.execute-api.us-east-1.amazon
 const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
-const authManager = new AuthManager(poolLocator, region, logger);
+const authManager = new AuthManager(poolLocator, region);
 let queueUrl: string;
 let tenantId: string;
 
