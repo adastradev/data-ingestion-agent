@@ -1,6 +1,7 @@
-import { Container } from 'inversify';
+import { Container, interfaces } from 'inversify';
 import TYPES from '../../ioc.types';
 import { stubInterface } from 'ts-sinon';
+import { AuthManager } from '../../source/astra-sdk/AuthManager';
 
 // Handlers
 import IMessageHandler from '../../source/IMessageHandler';
@@ -36,8 +37,10 @@ const logger: Winston.Logger = Winston.createLogger({
     ]
 });
 
-container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
-container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
+// const authManager = ;
+
+container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory);
+container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory);
 
 const mockPool = stubInterface<IConnectionPool>();
 container.bind<IConnectionPool>(TYPES.ConnectionPool).toConstantValue(mockPool);
@@ -60,6 +63,11 @@ container.bind<string>(TYPES.Bucket).toConstantValue('some-bucket');
 
 container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
 
+// tslint:disable-next-line:only-arrow-functions
+container.bind<AuthManager>(TYPES.AuthManager)
+    .toDynamicValue((context: interfaces.Context) => {
+        return new AuthManager(null, 'us-east-1', logger);
+    });
 container.bind<Container>(TYPES.Container).toConstantValue(container);
 
 export default container;
