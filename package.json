@@ -23,7 +23,8 @@
       "test/**",
       "webpack.config.js",
       "source-map-install.js",
-      "inversify.config.ts"
+      "inversify.config.ts",
+      "**/I[A-Z]*.ts"
     ],
     "reporter": [
       "lcov",
