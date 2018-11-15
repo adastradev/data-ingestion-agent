@@ -115,9 +115,11 @@ const startup = async () => {
     logger.info('Looking up user management service address');
     const endpoints = await sdk.lookupService('user-management', stage);
     process.env.USER_MANAGEMENT_URI = endpoints[0];
+    logger.silly('authManager.signIn');
     const cognitoSession =
         await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
-    await authManager.configureIamCredentials();
+    logger.silly('authManager.getIamCredentials');
+    AWS.config.credentials = await authManager.getIamCredentials();
 
     // lookup SQS queue for this tenant
     const credentialsBearerToken: BearerTokenCredentials = {

@@ -11,6 +11,7 @@ import ICommand from './source/Commands/ICommand';
 import { AuthManager } from '@adastradev/user-management-sdk';
 import sleep from './source/Util/sleep';
 import * as v8 from 'v8';
+import * as AWS from 'aws-sdk';
 
 import fetch from 'fetch-with-proxy';
 // tslint:disable-next-line:no-string-literal
@@ -54,7 +55,9 @@ class App {
         while (!shutdownRequested) {
             await sleep(1000);
 
+            this.logger.silly('authManager.refreshCognitoCredentials');
             await authManager.refreshCognitoCredentials();
+            this.logger.silly('sqs.receiveMessage');
             const result = await sqs.receiveMessage({ QueueUrl: queueUrl, MaxNumberOfMessages: 1}).promise();
 
             if (result.Messages) {
