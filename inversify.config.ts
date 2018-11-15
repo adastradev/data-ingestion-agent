@@ -5,7 +5,11 @@ import TYPES from './ioc.types';
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
-import { AuthManager, CognitoUserPoolLocatorUserManagement, UserManagementApi } from '@adastradev/user-management-sdk';
+import { AuthManager,
+    CognitoUserPoolLocatorUserManagement,
+    configureAwsProxy,
+    UserManagementApi
+} from '@adastradev/user-management-sdk';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
 
 // Message Management
@@ -37,6 +41,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
+
+// AWS module configuration
+configureAwsProxy(AWS.config);
 AWS.config.region = region;
 
 process.env.UV_THREADPOOL_SIZE = process.env.CONCURRENT_CONNECTIONS || '5';
