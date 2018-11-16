@@ -23,7 +23,8 @@
       "test/**",
       "webpack.config.js",
       "source-map-install.js",
-      "inversify.config.ts"
+      "inversify.config.ts",
+      "**/I[A-Z]*.ts"
     ],
     "reporter": [
       "lcov",
@@ -41,6 +42,7 @@
   "license": "MIT",
   "dependencies": {
     "@adastradev/serverless-discovery-sdk": "0.0.7",
+    "@adastradev/user-management-sdk": "^1.0.3",
     "@types/bluebird-global": "^3.5.9",
     "@types/chai": "^4.1.6",
     "@types/express": "^4.16.0",

@@ -5,10 +5,12 @@ import TYPES from './ioc.types';
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
-import { AuthManager } from './source/astra-sdk/AuthManager';
-import { CognitoUserPoolLocatorUserManagement } from './source/astra-sdk/CognitoUserPoolLocatorUserManagement';
+import { AuthManager,
+    CognitoUserPoolLocatorUserManagement,
+    configureAwsProxy,
+    UserManagementApi
+} from '@adastradev/user-management-sdk';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
-import { UserManagementApi } from './source/astra-sdk/UserManagementApi';
 
 // Message Management
 import MessageHandlerFactory from './source/MessageHandlerFactory';
@@ -39,6 +41,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
+
+// AWS module configuration
+configureAwsProxy(AWS.config);
 AWS.config.region = region;
 
 process.env.UV_THREADPOOL_SIZE = process.env.CONCURRENT_CONNECTIONS || '5';
@@ -68,7 +73,7 @@ process.env.DISCOVERY_SERVICE = 'https://4w35qhpotd.execute-api.us-east-1.amazon
 const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
-const authManager = new AuthManager(poolLocator, region, logger);
+const authManager = new AuthManager(poolLocator, region);
 let queueUrl: string;
 let tenantId: string;
 
@@ -117,9 +122,11 @@ const startup = async () => {
     logger.info('Looking up user management service address');
     const endpoints = await sdk.lookupService('user-management', stage);
     process.env.USER_MANAGEMENT_URI = endpoints[0];
+    logger.silly('authManager.signIn');
     const cognitoSession =
         await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
-    await authManager.configureIamCredentials();
+    logger.silly('authManager.getIamCredentials');
+    AWS.config.credentials = await authManager.getIamCredentials();
 
     // lookup SQS queue for this tenant
     const credentialsBearerToken: BearerTokenCredentials = {
