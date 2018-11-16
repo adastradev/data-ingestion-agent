@@ -1,4 +1,4 @@
-import * as SQS from 'aws-sdk/clients/sqs';
+import { SQS } from 'aws-sdk';
 import * as Winston from 'winston';
 import { Container, inject, injectable } from 'inversify';
 
@@ -16,7 +16,7 @@ import { InvalidCommandException } from './InvalidCommandException';
 export enum AgentMode { 'ShutdownRequested', 'Listening', 'Adhoc' }
 
 @injectable()
-export default class Agent {
+export class Agent {
 
     private mode: AgentMode = AgentMode.Listening;
 
@@ -25,7 +25,7 @@ export default class Agent {
         @inject(TYPES.QueueUrl) private readonly queueUrl: string,
         @inject(TYPES.AuthManager) private readonly authManager: AuthManager,
         @inject(TYPES.Container) private readonly container: Container,
-        private readonly sqs?: SQS
+        @inject(TYPES.SQS) private readonly sqs: SQS
     ) { }
 
     public async main() {

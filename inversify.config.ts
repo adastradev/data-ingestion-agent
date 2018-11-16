@@ -41,7 +41,8 @@ import { FileTransportOptions } from 'winston/lib/winston/transports';
 import { IntegrationSystemType, IntegrationType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
-import Agent from './source/Agent';
+import { Agent } from './source/Agent';
+import { SQS } from 'aws-sdk';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -147,6 +148,9 @@ const startup = async () => {
 
     // App
     container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
+
+    // AWS
+    container.bind<SQS>(TYPES.SQS).toConstantValue(new SQS());
 
     // Config injection
     container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
