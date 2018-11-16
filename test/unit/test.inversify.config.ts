@@ -37,8 +37,6 @@ const logger: Winston.Logger = Winston.createLogger({
     ]
 });
 
-// const authManager = ;
-
 container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory);
 container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory);
 
