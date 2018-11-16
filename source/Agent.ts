@@ -42,10 +42,12 @@ export default class Agent {
         do {
             await sleep(1000);
 
+            this.logger.silly('authManager.refreshCognitoCredentials');
             await this.authManager.refreshCognitoCredentials();
 
             const sqs = this.sqs || new SQS();
             // For now fetch 1 message from the queue but in the future we could open this up
+            this.logger.silly('sqs.receiveMessage');
             const result = await sqs.receiveMessage({ QueueUrl: this.queueUrl, MaxNumberOfMessages: 1}).promise();
             const handlerFactory = this.container.get<MessageHandlerFactory>(TYPES.MessageHandlerFactory);
             const messageFactory = this.container.get<MessageFactory>(TYPES.MessageFactory);

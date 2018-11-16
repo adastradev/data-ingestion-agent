@@ -1,10 +1,13 @@
 
 import 'reflect-metadata';
+import container from './test.inversify.config';
+import TYPES from '../../ioc.types';
 import * as chai from 'chai';
 import * as AWS from 'aws-sdk-mock';
 
 import AdHocIngestCommand from '../../source/Commands/AdHocIngestCommand';
 import SendDataMessage from '../../source/Messages/SendDataMessage';
+import { Logger } from 'winston';
 
 const expect = chai.expect;
 
@@ -15,7 +18,8 @@ describe('AdHocIngestCommand', () => {
         it('should create and send a SendData message to the queue', async () => {
             const queueUrl = 'someurl';
 
-            const command: AdHocIngestCommand = new AdHocIngestCommand(queueUrl);
+            const logger = container.get<Logger>(TYPES.Logger);
+            const command: AdHocIngestCommand = new AdHocIngestCommand(queueUrl, logger);
             let sendMessageCalls = 0;
 
             // The ability to pass a spy in as the stub seems to be broken, so we do it the hard way for now.

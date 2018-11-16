@@ -3,6 +3,7 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../ioc.types';
 import { SQS } from 'aws-sdk';
 import PreviewMessage from '../Messages/PreviewMessage';
+import { Logger } from 'winston';
 
 /**
  * Initiates a preview of queries logged to stdout without performing query operations or delivering data.
@@ -13,14 +14,13 @@ import PreviewMessage from '../Messages/PreviewMessage';
  */
 @injectable()
 export default class AdHocPreviewCommand implements ICommand {
-    private _queueUrl;
-
     constructor(
-        @inject(TYPES.QueueUrl) queueUrl: string) {
-        this._queueUrl = queueUrl;
+        @inject(TYPES.QueueUrl) private _queueUrl: string,
+        @inject(TYPES.Logger) private _logger: Logger) {
     }
 
     public async invoke(subArgs?: string[]) {
+        this._logger.debug('Sending previewMessage notification');
         const sqs = new SQS();
         const previewMessage = PreviewMessage.create();
         await sqs.sendMessage({ QueueUrl: this._queueUrl, MessageBody: previewMessage.toJson() }).promise();
