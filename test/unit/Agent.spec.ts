@@ -24,7 +24,7 @@ import DummyHandler from '../../source/MessageHandlers/DummyHandler';
 
 const expect = chai.expect;
 
-xdescribe('Agent', () => {
+describe('Agent', () => {
 
     describe('handleAgentCommands', () => {
         let sandbox: sinon.SinonSandbox;
