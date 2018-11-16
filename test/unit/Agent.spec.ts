@@ -13,7 +13,7 @@ import ICommand from '../../source/Commands/ICommand';
 import TYPES from '../../ioc.types';
 import { InvalidCommandException } from '../../source/InvalidCommandException';
 import winston = require('winston');
-import { AuthManager } from '../../source/astra-sdk/AuthManager';
+import { AuthManager } from '@adastradev/user-management-sdk';
 import { SQS } from 'aws-sdk';
 import PreviewMessage from '../../source/Messages/PreviewMessage';
 import { create } from 'domain';

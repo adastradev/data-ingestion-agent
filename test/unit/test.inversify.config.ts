@@ -1,7 +1,7 @@
 import { Container, interfaces } from 'inversify';
 import TYPES from '../../ioc.types';
 import { stubInterface } from 'ts-sinon';
-import { AuthManager } from '../../source/astra-sdk/AuthManager';
+import { AuthManager } from '@adastradev/user-management-sdk';
 
 // Handlers
 import IMessageHandler from '../../source/IMessageHandler';
@@ -66,7 +66,7 @@ container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(
 // tslint:disable-next-line:only-arrow-functions
 container.bind<AuthManager>(TYPES.AuthManager)
     .toDynamicValue((context: interfaces.Context) => {
-        return new AuthManager(null, 'us-east-1', logger);
+        return new AuthManager(null, 'us-east-1');
     });
 container.bind<Container>(TYPES.Container).toConstantValue(container);
 
