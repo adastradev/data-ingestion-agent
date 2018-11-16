@@ -151,17 +151,19 @@ describe('Agent', () => {
             expect(ctx.handleMessageStub.firstCall.args[0]).to.deep.equal(dummyPreviewMsg.Messages[0]);
         });
 
-        it('should attempt to authenticate and then handle a message before exiting when a shutdown is requested', async () => {
+        it('should attempt to authenticate and then handle a message before exiting when a shutdown is requested via SIGTERM', async () => {
             const ctx = createTestContext();
-            (ctx.agent as any).mode = AgentMode.ShutdownRequested;
             const dummyPreviewMsg = {
                 Messages: [ new PreviewMessage() ]
             };
 
             const sqsReceiveMsgStub = sandbox.stub(ctx.sqs, 'receiveMessage').returns({ promise: () => Promise.resolve(dummyPreviewMsg)});
 
-            await ctx.agent.main();
+            const mainResult = ctx.agent.main();
+            (process as any).emit('SIGTERM', {});
+            await mainResult;
 
+            expect((ctx.agent as any).mode).to.equal(AgentMode.ShutdownRequested);
             expect(ctx.logHeapSpaceStatsStub.calledOnce).to.be.true;
             expect(ctx.refreshCognitoStub.calledOnce).to.be.true;
             expect(ctx.handleMessageStub.calledOnce).to.be.true;
@@ -178,21 +180,27 @@ describe('Agent', () => {
             const logger = container.get<winston.Logger>(TYPES.Logger);
             const authManager = container.get<AuthManager>(TYPES.AuthManager);
             const sqs = new SQS();
-            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs);
-            const logHeapSpaceStatsStub = sandbox.stub(agent as any, 'logHeapSpaceStats');
-            const refreshCognitoStub = sandbox.stub(authManager, 'refreshCognitoCredentials');
-            const handleMessageStub = sandbox.stub(agent, 'handleMessage' as any);
-            const handleAgentCmdsStub = sandbox.stub(agent, 'handleAgentCommands' as any);
+            const deleteMessageStub = sandbox.stub(sqs, 'deleteMessage').returns({ promise: async () => Promise.resolve()});
+            const dummyHandler = new DummyHandler();
+            const handleMessageSpy = sandbox.spy(dummyHandler, 'handle');
+            const messageHandlerFactory = new MessageHandlerFactory(container);
+            const getHandlerStub = sandbox.stub(messageHandlerFactory, 'getHandler').returns(dummyHandler);
+            const messageFactory = new MessageFactory(container, logger);
+            const dummyMessage = new DummyMessage();
+            const createFromJsonStub = sandbox.stub(messageFactory, 'createFromJson').returns(dummyMessage);
 
             return {
                 logger,
                 authManager,
                 sqs,
-                agent,
-                logHeapSpaceStatsStub,
-                refreshCognitoStub,
-                handleMessageStub,
-                handleAgentCmdsStub
+                deleteMessageStub,
+                dummyHandler,
+                handleMessageSpy,
+                messageHandlerFactory,
+                getHandlerStub,
+                messageFactory,
+                dummyMessage,
+                createFromJsonStub
             };
         };
 
@@ -205,31 +213,44 @@ describe('Agent', () => {
         });
 
         it('should call a handler and ackwnowledge the message', async () => {
-            const logger = container.get<winston.Logger>(TYPES.Logger);
-            const authManager = container.get<AuthManager>(TYPES.AuthManager);
-            const sqs = new SQS();
-            const deleteMessageStub = sandbox.stub(sqs, 'deleteMessage').returns({ promise: () => Promise.resolve()});
-            const dummyHandler = new DummyHandler();
-            const handleMessageSpy = sandbox.spy(dummyHandler, 'handle');
-            const messageHandlerFactory = new MessageHandlerFactory(container);
-            const getHandlerStub = sandbox.stub(messageHandlerFactory, 'getHandler').returns(dummyHandler);
-            const messageFactory = new MessageFactory(container, logger);
-            const createFromJsonStub = sandbox.stub(messageFactory, 'createFromJson').returns(new DummyMessage());
+            const ctx = createTestContext();
 
-            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),
                 ReceiptHandle: 'abc123'
             };
 
-            await (agent as any).handleMessage(message, sqs, messageHandlerFactory, messageFactory);
+            await (agent as any).handleMessage(message, ctx.sqs, ctx.messageHandlerFactory, ctx.messageFactory);
+
+            expect(ctx.createFromJsonStub.calledOnce).to.be.true;
+            expect(ctx.deleteMessageStub.calledOnce).to.be.true;
+            expect(ctx.getHandlerStub.calledOnce).to.be.true;
+            expect(ctx.handleMessageSpy.calledOnce).to.be.true;
+        });
+
+        it('should not acknowledge the message when an error occurs parsing the message body', async () => {
+            const ctx = createTestContext();
+            (ctx.messageFactory.createFromJson as any).restore();
+            const createFromJsonStub = sandbox.stub(ctx.messageFactory, 'createFromJson').throws(new Error('Some failure'));
+
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
+
+            const message = {
+                Body: JSON.stringify(new DummyMessage()),
+                ReceiptHandle: 'abc123'
+            };
+
+            // Can't parse the message so we can't delete a message we have no receipt handle for
+            await (agent as any).handleMessage(message, ctx.sqs, ctx.messageHandlerFactory, ctx.messageFactory);
 
             expect(createFromJsonStub.calledOnce).to.be.true;
-            expect(deleteMessageStub.calledOnce).to.be.true;
-            expect(getHandlerStub.calledOnce).to.be.true;
-            expect(handleMessageSpy.calledOnce).to.be.true;
+            expect(ctx.deleteMessageStub.notCalled).to.be.true;
+            expect(ctx.getHandlerStub.notCalled).to.be.true;
+            expect(ctx.handleMessageSpy.notCalled).to.be.true;
         });
+
     });
 });
 

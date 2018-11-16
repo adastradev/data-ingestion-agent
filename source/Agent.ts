@@ -95,8 +95,10 @@ export class Agent {
 
             await messageHandler.handle(message);
         } catch (error) {
-            this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
-            await sqs.deleteMessage({ QueueUrl: this.queueUrl, ReceiptHandle: message.receiptHandle }).promise();
+            if (message) {
+                this.logger.debug(`Acknowledging message: ${message.receiptHandle}`);
+                await sqs.deleteMessage({ QueueUrl: this.queueUrl, ReceiptHandle: message.receiptHandle }).promise();
+            }
             this.logger.error(error.message);
         }
     }
