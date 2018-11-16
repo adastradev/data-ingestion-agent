@@ -19,7 +19,7 @@ describe('S3Writer', () => {
 
         it('should upload data to S3', async () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const s3Writer = new S3Writer('some_tenant_id', 'some_bucket', logger);
+            const s3Writer = new S3Writer('some_bucket/some_tenant_id', logger);
             const result = {} as awssdk.S3.ManagedUpload.SendData;
 
             const dummyPromise = (): Promise<awssdk.S3.ManagedUpload.SendData> => {
