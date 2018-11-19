@@ -52,3 +52,7 @@ pipelines:
 
             # Run system test
             - . ./pipeline/run-system-tests.sh
+definitions:
+  services:
+    docker:
+      memory: 2048 
