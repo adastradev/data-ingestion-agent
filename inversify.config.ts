@@ -42,7 +42,7 @@ import { IntegrationSystemType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
 import { Agent } from './source/Agent';
-import { SQS } from 'aws-sdk';
+import { SNS, SQS } from 'aws-sdk';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -138,16 +138,21 @@ const startup = async () => {
         const queueUrl = poolListResponse.data.tenantDataIngestionQueueUrl;
         const bucketPath = poolListResponse.data.dataIngestionBucketPath;
 
+        const globalConfigResponse = await dataIngestionApi.getSettings();
+        const snsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
+
         // App
         container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
 
         // AWS
         container.bind<SQS>(TYPES.SQS).toConstantValue(new SQS());
+        container.bind<SNS>(TYPES.SNS).toConstantValue(new SNS());
 
         // Config injection
         container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
         container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
         container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
+        container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snsTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
             .to(IntegrationConfigFactory).inSingletonScope();

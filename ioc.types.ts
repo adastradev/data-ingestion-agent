@@ -20,6 +20,8 @@ const TYPES = {
     QueueUrl: Symbol('QueueUrl'),
     SendDataHandler: Symbol('SendDataHandler'),
     SendDataMessage: Symbol('SendDataMessage'),
+    SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
+    SNS: Symbol('SNS'),
     SQS: Symbol('SQS')
 };
 

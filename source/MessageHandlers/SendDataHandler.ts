@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 import { Container, inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
+import { SnapshotReceivedEventModel } from '@adastradev/data-ingestion-sdk';
 
 import SendDataMessage from '../Messages/SendDataMessage';
 import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
@@ -15,6 +16,7 @@ import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IntegrationType, IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
+import { SNS } from 'aws-sdk';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -35,19 +37,28 @@ export default class SendDataHandler implements IMessageHandler {
     private _integrationConfigFactory: IntegrationConfigFactory;
     private _connectionPool: IConnectionPool;
     private _container: Container;
+    private _snapshotReceivedArn: any;
+    private _sns: SNS;
+    private _bucketPath: string;
 
     constructor(
         @inject(TYPES.DataWriter) writer: IDataWriter,
         @inject(TYPES.Logger) logger: Logger,
         @inject(TYPES.IntegrationConfigFactory) integrationConfigFactory: IntegrationConfigFactory,
         @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool,
-        @inject(TYPES.Container) container: Container) {
+        @inject(TYPES.Container) container: Container,
+        @inject(TYPES.SNS) sns: SNS,
+        @inject(TYPES.SnapshotReceivedTopicArn) snapshotReceivedArn: string,
+        @inject(TYPES.Bucket) bucketPath: string) {
 
         this._writer = writer;
         this._logger = logger;
         this._integrationConfigFactory = integrationConfigFactory;
         this._connectionPool = connectionPool;
         this._container = container;
+        this._sns = sns;
+        this._snapshotReceivedArn = snapshotReceivedArn;
+        this._bucketPath = bucketPath;
     }
 
     public async handle(message: SendDataMessage) {
@@ -111,11 +122,22 @@ export default class SendDataHandler implements IMessageHandler {
                         });
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
+                        this.raiseSnapshotCompletionEvent(integrationType);
+
                         resolve();
                     }
                 }
             );
         });
+    }
+
+    private raiseSnapshotCompletionEvent(integrationType: IntegrationType) {
+        const tenantId = this._bucketPath.split('/')[1];
+        const event = new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath);
+
+        // TODO: Optionally use event methods to generate messages per protocol so that subscribers on a given
+        // protocol aren't forced to see a generic, potentially difficult to read, message
+        this._sns.publish({ Message: JSON.stringify(event), TopicArn: this._snapshotReceivedArn });
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
