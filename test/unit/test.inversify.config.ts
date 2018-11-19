@@ -1,6 +1,7 @@
-import { Container } from 'inversify';
+import { Container, interfaces } from 'inversify';
 import TYPES from '../../ioc.types';
 import { stubInterface } from 'ts-sinon';
+import { AuthManager } from '@adastradev/user-management-sdk';
 
 // Handlers
 import IMessageHandler from '../../source/IMessageHandler';
@@ -22,6 +23,9 @@ import IDataReader from '../../source/DataAccess/IDataReader';
 import IDataWriter from '../../source/DataAccess/IDataWriter';
 import SendDataHandler from '../../source/MessageHandlers/SendDataHandler';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
+import IDDLHelper from '../../source/DataAccess/IDDLHelper';
+import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
+import { IntegrationSystemType } from '../../source/IIntegrationConfig';
 
 const container = new Container();
 
@@ -33,8 +37,8 @@ const logger: Winston.Logger = Winston.createLogger({
     ]
 });
 
-container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory).inSingletonScope();
-container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory).inSingletonScope();
+container.bind<MessageFactory>(TYPES.MessageFactory).to(MessageFactory);
+container.bind<MessageHandlerFactory>(TYPES.MessageHandlerFactory).to(MessageHandlerFactory);
 
 const mockPool = stubInterface<IConnectionPool>();
 container.bind<IConnectionPool>(TYPES.ConnectionPool).toConstantValue(mockPool);
@@ -55,6 +59,13 @@ container.bind<string>(TYPES.QueueUrl).toConstantValue('http://www.someurl.com')
 container.bind<string>(TYPES.TenantId).toConstantValue('74c23bda-a496-4ccb-b08f-a9ab80e407b6');
 container.bind<string>(TYPES.Bucket).toConstantValue('some-bucket');
 
+container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
+
+// tslint:disable-next-line:only-arrow-functions
+container.bind<AuthManager>(TYPES.AuthManager)
+    .toDynamicValue((context: interfaces.Context) => {
+        return new AuthManager(null, 'us-east-1');
+    });
 container.bind<Container>(TYPES.Container).toConstantValue(container);
 
 export default container;

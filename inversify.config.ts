@@ -35,9 +35,14 @@ import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
 import IntegrationConfigFactory from './source/IntegrationConfigFactory';
 import IConnectionPool from './source/DataAccess/IConnectionPool';
 import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
+import OracleDDLHelper from './source/DataAccess/Oracle/OracleDDLHelper';
+import IDDLHelper from './source/DataAccess/IDDLHelper';
 import { FileTransportOptions } from 'winston/lib/winston/transports';
+import { IntegrationSystemType, IntegrationType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
+import { Agent } from './source/Agent';
+import { SQS } from 'aws-sdk';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -83,8 +88,6 @@ const s3Buckets = {
 };
 
 const bucketName = s3Buckets[stage];
-
-const integrationConfigFactory = new IntegrationConfigFactory(logger);
 
 const startup = async () => {
     if (logger.level === 'silly') { // truly silly debugging for testing proxy operation
@@ -143,13 +146,20 @@ const startup = async () => {
     queueUrl = poolListResponse.data[0].tenantDataIngestionQueueUrl;
     tenantId = poolListResponse.data[0].tenant_id;
 
+    // App
+    container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
+
+    // AWS
+    container.bind<SQS>(TYPES.SQS).toConstantValue(new SQS());
+
     // Config injection
     container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
     container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
     container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
     container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
     container.bind<string>(TYPES.Bucket).toConstantValue(bucketName);
-    container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory).toConstantValue(integrationConfigFactory);
+    container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
+        .to(IntegrationConfigFactory).inSingletonScope();
     container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();
 
     // Message Management
@@ -165,6 +175,7 @@ const startup = async () => {
     // Data Access
     container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
     container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
+    container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
 
     // Agent Commands
     container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);

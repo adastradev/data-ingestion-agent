@@ -1,8 +1,10 @@
 const TYPES = {
+    Agent: Symbol('Agent'),
     AuthManager: Symbol('AuthService'),
     Bucket: Symbol('Bucket'),
     ConnectionPool: Symbol('ConnectionPool'),
     Container: Symbol('Container'),
+    DDLHelper: Symbol('DDLHelper'),
     DataReader: Symbol('IngestionReader'),
     DataWriter: Symbol('IngestionWriter'),
     DummyHandler: Symbol('DummyHandler'),
@@ -18,6 +20,7 @@ const TYPES = {
     QueueUrl: Symbol('QueueUrl'),
     SendDataHandler: Symbol('SendDataHandler'),
     SendDataMessage: Symbol('SendDataMessage'),
+    SQS: Symbol('SQS'),
     TenantId: Symbol('TenantId')
 };
 

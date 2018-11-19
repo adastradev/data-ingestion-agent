@@ -1,6 +1,7 @@
 import { Readable } from 'stream';
 
-export declare type IntegrationType = 'Banner' | 'DegreeWorks' | 'Demo';
+export enum IntegrationType { 'Banner', 'DegreeWorks', 'Demo', 'Unknown' }
+export enum IntegrationSystemType { 'Oracle' = 'Oracle' }
 
 /**
  * Represents a set of statements or queries that need to be run for a given integration

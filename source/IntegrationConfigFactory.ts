@@ -1,11 +1,10 @@
 // tslint:disable:no-string-literal
 
 import TYPES from '../ioc.types';
-import { Container, inject, injectable, tagged } from 'inversify';
+import { inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
-import * as Winston from 'winston';
-import { IIntegrationConfig, IQueryDefinition } from './IIntegrationConfig';
-import { IntegrationType } from 'aws-sdk/clients/apigateway';
+import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from './IIntegrationConfig';
+import IDDLHelper from './DataAccess/IDDLHelper';
 
 /**
  * Given an integration type, return a set of integration queries to run
@@ -15,20 +14,20 @@ import { IntegrationType } from 'aws-sdk/clients/apigateway';
  */
 @injectable()
 export default class IntegrationConfigFactory {
-    private _logger: Winston.Logger;
-
     /**
      * Creates specifically typed messages given a json string
      * @param {Container} container The IOC container used to resolve other dependencies
      * @memberof MessageHandlerFactory
      */
-    constructor(@inject(TYPES.Logger) logger: Winston.Logger) {
-        this._logger = logger;
+    constructor(
+        @inject(TYPES.DDLHelper)
+        @named(IntegrationSystemType.Oracle)
+        private readonly oracleDDLHelper: IDDLHelper) {
     }
 
     public create(integrationType: IntegrationType): IIntegrationConfig {
         switch (integrationType) {
-            case 'Banner': {
+            case IntegrationType.Banner: {
                 const BANNER_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 BANNER_TEMPLATE_STATEMENTS.push({
@@ -573,26 +572,8 @@ export default class IntegrationConfigFactory {
                     query: 'Select * from GOREMAL'
                 });
 
-                const tableFilter =
-                    BANNER_TEMPLATE_STATEMENTS
-                        .map((definition) => {
-                            return `'${definition.name}'`;
-                        }).join(',');
-
-                // Having the ability to use DBMS_METADATA.SET_TRANSFORM_PARAM would help here to remove things like
-                // disabling the scripting of the 'user' in create statements but this system function does not seem
-                // to always be available despite 'GET_DDL' working
-                // NOTE: Scripting dependencies (FKs etc) via simple commands such as GET_DDL does not seem to be
-                // possible and would require some extra overhead to implement
-                const ddlQuery =
-                    'SELECT 1 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'TABLE\',u.table_name) as ddl ' +
-                    'FROM USER_TABLES u ' +
-                    `WHERE u.table_name in (${tableFilter})` +
-                    'union all ' +
-                    'SELECT 2 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'INDEX\',u.index_name) as ddl ' +
-                    'FROM USER_INDEXES u ' +
-                    `WHERE u.table_name in (${tableFilter})`  +
-                    'ORDER BY table_name, "priority"';
+                const tableNameList = BANNER_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
+                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
 
                 BANNER_TEMPLATE_STATEMENTS.push({
                     name: `ddl`,
@@ -601,10 +582,60 @@ export default class IntegrationConfigFactory {
 
                 return {
                     queries: BANNER_TEMPLATE_STATEMENTS,
-                    type: 'Banner'
+                    type: integrationType
                 };
             }
-            case 'Demo': {
+            case IntegrationType.DegreeWorks: {
+                const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
+
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'dap_result_dtl',
+                    query: `SELECT
+                        DAP_STU_ID,
+                        DAP_AUDIT_TYPE,
+                        DAP_DEGREE,
+                        DAP_BLOCK_SEQ_NUM,
+                        DAP_RESULT_SEQ_NUM,
+                        DAP_REQ_ID,
+                        DAP_RULE_ID,
+                        DAP_RESULT_TYPE,
+                        DAP_VALUE1,
+                        DAP_SCHOOL,
+                        DAP_VALUE2,
+                        DAP_VALUE3,
+                        DAP_VALUE4,
+                        DAP_FREETEXT,
+                        DAP_CREATE_DATE,
+                        Unique_ID,
+                        DAP_NODE_TYPE
+                    FROM dap_result_dtl`
+                });
+
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: 'CPA_CLASSNEEDED',
+                    query: `SELECT
+                        STU_ID,
+                        REQ_ID,
+                        RULE_ID,
+                        RESULT_TYPE
+                        WITH_ADVICE,
+                        RESULT_SEQ_NUM
+                    FROM CPA_CLASSNEEDED`
+                });
+
+                const tableNameList = DW_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
+                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
+
+                DW_TEMPLATE_STATEMENTS.push({
+                    name: `ddl`,
+                    query: ddlQuery
+                });
+                return {
+                    queries: DW_TEMPLATE_STATEMENTS,
+                    type: integrationType
+                };
+            }
+            case IntegrationType.Demo: {
                 const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 DEMO_TEMPLATE_STATEMENTS.push({
@@ -613,7 +644,7 @@ export default class IntegrationConfigFactory {
                 });
                 return {
                     queries: DEMO_TEMPLATE_STATEMENTS,
-                    type: 'Demo'
+                    type: integrationType
                 };
             }
             default: {
