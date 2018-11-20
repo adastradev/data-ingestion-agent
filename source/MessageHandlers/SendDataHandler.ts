@@ -124,7 +124,7 @@ export default class SendDataHandler implements IMessageHandler {
                         });
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        await this.raiseSnapshotCompletionEvent(integrationType, completionDescription);
+                        await this.raiseSnapshotCompletionEvent(integrationType, completionDescription, this._bucketPath + '/' + folderPath);
 
                         resolve();
                     }
@@ -133,7 +133,7 @@ export default class SendDataHandler implements IMessageHandler {
         });
     }
 
-    private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string) {
+    private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string, snapshotFolder: string) {
         const tenantId = this._bucketPath.split('/')[1];
         const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath, completionTimeDescription));
         const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
