@@ -124,7 +124,7 @@ export default class SendDataHandler implements IMessageHandler {
                         });
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        this.raiseSnapshotCompletionEvent(integrationType, completionDescription);
+                        await this.raiseSnapshotCompletionEvent(integrationType, completionDescription);
 
                         resolve();
                     }
@@ -133,17 +133,17 @@ export default class SendDataHandler implements IMessageHandler {
         });
     }
 
-    private raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string) {
+    private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string) {
         const tenantId = this._bucketPath.split('/')[1];
-        const event = { lambda: JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath, completionTimeDescription)) };
+        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath, completionTimeDescription));
+        const event = { lambda: snapshotReceivedEventString };
 
-        // TODO: Optionally use event methods to generate messages per protocol so that subscribers on a given
-        // protocol aren't forced to see a generic, potentially difficult to read, message
-        this._sns.publish({
+        this._logger.info('Sending snapshot upload completion notification');
+        await this._sns.publish({
             Message: JSON.stringify(event),
             TopicArn: this._snapshotReceivedArn,
             MessageStructure: 'json'
-        });
+        }).promise();
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
