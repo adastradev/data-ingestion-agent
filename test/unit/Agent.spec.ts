@@ -139,7 +139,7 @@ describe('Agent', () => {
                 Messages: [ new PreviewMessage() ]
             };
 
-            const sqsReceiveMsgStub = sandbox.stub(ctx.sqs, 'receiveMessage').returns({ promise: () => Promise.resolve(dummyPreviewMsg)});
+            const sqsReceiveMsgStub = (sandbox.stub(ctx.sqs, 'receiveMessage') as sinon.SinonStub).returns({ promise: () => Promise.resolve(dummyPreviewMsg)});
 
             await ctx.agent.main();
 
@@ -158,7 +158,7 @@ describe('Agent', () => {
                 Messages: [ new PreviewMessage() ]
             };
 
-            const sqsReceiveMsgStub = sandbox.stub(ctx.sqs, 'receiveMessage').returns({ promise: () => Promise.resolve(dummyPreviewMsg)});
+            const sqsReceiveMsgStub = (sandbox.stub(ctx.sqs, 'receiveMessage') as sinon.SinonStub).returns({ promise: () => Promise.resolve(dummyPreviewMsg)});
 
             await ctx.agent.main();
 
@@ -208,7 +208,7 @@ describe('Agent', () => {
             const logger = container.get<winston.Logger>(TYPES.Logger);
             const authManager = container.get<AuthManager>(TYPES.AuthManager);
             const sqs = new SQS();
-            const deleteMessageStub = sandbox.stub(sqs, 'deleteMessage').returns({ promise: () => Promise.resolve()});
+            const deleteMessageStub = (sandbox.stub(sqs, 'deleteMessage') as sinon.SinonStub).returns({ promise: () => Promise.resolve()});
             const dummyHandler = new DummyHandler();
             const handleMessageSpy = sandbox.spy(dummyHandler, 'handle');
             const messageHandlerFactory = new MessageHandlerFactory(container);

@@ -18,6 +18,15 @@ const expect = chai.expect;
 describe('SendDataHandler', () => {
 
     describe('when handling a message', () => {
+        let sandbox: sinon.SinonSandbox;
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+        });
+
+        afterEach(() => {
+            sandbox.reset();
+        });
+
         const integrationConfigFactory = sinon.createStubInstance(IntegrationConfigFactory);
         integrationConfigFactory.create.returns({
             queries: [
@@ -33,10 +42,14 @@ describe('SendDataHandler', () => {
             const writer = container.get<IDataWriter>(TYPES.DataWriter);
             const pool = container.get<IConnectionPool>(TYPES.ConnectionPool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container);
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null);
+
+            const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
+
             await handler.handle(message);
 
             expect((writer.ingest as sinon.SinonStub).callCount).to.eq(2);
+            expect(raiseCompletionStub.calledOnce).to.be.true;
         });
     });
 });
