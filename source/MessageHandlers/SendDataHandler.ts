@@ -136,7 +136,7 @@ export default class SendDataHandler implements IMessageHandler {
     private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string) {
         const tenantId = this._bucketPath.split('/')[1];
         const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath, completionTimeDescription));
-        const event = { lambda: snapshotReceivedEventString };
+        const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
 
         this._logger.info('Sending snapshot upload completion notification');
         await this._sns.publish({
