@@ -73,6 +73,7 @@ export default class SendDataHandler implements IMessageHandler {
         const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
 
         return new Promise<void>((resolve, reject) => {
+            let completionDescription: string;
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
                 async (queryStatement: IQueryDefinition, queryCallback: any) => { // iterator value callback
                     let reader: IDataReader;
@@ -86,9 +87,10 @@ export default class SendDataHandler implements IMessageHandler {
                         await this._writer.ingest(readable.result, folderPath, queryStatement.name);
                         const endTime = Date.now();
                         const diff = moment.duration(endTime - startTime);
+                        completionDescription = diff.humanize(false);
                         this._logger.info(
                             `Ingestion for '${queryStatement.name}' ` +
-                            `took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`
+                            `took ${completionDescription} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
                         if (err instanceof TableNotFoundException) {
@@ -122,7 +124,7 @@ export default class SendDataHandler implements IMessageHandler {
                         });
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        this.raiseSnapshotCompletionEvent(integrationType);
+                        this.raiseSnapshotCompletionEvent(integrationType, completionDescription);
 
                         resolve();
                     }
@@ -131,13 +133,17 @@ export default class SendDataHandler implements IMessageHandler {
         });
     }
 
-    private raiseSnapshotCompletionEvent(integrationType: IntegrationType) {
+    private raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string) {
         const tenantId = this._bucketPath.split('/')[1];
-        const event = new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath);
+        const event = { lambda: JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, this._bucketPath, completionTimeDescription)) };
 
         // TODO: Optionally use event methods to generate messages per protocol so that subscribers on a given
         // protocol aren't forced to see a generic, potentially difficult to read, message
-        this._sns.publish({ Message: JSON.stringify(event), TopicArn: this._snapshotReceivedArn });
+        this._sns.publish({
+            Message: JSON.stringify(event),
+            TopicArn: this._snapshotReceivedArn,
+            MessageStructure: 'json'
+        });
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
