@@ -33,30 +33,39 @@ export class Agent {
             this.mode = AgentMode.ShutdownRequested;
         });
 
-        this.logHeapSpaceStats();
-        await this.handleAgentCommands();
+        try {
+            this.logHeapSpaceStats();
+            await this.handleAgentCommands();
 
-        this.logger.debug(`Process Id: ${process.pid}`);
-        this.logger.debug('Waiting for ingestion commands');
+            this.logger.debug(`Process Id: ${process.pid}`);
+            this.logger.debug('Waiting for ingestion commands');
 
-        do {
-            await sleep(1000);
+            do {
+                await sleep(1000);
 
-            this.logger.silly('authManager.refreshCognitoCredentials');
-            await this.authManager.refreshCognitoCredentials();
+                this.logger.silly('authManager.refreshCognitoCredentials');
+                await this.authManager.refreshCognitoCredentials();
 
-            const sqs = this.sqs || new SQS();
-            // For now fetch 1 message from the queue but in the future we could open this up
-            this.logger.silly('sqs.receiveMessage');
-            const result = await sqs.receiveMessage({ QueueUrl: this.queueUrl, MaxNumberOfMessages: 1}).promise();
-            const handlerFactory = this.container.get<MessageHandlerFactory>(TYPES.MessageHandlerFactory);
-            const messageFactory = this.container.get<MessageFactory>(TYPES.MessageFactory);
-            for (const msg of result.Messages) {
-                await this.handleMessage(msg, sqs, handlerFactory, messageFactory);
+                const sqs = this.sqs || new SQS();
+                // For now fetch 1 message from the queue but in the future we could open this up
+                this.logger.silly('sqs.receiveMessage');
+                const result = await sqs.receiveMessage({ QueueUrl: this.queueUrl, MaxNumberOfMessages: 1}).promise();
+                const handlerFactory = this.container.get<MessageHandlerFactory>(TYPES.MessageHandlerFactory);
+                const messageFactory = this.container.get<MessageFactory>(TYPES.MessageFactory);
+                for (const msg of result.Messages) {
+                    await this.handleMessage(msg, sqs, handlerFactory, messageFactory);
+                }
+            } while (this.mode === AgentMode.Listening);
+
+            this.logger.debug('Stopped waiting for ingestion commands');
+        } catch (error) {
+            this.logger.error('Data ingestion agent error: ' + error.message);
+            // Log detail for axios errors
+            if (error.response !== undefined && error.response.data !== undefined) {
+                this.logger.debug('Axios response data: ' + JSON.stringify(error.response.data));
             }
-        } while (this.mode === AgentMode.Listening);
-
-        this.logger.debug('Stopped waiting for ingestion commands');
+            throw error;
+        }
     }
 
     private async handleAgentCommands() {

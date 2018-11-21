@@ -56,8 +56,7 @@ container.bind<IDataWriter>(TYPES.DataWriter).toConstantValue(mockWriter);
 container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
 
 container.bind<string>(TYPES.QueueUrl).toConstantValue('http://www.someurl.com');
-container.bind<string>(TYPES.TenantId).toConstantValue('74c23bda-a496-4ccb-b08f-a9ab80e407b6');
-container.bind<string>(TYPES.Bucket).toConstantValue('some-bucket');
+container.bind<string>(TYPES.Bucket).toConstantValue('some-bucket/74c23bda-a496-4ccb-b08f-a9ab80e407b6');
 
 container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
 

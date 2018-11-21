@@ -6,6 +6,7 @@ import { Logger } from 'winston';
 import { Container, inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
+import { SnapshotReceivedEventModel } from '@adastradev/data-ingestion-sdk';
 
 import SendDataMessage from '../Messages/SendDataMessage';
 import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
@@ -15,6 +16,7 @@ import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IntegrationType, IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
+import { SNS } from 'aws-sdk';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -35,19 +37,28 @@ export default class SendDataHandler implements IMessageHandler {
     private _integrationConfigFactory: IntegrationConfigFactory;
     private _connectionPool: IConnectionPool;
     private _container: Container;
+    private _snapshotReceivedArn: any;
+    private _sns: SNS;
+    private _bucketPath: string;
 
     constructor(
         @inject(TYPES.DataWriter) writer: IDataWriter,
         @inject(TYPES.Logger) logger: Logger,
         @inject(TYPES.IntegrationConfigFactory) integrationConfigFactory: IntegrationConfigFactory,
         @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool,
-        @inject(TYPES.Container) container: Container) {
+        @inject(TYPES.Container) container: Container,
+        @inject(TYPES.SNS) sns: SNS,
+        @inject(TYPES.SnapshotReceivedTopicArn) snapshotReceivedArn: string,
+        @inject(TYPES.Bucket) bucketPath: string) {
 
         this._writer = writer;
         this._logger = logger;
         this._integrationConfigFactory = integrationConfigFactory;
         this._connectionPool = connectionPool;
         this._container = container;
+        this._sns = sns;
+        this._snapshotReceivedArn = snapshotReceivedArn;
+        this._bucketPath = bucketPath;
     }
 
     public async handle(message: SendDataMessage) {
@@ -62,6 +73,7 @@ export default class SendDataHandler implements IMessageHandler {
         const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
 
         return new Promise<void>((resolve, reject) => {
+            let completionDescription: string;
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
                 async (queryStatement: IQueryDefinition, queryCallback: any) => { // iterator value callback
                     let reader: IDataReader;
@@ -75,9 +87,10 @@ export default class SendDataHandler implements IMessageHandler {
                         await this._writer.ingest(readable.result, folderPath, queryStatement.name);
                         const endTime = Date.now();
                         const diff = moment.duration(endTime - startTime);
+                        completionDescription = diff.humanize(false);
                         this._logger.info(
                             `Ingestion for '${queryStatement.name}' ` +
-                            `took ${diff.humanize(false)} (${diff.asMilliseconds()}ms)`
+                            `took ${completionDescription} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
                         if (err instanceof TableNotFoundException) {
@@ -111,11 +124,26 @@ export default class SendDataHandler implements IMessageHandler {
                         });
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
+                        await this.raiseSnapshotCompletionEvent(integrationType, completionDescription, this._bucketPath + '/' + folderPath);
+
                         resolve();
                     }
                 }
             );
         });
+    }
+
+    private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string, snapshotFolder: string) {
+        const tenantId = this._bucketPath.split('/')[1];
+        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, snapshotFolder, completionTimeDescription));
+        const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
+
+        this._logger.info('Sending snapshot upload completion notification');
+        await this._sns.publish({
+            Message: JSON.stringify(event),
+            TopicArn: this._snapshotReceivedArn,
+            MessageStructure: 'json'
+        }).promise();
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {

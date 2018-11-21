@@ -56,7 +56,7 @@ describe('OracleReader', () => {
             const oracleReader: OracleReader = new OracleReader(logger, mockPool);
 
             const readerSubscribeStub = sinon.stub(oracleReader, 'subscribeToStreamEvents' as any);
-            readerSubscribeStub.callsFake(sandbox.spy(async (args) => {
+            (readerSubscribeStub as sinon.SinonStub).callsFake(sandbox.spy(async (args) => {
                 const metadataStream = new Readable({objectMode: true });
                 metadataStream.push({ name: 'SOME_COLUMN', dbType: 2});
                 metadataStream.push(null);
@@ -144,8 +144,8 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
-            const getMetadataStreamStub = sandbox.stub(oracleReader, 'getMetadataAsStream' as any).returns({});
-            const getTransformStreamStub = sandbox.stub(oracleReader, 'getTransformStream' as any).returns({});
+            const getMetadataStreamStub = (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
+            const getTransformStreamStub = (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});
 
             const queryStream = new Readable({objectMode: true});
 
@@ -169,8 +169,8 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
-            sandbox.stub(oracleReader, 'getMetadataAsStream' as any).returns({});
-            sandbox.stub(oracleReader, 'getTransformStream' as any).returns({});
+            (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
+            (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});
 
             const queryStream = new Readable({objectMode: true});
 
@@ -188,8 +188,8 @@ describe('OracleReader', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
-            sandbox.stub(oracleReader, 'getMetadataAsStream' as any).returns({});
-            sandbox.stub(oracleReader, 'getTransformStream' as any).returns({});
+            (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
+            (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});
 
             const queryStream = new Readable({objectMode: true});
 

@@ -25,24 +25,16 @@ if (process.env.S3_QUEUE_SIZE) {
  */
 @injectable()
 export default class S3Writer implements IDataWriter {
-    private _tenantId: string;
-    private _bucket: string;
-    private _logger: Logger;
-
     constructor(
-        @inject(TYPES.TenantId) tenantId: string,
-        @inject(TYPES.Bucket) bucket: string,
-        @inject(TYPES.Logger) logger: Logger) {
-        this._tenantId = tenantId;
-        this._bucket = bucket;
-        this._logger = logger;
+        @inject(TYPES.Bucket) private _bucketPath: string,
+        @inject(TYPES.Logger) private _logger: Logger) {
     }
 
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
         const dataBody = stream;
         const parms = {
             Body: dataBody,
-            Bucket:  this._bucket + '/' + this._tenantId + '/' + folderPath,
+            Bucket:  this._bucketPath + '/' + folderPath,
             Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex')
         };
 

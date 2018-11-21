@@ -20,8 +20,9 @@ const TYPES = {
     QueueUrl: Symbol('QueueUrl'),
     SendDataHandler: Symbol('SendDataHandler'),
     SendDataMessage: Symbol('SendDataMessage'),
-    SQS: Symbol('SQS'),
-    TenantId: Symbol('TenantId')
+    SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
+    SNS: Symbol('SNS'),
+    SQS: Symbol('SQS')
 };
 
 export default TYPES;
