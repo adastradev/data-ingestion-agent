@@ -433,11 +433,6 @@ export default class IntegrationConfigFactory {
                     query: 'select * from SPRIDEN s where SPRIDEN_CHANGE_IND IS NULL'
                 });
                 BANNER_TEMPLATE_STATEMENTS.push({
-                    name: 'SPRID',
-                    query: 'select SPRIDEN_PIDM, SPRIDEN_ID, SPRIDEN_CHANGE_IND, SPRIDEN_LAST_NAME, '
-                    + 'NVL(SPRIDEN_FIRST_NAME, \'STUDENT\') SPRIDEN_FIRST_NAME, SPRIDEN_MI from SPRID'
-                });
-                BANNER_TEMPLATE_STATEMENTS.push({
                     name: 'SSBSECT',
                     query: 'select * From SSBSECT'
                 });
@@ -590,37 +585,17 @@ export default class IntegrationConfigFactory {
 
                 DW_TEMPLATE_STATEMENTS.push({
                     name: 'dap_result_dtl',
-                    query: `SELECT
-                        DAP_STU_ID,
-                        DAP_AUDIT_TYPE,
-                        DAP_DEGREE,
-                        DAP_BLOCK_SEQ_NUM,
-                        DAP_RESULT_SEQ_NUM,
-                        DAP_REQ_ID,
-                        DAP_RULE_ID,
-                        DAP_RESULT_TYPE,
-                        DAP_VALUE1,
-                        DAP_SCHOOL,
-                        DAP_VALUE2,
-                        DAP_VALUE3,
-                        DAP_VALUE4,
-                        DAP_FREETEXT,
-                        DAP_CREATE_DATE,
-                        Unique_ID,
-                        DAP_NODE_TYPE
-                    FROM dap_result_dtl`
+                    query: 'SELECT DAP_STU_ID, DAP_AUDIT_TYPE, DAP_DEGREE, DAP_BLOCK_SEQ_NUM, '
+                        + 'DAP_RESULT_SEQ_NUM, DAP_REQ_ID, DAP_RULE_ID, DAP_RESULT_TYPE, '
+                        + 'DAP_VALUE1, DAP_SCHOOL, DAP_VALUE2, DAP_VALUE3, DAP_VALUE4, '
+                        + 'DAP_FREETEXT, DAP_CREATE_DATE, Unique_ID, DAP_NODE_TYPE '
+                    + 'FROM dap_result_dtl'
                 });
 
                 DW_TEMPLATE_STATEMENTS.push({
                     name: 'CPA_CLASSNEEDED',
-                    query: `SELECT
-                        STU_ID,
-                        REQ_ID,
-                        RULE_ID,
-                        RESULT_TYPE
-                        WITH_ADVICE,
-                        RESULT_SEQ_NUM
-                    FROM CPA_CLASSNEEDED`
+                    query: 'SELECT STU_ID, REQ_ID, RULE_ID, RESULT_TYPE, WITH_ADVICE, RESULT_SEQ_NUM '
+                    + 'FROM CPA_CLASSNEEDED'
                 });
 
                 const tableNameList = DW_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
