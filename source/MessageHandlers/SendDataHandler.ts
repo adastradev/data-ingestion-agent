@@ -1,3 +1,5 @@
+// tslint:disable:no-conditional-assignment
+
 import IMessageHandler from '../IMessageHandler';
 import TYPES from '../../ioc.types';
 
@@ -75,28 +77,31 @@ export default class SendDataHandler implements IMessageHandler {
         return new Promise<void>((resolve, reject) => {
             let completionDescription: string;
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
-                async (queryStatement: IQueryDefinition, queryCallback: any) => { // iterator value callback
+                async (queryDefinition: IQueryDefinition, queryCallback: any) => { // iterator value callback
                     let reader: IDataReader;
                     let itemMetadata: Readable;
+                    let itemDDL: Readable;
+
                     try {
                         const startTime = Date.now();
 
                         reader = this._container.get<IDataReader>(TYPES.DataReader);
-                        const readable: IQueryResult = await reader.read(queryStatement.query);
-                        itemMetadata = readable.metadata;
-                        await this._writer.ingest(readable.result, folderPath, queryStatement.name);
+                        const queryResult: IQueryResult = await reader.read(queryDefinition);
+                        itemMetadata = queryResult.metadata;
+                        itemDDL = queryResult.ddl;
+                        await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
                         const endTime = Date.now();
                         const diff = moment.duration(endTime - startTime);
                         completionDescription = diff.humanize(false);
                         this._logger.info(
-                            `Ingestion for '${queryStatement.name}' ` +
+                            `Ingestion for '${queryDefinition.name}' ` +
                             `took ${completionDescription} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
                         if (err instanceof TableNotFoundException) {
                             // ignore query statements that fail due to missing tables/views
                             this._logger.warn(err);
-                            queryCallback(null, { name: queryStatement.name, data: null});
+                            queryCallback(null, { name: queryDefinition.name, data: null});
                             return;
                         } else {
                             this._logger.error(err);
@@ -108,7 +113,7 @@ export default class SendDataHandler implements IMessageHandler {
                             await reader.close();
                         }
                     }
-                    queryCallback(null, { name: queryStatement.name, data: itemMetadata});
+                    queryCallback(null, { name: queryDefinition.name, data: itemMetadata});
                 },
                 async (err, results) => { // async.mapLimit callback
                     if (err) {
@@ -150,15 +155,21 @@ export default class SendDataHandler implements IMessageHandler {
         // First build a common structure to store each queries metadata in so it
         // can be consumed later during the restoration process
         const allTableMetadata = new Map<string, any>();
+        const ddlStream: Readable = new Readable({objectMode: true });
         for (const queryMetadata of metadata) {
             let columnMetadata;
             const columns = [];
-            // tslint:disable-next-line:no-conditional-assignment
+
             while ((columnMetadata = queryMetadata.data.read()) !== null) {
                 columns.push(columnMetadata);
             }
 
             allTableMetadata[queryMetadata.name] = columns;
+
+            let ddlRecord;
+            while ((ddlRecord = queryMetadata.ddl.read()) !== null) {
+                ddlStream.push(ddlRecord);
+            }
         }
 
         // Then prepare it to stream to the destination
@@ -166,6 +177,9 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(JSON.stringify(allTableMetadata));
         compiledMetadataStream.push(null);
 
+        ddlStream.unshift(null);
+
         await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
+        await this._writer.ingest(ddlStream, folderPath, 'ddl');
     }
 }

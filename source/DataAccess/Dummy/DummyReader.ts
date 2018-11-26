@@ -23,7 +23,11 @@ export default class DummyReader implements IDataReader {
         metadataStream.push({ name: 'somecolumn', dbType: 'someType'});
         metadataStream.push(null);
 
-        return { result: s, metadata: metadataStream };
+        const ddl = new Readable({objectMode: true});
+        ddl.push({ priority: 1, table_name: 'sometable', ddl: 'create table sometable (...)'});
+        ddl.push(null);
+
+        return { result: s, ddl, metadata: metadataStream };
     }
 
     public async close(): Promise<void> {

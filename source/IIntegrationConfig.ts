@@ -62,4 +62,12 @@ export interface IQueryMetadata {
      * @memberof IQueryMetadata
      */
     data: Readable;
+
+    /**
+     * A stream containing a platform specific DDL statement of the data object being queried
+     *
+     * @type {Readable}
+     * @memberof IQueryMetadata
+     */
+    ddl: Readable;
 }

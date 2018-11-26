@@ -4,7 +4,6 @@ import TYPES from '../ioc.types';
 import { inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
 import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from './IIntegrationConfig';
-import IDDLHelper from './DataAccess/IDDLHelper';
 
 /**
  * Given an integration type, return a set of integration queries to run
@@ -19,10 +18,7 @@ export default class IntegrationConfigFactory {
      * @param {Container} container The IOC container used to resolve other dependencies
      * @memberof MessageHandlerFactory
      */
-    constructor(
-        @inject(TYPES.DDLHelper)
-        @named(IntegrationSystemType.Oracle)
-        private readonly oracleDDLHelper: IDDLHelper) {
+    constructor() {
     }
 
     public create(integrationType: IntegrationType): IIntegrationConfig {
@@ -573,12 +569,6 @@ export default class IntegrationConfigFactory {
                 });
 
                 const tableNameList = BANNER_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
-                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
-
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: `ddl`,
-                    query: ddlQuery
-                });
 
                 return {
                     queries: BANNER_TEMPLATE_STATEMENTS,
@@ -624,12 +614,7 @@ export default class IntegrationConfigFactory {
                 });
 
                 const tableNameList = DW_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
-                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
 
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: `ddl`,
-                    query: ddlQuery
-                });
                 return {
                     queries: DW_TEMPLATE_STATEMENTS,
                     type: integrationType
