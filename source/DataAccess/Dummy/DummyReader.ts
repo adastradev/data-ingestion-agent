@@ -27,7 +27,7 @@ export default class DummyReader implements IDataReader {
         ddl.push({ priority: 1, table_name: 'sometable', ddl: 'create table sometable (...)'});
         ddl.push(null);
 
-        return { result: s, ddl, metadata: metadataStream };
+        return { result: s, metadata: metadataStream };
     }
 
     public async close(): Promise<void> {

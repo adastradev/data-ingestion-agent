@@ -12,6 +12,7 @@ import * as sinon from 'sinon';
 import { Logger } from 'winston';
 import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
+import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 
 const expect = chai.expect;
 
@@ -41,8 +42,9 @@ describe('SendDataHandler', () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const writer = container.get<IDataWriter>(TYPES.DataWriter);
             const pool = container.get<IConnectionPool>(TYPES.ConnectionPool);
+            const oracleDDLHelper = new OracleDDLHelper();
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null);
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper);
 
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 

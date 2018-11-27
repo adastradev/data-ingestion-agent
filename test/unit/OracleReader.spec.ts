@@ -55,9 +55,7 @@ describe('OracleReader', () => {
             }));
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, mockPool, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, mockPool);
 
             const readerSubscribeStub = sinon.stub(oracleReader, 'subscribeToStreamEvents' as any);
             (readerSubscribeStub as sinon.SinonStub).callsFake(sandbox.spy(async (args) => {
@@ -77,7 +75,7 @@ describe('OracleReader', () => {
             await mockPool.close();
 
             expect(getConnectionStub.calledOnce).to.be.true;
-            expect(queryStreamSpy.calledTwice).to.be.true;
+            expect(queryStreamSpy.calledOnce).to.be.true;
             expect(releaseConnectionStub.calledOnce).to.be.true;
             expect(closeConnectionSpy.calledOnce).to.be.true;
             expect(queryResult).to.be.not.null;
@@ -89,8 +87,7 @@ describe('OracleReader', () => {
             const poolStub = stubInterface<IConnectionPool>();
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, poolStub, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
             const closeSpy = sandbox.spy(oracleReader, 'close');
 
             const queryResult: IQueryResult = await oracleReader.read({ name: 'mocktable', query: 'Mock query statement' });
@@ -103,8 +100,7 @@ describe('OracleReader', () => {
             const poolStub = stubInterface<IConnectionPool>();
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, poolStub, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
             const queryStream = new Readable({objectMode: true});
             const queryObj = { COL1: 'value' };
 
@@ -127,8 +123,7 @@ describe('OracleReader', () => {
             const poolStub = stubInterface<IConnectionPool>();
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, poolStub, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
             const queryStream = new Readable({objectMode: true});
 
             const metadataObject = {TABLE1: { name: 'COL1' }};
@@ -149,8 +144,7 @@ describe('OracleReader', () => {
             const poolStub = stubInterface<IConnectionPool>();
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, poolStub, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
             const getMetadataStreamStub = (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
             const getTransformStreamStub = (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});
@@ -175,8 +169,7 @@ describe('OracleReader', () => {
             const poolStub = stubInterface<IConnectionPool>();
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, poolStub, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
             (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
             (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});
@@ -195,8 +188,7 @@ describe('OracleReader', () => {
             const poolStub = stubInterface<IConnectionPool>();
 
             const logger: Logger = container.get<Logger>(TYPES.Logger);
-            const ddlHelper: IDDLHelper = new OracleDDLHelper();
-            const oracleReader: OracleReader = new OracleReader(logger, poolStub, ddlHelper);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
 
             (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
             (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});

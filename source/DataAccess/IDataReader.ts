@@ -22,5 +22,4 @@ export type CloseFunction = () => Promise<void>;
 export interface IQueryResult {
     result: Readable;
     metadata: Readable;
-    ddl: Readable;
 }

@@ -28,10 +28,7 @@ export default class OracleReader implements IDataReader {
 
     constructor(
         @inject(TYPES.Logger) logger: Logger,
-        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool,
-        @inject(TYPES.DDLHelper)
-        @named(IntegrationSystemType.Oracle)
-        private readonly oracleDDLHelper: IDDLHelper) {
+        @inject(TYPES.ConnectionPool) connectionPool: IConnectionPool) {
         this._logger = logger;
         this._connectionPool = connectionPool;
 
@@ -59,11 +56,7 @@ export default class OracleReader implements IDataReader {
             const queryResultStream = await this._connection.queryStream(queryDefinition.query, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
-            const ddlQuery = this.oracleDDLHelper.getDDLQuery(queryDefinition.name);
-            const ddlStream  = await this._connection.queryStream(ddlQuery, [],
-                { outFormat: oracledb.OBJECT, fetchArraySize: 1000, extendedMetaData: true } as any);
-
-            return await this.subscribeToStreamEvents(queryResultStream, ddlStream, queryDefinition.query);
+            return await this.subscribeToStreamEvents(queryResultStream, queryDefinition.query);
         } catch (err) {
             this._logger.error(err);
             throw err;
@@ -81,13 +74,12 @@ export default class OracleReader implements IDataReader {
         }
     }
 
-    private async subscribeToStreamEvents(queryStream: stream.Readable, ddlStream: stream.Readable, queryStatement: string): Promise<IQueryResult> {
+    private async subscribeToStreamEvents(queryStream: stream.Readable, queryStatement: string): Promise<IQueryResult> {
         const streamEvents = new Promise<any>((resolve, reject) => {
-            const result: IQueryResult = { result: null, ddl: null, metadata: null };
+            const result: IQueryResult = { result: null, metadata: null };
 
             queryStream.on('metadata', (md: any[]) => {
                 result.metadata = this.getMetadataAsStream(md);
-                result.ddl = ddlStream;
                 result.result = this.getTransformStream(queryStream);
                 resolve(result);
             });

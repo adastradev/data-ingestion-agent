@@ -12,7 +12,7 @@ describe('OracleDDLHelper', () => {
 
         it('should return a properly formatted query for all specified tables', async () => {
             const helper = new OracleDDLHelper();
-            const query = helper.getDDLQuery('table1');
+            const query = helper.getDDLQuery(['table1']);
 
             const expectedQuery =
                 'SELECT 1 as "priority", \'table1\' as table_name, DBMS_METADATA.GET_DDL(\'TABLE\', \'table1\') as ddl ' +

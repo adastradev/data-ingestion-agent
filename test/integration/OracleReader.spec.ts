@@ -21,8 +21,7 @@ describe('oracledb', () => {
         it('should return sample query results', async () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const pool = new OracleConnectionPoolProxy(logger);
-            const ddlHelper = new OracleDDLHelper();
-            const reader = new OracleReader(logger, pool, ddlHelper);
+            const reader = new OracleReader(logger, pool);
 
             await pool.open();
 
@@ -40,10 +39,6 @@ describe('oracledb', () => {
                 output += chunk.toString();
             }
 
-            while ((chunk = queryResult.ddl.read()) !== null) {
-                output += chunk.toString();
-            }
-
             await reader.close();
             await pool.close();
         });
@@ -51,8 +46,7 @@ describe('oracledb', () => {
         it('should throw an exception when attempting to query a table that does not exist', async () => {
             const logger = container.get<Logger>(TYPES.Logger);
             const pool = new OracleConnectionPoolProxy(logger);
-            const ddlHelper = new OracleDDLHelper();
-            const reader = new OracleReader(logger, pool, ddlHelper);
+            const reader = new OracleReader(logger, pool);
 
             await pool.open();
 

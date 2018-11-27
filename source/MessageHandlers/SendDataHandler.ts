@@ -5,7 +5,7 @@ import TYPES from '../../ioc.types';
 
 import { Readable } from 'stream';
 import { Logger } from 'winston';
-import { Container, inject, injectable } from 'inversify';
+import { Container, inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
 import { SnapshotReceivedEventModel } from '@adastradev/data-ingestion-sdk';
@@ -15,10 +15,11 @@ import IDataReader, { IQueryResult } from '../DataAccess/IDataReader';
 import IDataWriter from '../DataAccess/IDataWriter';
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import IConnectionPool from '../DataAccess/IConnectionPool';
-import { IntegrationType, IQueryDefinition, IQueryMetadata } from '../IIntegrationConfig';
+import { IntegrationSystemType, IntegrationType, IQueryDefinition, IQueryMetadata  } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
+import IDDLHelper from '../DataAccess/IDDLHelper';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -51,7 +52,10 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.Container) container: Container,
         @inject(TYPES.SNS) sns: SNS,
         @inject(TYPES.SnapshotReceivedTopicArn) snapshotReceivedArn: string,
-        @inject(TYPES.Bucket) bucketPath: string) {
+        @inject(TYPES.Bucket) bucketPath: string,
+        @inject(TYPES.DDLHelper)
+        @named(IntegrationSystemType.Oracle)
+        private readonly _oracleDDLHelper: IDDLHelper) {
 
         this._writer = writer;
         this._logger = logger;
@@ -76,11 +80,15 @@ export default class SendDataHandler implements IMessageHandler {
 
         return new Promise<void>((resolve, reject) => {
             let completionDescription: string;
+            const validTables = {};
+            for (const tbl of integrationConfig.queries.map((q) => q.name)) {
+                validTables[tbl] = tbl;
+            }
+
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
                 async (queryDefinition: IQueryDefinition, queryCallback: any) => { // iterator value callback
                     let reader: IDataReader;
                     let itemMetadata: Readable;
-                    let itemDDL: Readable;
 
                     try {
                         const startTime = Date.now();
@@ -88,7 +96,6 @@ export default class SendDataHandler implements IMessageHandler {
                         reader = this._container.get<IDataReader>(TYPES.DataReader);
                         const queryResult: IQueryResult = await reader.read(queryDefinition);
                         itemMetadata = queryResult.metadata;
-                        itemDDL = queryResult.ddl;
                         await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
                         const endTime = Date.now();
                         const diff = moment.duration(endTime - startTime);
@@ -98,6 +105,7 @@ export default class SendDataHandler implements IMessageHandler {
                             `took ${completionDescription} (${diff.asMilliseconds()}ms)`
                         );
                     } catch (err) {
+                        delete validTables[queryDefinition.name];
                         if (err instanceof TableNotFoundException) {
                             // ignore query statements that fail due to missing tables/views
                             this._logger.warn(err);
@@ -113,13 +121,15 @@ export default class SendDataHandler implements IMessageHandler {
                             await reader.close();
                         }
                     }
-                    queryCallback(null, { name: queryDefinition.name, metadata: itemMetadata, ddl: itemDDL});
+                    queryCallback(null, { name: queryDefinition.name, metadata: itemMetadata});
                 },
                 async (err, results) => { // async.mapLimit callback
                     if (err) {
                         await this._connectionPool.close();
                         reject(err);
                     } else {
+                        await this.ingestDDL(validTables, folderPath);
+
                         await this._connectionPool.close();
 
                         results.forEach((queryResult) => {
@@ -127,6 +137,7 @@ export default class SendDataHandler implements IMessageHandler {
                                 aggregateMetadata.push(queryResult);
                             }
                         });
+
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
                         await this.raiseSnapshotCompletionEvent(integrationType, completionDescription, this._bucketPath + '/' + folderPath);
@@ -151,11 +162,19 @@ export default class SendDataHandler implements IMessageHandler {
         }).promise();
     }
 
+    private async ingestDDL(validTables: any, folderPath) {
+        const ddlQuery = this._oracleDDLHelper.getDDLQuery(Object.keys(validTables));
+        const reader = this._container.get<IDataReader>(TYPES.DataReader);
+        const ddlPrefix = 'ddl';
+        const queryResult = await reader.read({name: ddlPrefix, query: ddlQuery});
+
+        await this._writer.ingest(queryResult.result, folderPath, ddlPrefix);
+    }
+
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
         // First build a common structure to store each queries metadata in so it
         // can be consumed later during the restoration process
         const allTableMetadata = new Map<string, any>();
-        const ddlStream: Readable = new Readable({objectMode: true });
         for (const queryMetadata of metadata) {
             let columnMetadata;
             const columns = [];
@@ -165,11 +184,6 @@ export default class SendDataHandler implements IMessageHandler {
             }
 
             allTableMetadata[queryMetadata.name] = columns;
-
-            let ddlRecord;
-            while ((ddlRecord = queryMetadata.ddl.read()) !== null) {
-                ddlStream.push(ddlRecord);
-            }
         }
 
         // Then prepare it to stream to the destination
@@ -177,9 +191,6 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(JSON.stringify(allTableMetadata));
         compiledMetadataStream.push(null);
 
-        ddlStream.push(null);
-
         await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
-        await this._writer.ingest(ddlStream, folderPath, 'ddl');
     }
 }
