@@ -159,12 +159,9 @@ describe('OracleConnectionPoolProxy', () => {
             const closeSpy = sandbox.spy(stubConnection, 'close');
             const logger = container.get<Logger>(TYPES.Logger);
             const poolProxy = new OracleConnectionPoolProxy(logger);
-            const loggerErrorSpy = sandbox.spy(logger, 'error');
 
-            await poolProxy.releaseConnection(stubConnection);
-
+            expect(poolProxy.releaseConnection(stubConnection)).to.eventually.be.fulfilled;
             expect(closeSpy.calledOnce).to.be.true;
-            expect(loggerErrorSpy.calledOnce).to.be.true;
         });
     });
 });
