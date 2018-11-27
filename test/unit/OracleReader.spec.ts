@@ -77,7 +77,7 @@ describe('OracleReader', () => {
             await mockPool.close();
 
             expect(getConnectionStub.calledOnce).to.be.true;
-            expect(queryStreamSpy.calledOnce).to.be.true;
+            expect(queryStreamSpy.calledTwice).to.be.true;
             expect(releaseConnectionStub.calledOnce).to.be.true;
             expect(closeConnectionSpy.calledOnce).to.be.true;
             expect(queryResult).to.be.not.null;

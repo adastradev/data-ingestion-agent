@@ -149,7 +149,7 @@ describe('OracleConnectionPoolProxy', () => {
             expect(closeSpy.calledOnce).to.be.true;
         });
 
-        it('should reject with an error if there is a failure to close the connection', async () => {
+        it('should not reject with an error if there is a failure to close the connection', async () => {
             const stubConnection = {
                 close: async () => {
                     return Promise.reject(new Error('Some failure'));
@@ -157,9 +157,14 @@ describe('OracleConnectionPoolProxy', () => {
             };
 
             const closeSpy = sandbox.spy(stubConnection, 'close');
-            const poolProxy = new OracleConnectionPoolProxy(container.get<Logger>(TYPES.Logger));
+            const logger = container.get<Logger>(TYPES.Logger);
+            const poolProxy = new OracleConnectionPoolProxy(logger);
+            const loggerErrorSpy = sandbox.spy(logger, 'error');
 
-            expect(poolProxy.releaseConnection(stubConnection)).to.eventually.be.rejectedWith(Error, 'Some failure');
+            await poolProxy.releaseConnection(stubConnection);
+
+            expect(closeSpy.calledOnce).to.be.true;
+            expect(loggerErrorSpy.calledOnce).to.be.true;
         });
     });
 });

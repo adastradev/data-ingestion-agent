@@ -48,7 +48,7 @@ describe('SendDataHandler', () => {
 
             await handler.handle(message);
 
-            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(2);
+            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(3);
             expect(raiseCompletionStub.calledOnce).to.be.true;
         });
     });
