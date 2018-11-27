@@ -61,5 +61,5 @@ export interface IQueryMetadata {
      * @type {Readable}
      * @memberof IQueryMetadata
      */
-    metadata: Readable;
+    data: Readable;
 }

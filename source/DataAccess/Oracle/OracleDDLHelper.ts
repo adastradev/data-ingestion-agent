@@ -19,8 +19,9 @@ export default class OracleDDLHelper implements IDDLHelper {
                 return `SELECT 1 as "priority", \'${name}\' as table_name, DBMS_METADATA.GET_DDL(\'TABLE\', \'${name}\') as ddl ` +
                 'FROM dual ' +
                 'union all ' +
-                `SELECT 2 as "priority", \'${name}\' as table_name, DBMS_METADATA.GET_DDL(\'INDEX\', \'${name}\') as ddl ` +
-                'FROM dual ';
+                // We know what tables exist but must discover any indexes
+                `SELECT 2 as "priority", \'${name}\' as table_name, DBMS_METADATA.GET_DDL(\'INDEX\', uidx.INDEX_NAME) as ddl ` +
+                `FROM USER_INDEXES uidx where table_name = '${name}' `;
             })
             .join('\nunion all\n');
     }

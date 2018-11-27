@@ -121,7 +121,7 @@ export default class SendDataHandler implements IMessageHandler {
                             await reader.close();
                         }
                     }
-                    queryCallback(null, { name: queryDefinition.name, metadata: itemMetadata});
+                    queryCallback(null, { name: queryDefinition.name, data: itemMetadata});
                 },
                 async (err, results) => { // async.mapLimit callback
                     if (err) {
@@ -179,7 +179,7 @@ export default class SendDataHandler implements IMessageHandler {
             let columnMetadata;
             const columns = [];
 
-            while ((columnMetadata = queryMetadata.metadata.read()) !== null) {
+            while ((columnMetadata = queryMetadata.data.read()) !== null) {
                 columns.push(columnMetadata);
             }
 

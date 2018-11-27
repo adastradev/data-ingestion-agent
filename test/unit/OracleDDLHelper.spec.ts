@@ -18,8 +18,8 @@ describe('OracleDDLHelper', () => {
                 'SELECT 1 as "priority", \'table1\' as table_name, DBMS_METADATA.GET_DDL(\'TABLE\', \'table1\') as ddl ' +
                 'FROM dual ' +
                 'union all ' +
-                'SELECT 2 as "priority", \'table1\' as table_name, DBMS_METADATA.GET_DDL(\'INDEX\', \'table1\') as ddl ' +
-                'FROM dual ';
+                'SELECT 2 as "priority", \'table1\' as table_name, DBMS_METADATA.GET_DDL(\'INDEX\', uidx.INDEX_NAME) as ddl ' +
+                'FROM USER_INDEXES uidx where table_name = \'table1\' ';
 
             expect(query).to.equal(expectedQuery);
         });
