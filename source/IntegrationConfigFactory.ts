@@ -579,7 +579,7 @@ export default class IntegrationConfigFactory {
                 const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 DW_TEMPLATE_STATEMENTS.push({
-                    name: 'dap_result_dtl',
+                    name: 'DAP_RESULT_DTL',
                     query: `SELECT
                         DAP_STU_ID,
                         DAP_AUDIT_TYPE,
@@ -598,7 +598,7 @@ export default class IntegrationConfigFactory {
                         DAP_CREATE_DATE,
                         Unique_ID,
                         DAP_NODE_TYPE
-                    FROM dap_result_dtl`
+                    FROM DAP_RESULT_DTL`
                 });
 
                 DW_TEMPLATE_STATEMENTS.push({
