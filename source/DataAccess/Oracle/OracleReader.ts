@@ -58,7 +58,6 @@ export default class OracleReader implements IDataReader {
 
             return await this.subscribeToStreamEvents(queryResultStream, queryDefinition.query);
         } catch (err) {
-            this._logger.error(err);
             throw err;
         }
     }
@@ -85,12 +84,12 @@ export default class OracleReader implements IDataReader {
             });
 
             queryStream.on('error', (error: any) => {
-                this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
                 queryStream.destroy();
                 // Translate - ORA-00942: table or view does not exist
                 if (error.errorNum && error.errorNum === 942) {
-                    reject(new TableNotFoundException(queryStatement, error.message));
+                    reject(new TableNotFoundException(queryStatement, `Query execution unsuccessful. ${error.message}`));
                 } else {
+                    this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
                     reject(error);
                 }
             });

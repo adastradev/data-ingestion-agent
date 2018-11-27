@@ -108,7 +108,7 @@ export default class SendDataHandler implements IMessageHandler {
                         delete validTables[queryDefinition.name];
                         if (err instanceof TableNotFoundException) {
                             // ignore query statements that fail due to missing tables/views
-                            this._logger.warn(err);
+                            this._logger.warn(`${err.message || ''} - queryStatement: ${err.queryStatement}`);
                             queryCallback(null, { name: queryDefinition.name, data: null});
                             return;
                         } else {
