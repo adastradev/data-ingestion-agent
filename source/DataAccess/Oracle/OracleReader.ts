@@ -39,7 +39,7 @@ export default class OracleReader implements IDataReader {
 
     public async read(queryDefinition: IQueryDefinition): Promise<IQueryResult> {
         if (process.env.ORACLE_ENDPOINT === undefined) {
-            return Promise.resolve({ result: this.createDemoSnapshot(), ddl: null, metadata: null });
+            return Promise.resolve({ result: this.createDemoSnapshot(), metadata: null });
         }
 
         try {
