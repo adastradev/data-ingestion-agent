@@ -17,7 +17,7 @@ export default interface IDataReader {
     read: QueryStreamFunction;
 }
 
-export type QueryStreamFunction = (queryDefintion: IQueryDefinition) => Promise<IQueryResult>;
+export type QueryStreamFunction = (queryDefinition: IQueryDefinition) => Promise<IQueryResult>;
 export type CloseFunction = () => Promise<void>;
 export interface IQueryResult {
     result: Readable;
