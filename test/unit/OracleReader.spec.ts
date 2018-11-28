@@ -13,6 +13,8 @@ import TYPES from '../../ioc.types';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
+import IDDLHelper from '../../source/DataAccess/IDDLHelper';
+import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 
 const expect = chai.expect;
 
@@ -67,7 +69,7 @@ describe('OracleReader', () => {
             // expected use sequence for OracleReader
             await mockPool.open();
 
-            const queryResult: IQueryResult = await oracleReader.read('Mock query statement');
+            const queryResult: IQueryResult = await oracleReader.read({ name: 'mocktable', query: 'Mock query statement' });
             await oracleReader.close();
 
             await mockPool.close();
@@ -88,7 +90,7 @@ describe('OracleReader', () => {
             const oracleReader: OracleReader = new OracleReader(logger, poolStub);
             const closeSpy = sandbox.spy(oracleReader, 'close');
 
-            const queryResult: IQueryResult = await oracleReader.read('Mock query statement');
+            const queryResult: IQueryResult = await oracleReader.read({ name: 'mocktable', query: 'Mock query statement' });
             await oracleReader.close();
             expect(closeSpy.calledOnce).to.be.true;
             expect(queryResult.result).to.be.not.null;

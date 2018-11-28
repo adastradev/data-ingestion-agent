@@ -4,7 +4,6 @@ import TYPES from '../ioc.types';
 import { inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
 import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from './IIntegrationConfig';
-import IDDLHelper from './DataAccess/IDDLHelper';
 
 /**
  * Given an integration type, return a set of integration queries to run
@@ -19,10 +18,7 @@ export default class IntegrationConfigFactory {
      * @param {Container} container The IOC container used to resolve other dependencies
      * @memberof MessageHandlerFactory
      */
-    constructor(
-        @inject(TYPES.DDLHelper)
-        @named(IntegrationSystemType.Oracle)
-        private readonly oracleDDLHelper: IDDLHelper) {
+    constructor() {
     }
 
     public create(integrationType: IntegrationType): IIntegrationConfig {
@@ -567,14 +563,6 @@ export default class IntegrationConfigFactory {
                     query: 'Select * from GOREMAL'
                 });
 
-                const tableNameList = BANNER_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
-                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
-
-                BANNER_TEMPLATE_STATEMENTS.push({
-                    name: `ddl`,
-                    query: ddlQuery
-                });
-
                 return {
                     queries: BANNER_TEMPLATE_STATEMENTS,
                     type: integrationType
@@ -584,12 +572,12 @@ export default class IntegrationConfigFactory {
                 const DW_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 DW_TEMPLATE_STATEMENTS.push({
-                    name: 'dap_result_dtl',
+                    name: 'DAP_RESULT_DTL',
                     query: 'SELECT DAP_STU_ID, DAP_AUDIT_TYPE, DAP_DEGREE, DAP_BLOCK_SEQ_NUM, '
                         + 'DAP_RESULT_SEQ_NUM, DAP_REQ_ID, DAP_RULE_ID, DAP_RESULT_TYPE, '
                         + 'DAP_VALUE1, DAP_SCHOOL, DAP_VALUE2, DAP_VALUE3, DAP_VALUE4, '
                         + 'DAP_FREETEXT, DAP_CREATE_DATE, Unique_ID, DAP_NODE_TYPE '
-                    + 'FROM dap_result_dtl'
+                    + 'FROM DAP_RESULT_DTL'
                 });
 
                 DW_TEMPLATE_STATEMENTS.push({
@@ -598,13 +586,6 @@ export default class IntegrationConfigFactory {
                     + 'FROM CPA_CLASSNEEDED'
                 });
 
-                const tableNameList = DW_TEMPLATE_STATEMENTS.map((tbl) => tbl.name);
-                const ddlQuery = this.oracleDDLHelper.getDDLQuery(tableNameList);
-
-                DW_TEMPLATE_STATEMENTS.push({
-                    name: `ddl`,
-                    query: ddlQuery
-                });
                 return {
                     queries: DW_TEMPLATE_STATEMENTS,
                     type: integrationType

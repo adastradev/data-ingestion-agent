@@ -1,11 +1,17 @@
+// tslint:disable:no-conditional-assignment
+
 import container from '../unit/test.inversify.config';
 import OracleReader from '../../source/DataAccess/Oracle/OracleReader';
 import TYPES from '../../ioc.types';
 import { Logger } from 'winston';
 
 import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+chai.use(chaiAsPromised);
+
 import OracleConnectionPoolProxy from '../../source/DataAccess/Oracle/OracleConnectionPoolProxy';
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
+import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 
 const expect = chai.expect;
 
@@ -19,17 +25,16 @@ describe('oracledb', () => {
 
             await pool.open();
 
-            const queryResult: IQueryResult = await reader.read('SELECT * FROM ALL_TABLES');
+            const queryResult: IQueryResult = await reader.read({ name: 'ALL_TABLES', query: 'SELECT * FROM ALL_TABLES' });
             expect(queryResult.result.readable).to.be.equal(true);
             expect(queryResult.metadata.readable).to.be.equal(true);
+
             let chunk;
             let output = '';
-            // tslint:disable-next-line:no-conditional-assignment
             while ((chunk = queryResult.result.read()) !== null) {
                 output += chunk.toString();
             }
 
-            // tslint:disable-next-line:no-conditional-assignment
             while ((chunk = queryResult.metadata.read()) !== null) {
                 output += chunk.toString();
             }
@@ -45,19 +50,12 @@ describe('oracledb', () => {
 
             await pool.open();
 
-            // TODO: simplify with .should.be.rejected
-            let rejected = false;
-            const readPromise = reader.read('SELECT * FROM tableDNE');
-            try {
-                await readPromise;
-            } catch (err) {
-                console.log(err);
-                rejected = true;
-            } finally {
-                await reader.close();
-                await pool.close();
-                expect(rejected).to.be.true;
-            }
+            const readPromise = reader.read({ name: 'tableONE', query: 'SELECT * FROM tableDNE' });
+
+            expect(readPromise).to.eventually.be.rejectedWith(Error);
+
+            await reader.close();
+            await pool.close();
         });
     });
 });

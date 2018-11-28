@@ -1,12 +1,16 @@
 import * as stream from 'stream';
 import * as oracledb from 'oracledb';
-import { inject, injectable } from 'inversify';
+import { inject, injectable, named } from 'inversify';
 import TYPES from '../../../ioc.types';
 import { Logger } from 'winston';
 
 import IDataReader, { IQueryResult } from '../IDataReader';
 import IConnectionPool from '../IConnectionPool';
 import { TableNotFoundException } from '../../TableNotFoundException';
+
+import 'reflect-metadata';
+import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from '../../IIntegrationConfig';
+import IDDLHelper from '../IDDLHelper';
 
 /**
  * An interface through which data is queried using predefined queries for the
@@ -33,7 +37,7 @@ export default class OracleReader implements IDataReader {
         (oracledb as any).fetchAsString = [ oracledb.CLOB ];
     }
 
-    public async read(queryStatement: string): Promise<IQueryResult> {
+    public async read(queryDefinition: IQueryDefinition): Promise<IQueryResult> {
         if (process.env.ORACLE_ENDPOINT === undefined) {
             return Promise.resolve({ result: this.createDemoSnapshot(), metadata: null });
         }
@@ -48,13 +52,12 @@ export default class OracleReader implements IDataReader {
             };
 
             // TODO: Make fetch array size configurable?
-            this._logger.info('Executing statement: ' + queryStatement);
-            const queryResultStream = await this._connection.queryStream(queryStatement, [],
+            this._logger.info('Executing statement: ' + queryDefinition.query);
+            const queryResultStream = await this._connection.queryStream(queryDefinition.query, [],
                 { outFormat: oracledb.OBJECT, fetchArraySize: 10000, extendedMetaData: true } as any);
 
-            return await this.subscribeToStreamEvents(queryResultStream, queryStatement);
+            return await this.subscribeToStreamEvents(queryResultStream, queryDefinition.query);
         } catch (err) {
-            this._logger.error(err);
             throw err;
         }
     }
@@ -72,7 +75,7 @@ export default class OracleReader implements IDataReader {
 
     private async subscribeToStreamEvents(queryStream: stream.Readable, queryStatement: string): Promise<IQueryResult> {
         const streamEvents = new Promise<any>((resolve, reject) => {
-            const result = { result: null, metadata: null };
+            const result: IQueryResult = { result: null, metadata: null };
 
             queryStream.on('metadata', (md: any[]) => {
                 result.metadata = this.getMetadataAsStream(md);
@@ -81,12 +84,12 @@ export default class OracleReader implements IDataReader {
             });
 
             queryStream.on('error', (error: any) => {
-                this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
                 queryStream.destroy();
                 // Translate - ORA-00942: table or view does not exist
                 if (error.errorNum && error.errorNum === 942) {
-                    reject(new TableNotFoundException(queryStatement, error.message));
+                    reject(new TableNotFoundException(queryStatement, `Query execution unsuccessful. ${error.message}`));
                 } else {
+                    this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
                     reject(error);
                 }
             });

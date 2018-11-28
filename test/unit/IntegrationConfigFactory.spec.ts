@@ -2,9 +2,8 @@
 import 'reflect-metadata';
 import * as chai from 'chai';
 
-import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
-import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from '../../source/IIntegrationConfig';
+import { IIntegrationConfig, IntegrationType } from '../../source/IIntegrationConfig';
 
 const expect = chai.expect;
 
@@ -13,8 +12,7 @@ describe('IntegrationConfigFactory', () => {
     describe('create', () => {
 
         it('should return queries for Banner', async () => {
-            const helper = new OracleDDLHelper();
-            const icf = new IntegrationConfigFactory(helper);
+            const icf = new IntegrationConfigFactory();
 
             const cfg: IIntegrationConfig = icf.create(IntegrationType.Banner);
 
@@ -23,8 +21,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should return queries for DegreeWorks', async () => {
-            const helper = new OracleDDLHelper();
-            const icf = new IntegrationConfigFactory(helper);
+            const icf = new IntegrationConfigFactory();
 
             const cfg: IIntegrationConfig = icf.create(IntegrationType.DegreeWorks);
 
@@ -33,8 +30,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should return queries for Demo', async () => {
-            const helper = new OracleDDLHelper();
-            const icf = new IntegrationConfigFactory(helper);
+            const icf = new IntegrationConfigFactory();
 
             const cfg: IIntegrationConfig = icf.create(IntegrationType.Demo);
 
@@ -43,8 +39,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should fail when an unsupported type is specified', async () => {
-            const helper = new OracleDDLHelper();
-            const icf = new IntegrationConfigFactory(helper);
+            const icf = new IntegrationConfigFactory();
 
             expect(icf.create.bind(IntegrationType.Unknown)).to.throw(Error, 'Unsupported integration type in IntegrationConfigFactory');
         });

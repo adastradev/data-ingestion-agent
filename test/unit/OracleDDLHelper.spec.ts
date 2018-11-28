@@ -12,17 +12,14 @@ describe('OracleDDLHelper', () => {
 
         it('should return a properly formatted query for all specified tables', async () => {
             const helper = new OracleDDLHelper();
-            const query = helper.getDDLQuery(['table1', 'table2']);
+            const query = helper.getDDLQuery(['table1']);
 
             const expectedQuery =
-                'SELECT 1 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'TABLE\',u.table_name) as ddl ' +
-                'FROM USER_TABLES u ' +
-                `WHERE u.table_name in ('table1','table2')` +
+                'SELECT 1 as "priority", \'table1\' as table_name, DBMS_METADATA.GET_DDL(\'TABLE\', \'table1\') as ddl ' +
+                'FROM dual ' +
                 'union all ' +
-                'SELECT 2 as "priority", u.table_name, DBMS_METADATA.GET_DDL(\'INDEX\',u.index_name) as ddl ' +
-                'FROM USER_INDEXES u ' +
-                `WHERE u.table_name in ('table1','table2')`  +
-                'ORDER BY table_name, "priority"';
+                'SELECT 2 as "priority", \'table1\' as table_name, DBMS_METADATA.GET_DDL(\'INDEX\', uidx.INDEX_NAME) as ddl ' +
+                'FROM USER_INDEXES uidx where table_name = \'table1\' ';
 
             expect(query).to.equal(expectedQuery);
         });

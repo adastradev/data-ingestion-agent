@@ -1,4 +1,5 @@
 import { Readable, Stream } from 'stream';
+import { IQueryDefinition } from '../IIntegrationConfig';
 
 /**
  * Represents a mechanism intended to read data from some datasource and output that data as a stream
@@ -16,7 +17,7 @@ export default interface IDataReader {
     read: QueryStreamFunction;
 }
 
-export type QueryStreamFunction = (queryStatement: string) => Promise<IQueryResult>;
+export type QueryStreamFunction = (queryDefinition: IQueryDefinition) => Promise<IQueryResult>;
 export type CloseFunction = () => Promise<void>;
 export interface IQueryResult {
     result: Readable;

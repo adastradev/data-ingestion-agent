@@ -10,9 +10,9 @@
 export default interface IDDLHelper {
     /**
      * Returns a query statement to discover the DDL applicable to the
-     * specified objects
+     * specified objects that are expected to exist in the system
      *
      * @memberof IDDLHelper
      */
-    getDDLQuery: (objects: string[]) => string;
+    getDDLQuery: (validObjects: string[]) => string;
 }
