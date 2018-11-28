@@ -53,6 +53,9 @@ describe('oracledb', () => {
             const readPromise = reader.read({ name: 'tableONE', query: 'SELECT * FROM tableDNE' });
 
             expect(readPromise).to.eventually.be.rejectedWith(Error);
+
+            await reader.close();
+            await pool.close();
         });
     });
 });
