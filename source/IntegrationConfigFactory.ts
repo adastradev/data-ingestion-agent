@@ -607,7 +607,7 @@ export default class IntegrationConfigFactory {
                         STU_ID,
                         REQ_ID,
                         RULE_ID,
-                        RESULT_TYPE
+                        RESULT_TYPE,
                         WITH_ADVICE,
                         RESULT_SEQ_NUM
                     FROM CPA_CLASSNEEDED`
