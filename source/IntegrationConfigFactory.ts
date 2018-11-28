@@ -595,7 +595,7 @@ export default class IntegrationConfigFactory {
                 const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
                 DEMO_TEMPLATE_STATEMENTS.push({
-                    name: 'all_tables',
+                    name: 'ALL_TABLES',
                     query: 'SELECT * FROM ALL_TABLES'
                 });
                 return {
