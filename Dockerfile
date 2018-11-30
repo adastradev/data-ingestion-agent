@@ -3,7 +3,7 @@ FROM node:8-slim AS build-env
 ENV CLIENT_FILENAME instantclient-basiclite-linux.x64-18.3.0.0.0dbru.zip
 WORKDIR /app
 ADD . .
-ADD https://github.com/adastradev/oracle-instantclient/raw/master/${CLIENT_FILENAME} .
+RUN wget -q https://github.com/adastradev/oracle-instantclient/raw/master/${CLIENT_FILENAME}
 RUN node --version && \
     apt-get update && apt-get install libaio1 unzip && \
     mv /app/${CLIENT_FILENAME} /usr/lib && \
