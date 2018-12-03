@@ -16,12 +16,17 @@ export default class OracleDDLHelper implements IDDLHelper {
                 return validTableNames.indexOf(name) > -1;
             })
             .map((name) => {
-                return `SELECT 1 as "priority", \'${name}\' as table_name, DBMS_METADATA.GET_DDL(\'TABLE\', \'${name}\') as ddl ` +
-                'FROM dual ' +
-                'union all ' +
-                // We know what tables exist but must discover any indexes
-                `SELECT 2 as "priority", \'${name}\' as table_name, DBMS_METADATA.GET_DDL(\'INDEX\', uidx.INDEX_NAME) as ddl ` +
-                `FROM USER_INDEXES uidx where table_name = '${name}' `;
+                // This apparently does not return metadata for some system tables/views like ALL_TABLES but will return
+                // proper DDL otherwise
+                return `SELECT 1 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl ` +
+                `FROM ALL_TABLES where TABLE_NAME = \'${name}\' `;
+
+                // Getting index DDL statements has proven to be even more cumbersome than getting table DDL. Specifying an owner
+                // may not even succeed so leaving this to help in a future feature request to figure out how to do this cleanly
+                // 'union all ' +
+                // // We know what tables exist but must discover any indexes
+                // `SELECT 2 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'INDEX\', uidx.INDEX_NAME) as ddl ` +
+                // `FROM ALL_INDEXES uidx where TABLE_NAME = '${name}' `;
             })
             .join('\nunion all\n');
     }
