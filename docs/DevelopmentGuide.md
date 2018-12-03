@@ -39,3 +39,5 @@ npm run system-test
 
 ## Dependencies
 Data ingestion agent uses the [node-oracledb driver](https://github.com/oracle/node-oracledb/blob/master/doc/api.md) by Oracle.
+
+You must also copy the PEM key corresponding to the 'Keyname' set in your EC2 instance configuration ( see `test/system/instanceConfig.json` above ) into the project's root directory. `*.pem` is present in the `.gitignore` file as a safeguard against committing this file.
