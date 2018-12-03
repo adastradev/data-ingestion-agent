@@ -49,11 +49,13 @@ export class Agent {
                 const sqs = this.sqs || new SQS();
                 // For now fetch 1 message from the queue but in the future we could open this up
                 this.logger.silly('sqs.receiveMessage');
-                const result = await sqs.receiveMessage({ QueueUrl: this.queueUrl, MaxNumberOfMessages: 1}).promise();
+                const result = await sqs.receiveMessage({ QueueUrl: this.queueUrl, MaxNumberOfMessages: 1 }).promise();
                 const handlerFactory = this.container.get<MessageHandlerFactory>(TYPES.MessageHandlerFactory);
                 const messageFactory = this.container.get<MessageFactory>(TYPES.MessageFactory);
-                for (const msg of result.Messages) {
-                    await this.handleMessage(msg, sqs, handlerFactory, messageFactory);
+                if (result.Messages && result.Messages.length > 0) {
+                    for (const msg of result.Messages) {
+                        await this.handleMessage(msg, sqs, handlerFactory, messageFactory);
+                    }
                 }
             } while (this.mode === AgentMode.Listening);
 
