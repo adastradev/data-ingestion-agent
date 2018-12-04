@@ -43,6 +43,7 @@ export default class SendDataHandler implements IMessageHandler {
     private _snapshotReceivedArn: any;
     private _sns: SNS;
     private _bucketPath: string;
+    private _tenantName: string;
 
     constructor(
         @inject(TYPES.DataWriter) writer: IDataWriter,
@@ -55,7 +56,8 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.Bucket) bucketPath: string,
         @inject(TYPES.DDLHelper)
         @named(IntegrationSystemType.Oracle)
-        private readonly _oracleDDLHelper: IDDLHelper) {
+        private readonly _oracleDDLHelper: IDDLHelper,
+        @inject(TYPES.TenantName) tenantName: string) {
 
         this._writer = writer;
         this._logger = logger;
@@ -65,6 +67,7 @@ export default class SendDataHandler implements IMessageHandler {
         this._sns = sns;
         this._snapshotReceivedArn = snapshotReceivedArn;
         this._bucketPath = bucketPath;
+        this._tenantName = tenantName;
     }
 
     public async handle(message: SendDataMessage) {
@@ -151,7 +154,7 @@ export default class SendDataHandler implements IMessageHandler {
 
     private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string, snapshotFolder: string) {
         const tenantId = this._bucketPath.split('/')[1];
-        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, snapshotFolder, completionTimeDescription));
+        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, snapshotFolder, completionTimeDescription, this._tenantName));
         const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
 
         this._logger.info('Sending snapshot upload completion notification');

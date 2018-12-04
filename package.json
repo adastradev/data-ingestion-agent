@@ -41,7 +41,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@adastradev/data-ingestion-sdk": "^1.0.1",
+    "@adastradev/data-ingestion-sdk": "^1.0.2",
     "@adastradev/serverless-discovery-sdk": "0.0.7",
     "@adastradev/user-management-sdk": "^1.0.3",
     "@types/bluebird-global": "^3.5.9",

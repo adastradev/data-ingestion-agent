@@ -130,14 +130,13 @@ const startup = async () => {
             region,
             credentialsBearerToken);
 
-        logger.info('Looking up ingestion configuration info');
-        // TODO: lookup SNS topics for implementing notifications when uploads are complete
-
         logger.info('Looking up ingestion tenant configuration info');
         const poolListResponse = await dataIngestionApi.getTenantSettings();
         const queueUrl = poolListResponse.data.tenantDataIngestionQueueUrl;
         const bucketPath = poolListResponse.data.dataIngestionBucketPath;
+        const tenantName = poolListResponse.data.tenantName;
 
+        logger.info('Looking up ingestion configuration info');
         const globalConfigResponse = await dataIngestionApi.getSettings();
         const snsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
 
@@ -154,6 +153,7 @@ const startup = async () => {
         container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
         container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snsTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
+        container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
             .to(IntegrationConfigFactory).inSingletonScope();
         container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();
