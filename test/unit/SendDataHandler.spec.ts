@@ -44,7 +44,7 @@ describe('SendDataHandler', () => {
             const pool = container.get<IConnectionPool>(TYPES.ConnectionPool);
             const oracleDDLHelper = new OracleDDLHelper();
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper);
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
 
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 
