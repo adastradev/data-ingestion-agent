@@ -22,7 +22,8 @@ const TYPES = {
     SendDataMessage: Symbol('SendDataMessage'),
     SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
     SNS: Symbol('SNS'),
-    SQS: Symbol('SQS')
+    SQS: Symbol('SQS'),
+    TenantName: Symbol('TenantName')
 };
 
 export default TYPES;
