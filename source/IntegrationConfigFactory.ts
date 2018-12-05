@@ -591,6 +591,14 @@ export default class IntegrationConfigFactory {
                     type: integrationType
                 };
             }
+            case IntegrationType.PeopleSoft: {
+                const PEOPLESOFT_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
+
+                return {
+                    queries: PEOPLESOFT_TEMPLATE_STATEMENTS,
+                    type: integrationType
+                }
+            }
             case IntegrationType.Demo: {
                 const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
 
