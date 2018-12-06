@@ -29,6 +29,15 @@ describe('IntegrationConfigFactory', () => {
             expect(cfg.type).to.equal(IntegrationType.DegreeWorks);
         });
 
+        it('should return queries for PeopleSoft', async () => {
+            const icf = new IntegrationConfigFactory();
+
+            const cfg: IIntegrationConfig = icf.create(IntegrationType.PeopleSoft);
+
+            expect(cfg.queries).to.have.length.greaterThan(0);
+            expect(cfg.type).to.equal(IntegrationType.PeopleSoft);
+        });
+
         it('should return queries for Demo', async () => {
             const icf = new IntegrationConfigFactory();
 
