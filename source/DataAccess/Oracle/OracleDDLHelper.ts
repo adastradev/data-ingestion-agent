@@ -1,8 +1,16 @@
 import IDDLHelper from '../IDDLHelper';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
+import TYPES from '../../../ioc.types';
+import IConnectionPool from '../IConnectionPool';
+import oracledb = require('oracledb');
+import { DepGraph } from 'dependency-graph';
 
 @injectable()
 export default class OracleDDLHelper implements IDDLHelper {
+
+    constructor(@inject(TYPES.ConnectionPool) private readonly _connectionPool: IConnectionPool) {
+    }
+
     public getDDLQuery(validTableNames: string[]): string {
         // Having the ability to use DBMS_METADATA.SET_TRANSFORM_PARAM would help here to remove things like
         // disabling the scripting of the 'user' in create statements but this system function does not seem
@@ -29,5 +37,41 @@ export default class OracleDDLHelper implements IDDLHelper {
                 // `FROM ALL_INDEXES uidx where TABLE_NAME = '${name}' `;
             })
             .join('\nunion all\n');
+    }
+
+    public async prioritizeObjects(validTableNames: string[]): Promise<string[]> {
+        try {
+            // await this._connectionPool.open();
+            const connection: oracledb.IConnection = await this._connectionPool.getConnection();
+
+            const tableConstraintQueries = validTableNames.map((tableOrViewName) => {
+                return `select
+                    cons.table_name       as child_table,
+                    col.table_name           parent_table
+                from
+                    all_cons_columns      col
+                    JOIN all_constraints       cons
+                    ON cons.r_owner = col.owner
+                    AND cons.r_constraint_name = col.constraint_name
+                where cons.table_name = '${tableOrViewName}'"`;
+            })
+            .join('\nunion all\n');
+
+            const records = await connection.execute(tableConstraintQueries);
+
+            const tableGraph = new DepGraph<string>({ circular: true });
+            validTableNames.forEach((tableOrView, idx, array) => tableGraph.addNode(tableOrView));
+
+            // Use a simple 2-tuple to represent an association of two database objects
+            let row: [string, string];
+            for (row of records.rows) {
+                tableGraph.addDependency(row[0], row[1]);
+            }
+
+            return tableGraph.overallOrder();
+
+        } catch (error) {
+            throw error;
+        }
     }
 }
