@@ -602,50 +602,42 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_AA_OVRD_CRSDATA',
-                    query: 'Select RQ_AA_OVERRIDE, RQ_AA_OVRD_LN_NBR, RQ_AA_OVRD_CRS_NBR, RQ_CRSE_SOURCE, CRSE_ID, EFFDT, CRSE_OFFER_NBR, STRM, CLASS_NBR, SUBJECT, CATALOG_NBR, '
+                    query: 'SELECT RQ_AA_OVERRIDE, RQ_AA_OVRD_LN_NBR, RQ_AA_OVRD_CRS_NBR, RQ_CRSE_SOURCE, CRSE_ID, EFFDT, CRSE_OFFER_NBR, STRM, CLASS_NBR, SUBJECT, CATALOG_NBR, '
                         + 'SESSION_CODE, CLASS_SECTION, CRS_TOPIC_ID, CRSES_DIRECTED, UNITS_DIRECTED, DIRCT_TYPE, GRADE_POINTS_MIN, ACAD_GROUP, TRNSFR_EQVLNCY_GRP, TRNSFR_EQVLNCY_SEQ, '
                         + 'MODEL_NBR, CRSE_GRADE_OFF, UNT_EARNED, RQMNT_DESIGNTN, RQMNT_DESIGNTN_GRD, RQMNT_DESIGNTN_OPT, ROWID '
                         + 'FROM PS_AA_OVRD_CRSDATA'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'PS_K_ASTRA_PA_LOC',
-                    query: 'Select * from PS_K_ASTRA_PA_LOC'
-                });
-                PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'PS_K_HOME_CAMPUSVW',
-                    query: 'Select * from PS_K_HOME_CAMPUSVW'
-                });
-                PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_AA_OVRD_DATA',
-                    query: 'Select * from PS_AA_OVRD_DATA'
+                    query: 'SELECT * FROM PS_AA_OVRD_DATA'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_AA_OVRD_WHERE',
-                    query: 'Select * from PS_AA_OVRD_WHERE'
+                    query: 'SELECT * FROM PS_AA_OVRD_WHERE'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CRSE_ATTRIBUTES',
-                    query: 'Select * from PS_CRSE_ATTRIBUTES'
+                    query: 'SELECT * FROM PS_CRSE_ATTRIBUTES'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'ps_crse_attr_tbl',
-                    query: 'Select * from ps_crse_attr_tbl'
+                    name: 'PS_CRSE_ATTR_TBL',
+                    query: 'SELECT * FROM PS_CRSE_ATTR_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_DEGR',
-                    query: 'Select * from PS_ACAD_DEGR'
+                    query: 'SELECT * FROM PS_ACAD_DEGR'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_GROUP_TBL',
-                    query: 'Select * from PS_ACAD_GROUP_TBL'
+                    query: 'SELECT * FROM PS_ACAD_GROUP_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_LEVEL_TBL',
-                    query: 'Select * from PS_ACAD_LEVEL_TBL'
+                    query: 'SELECT * FROM PS_ACAD_LEVEL_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_ORG_TBL',
-                    query: 'Select * from PS_ACAD_ORG_TBL'
+                    query: 'SELECT * FROM PS_ACAD_ORG_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_PLAN',
@@ -663,48 +655,44 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_PROG_TBL',
-                    query: 'Select * from PS_ACAD_PROG_TBL'
+                    query: 'SELECT * FROM PS_ACAD_PROG_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_SUBPLAN',
                     query: 'SELECT EMPLID, ACAD_PLAN, ACAD_SUB_PLAN, STDNT_CAR_NBR, ACAD_CAREER, EFFDT, EFFSEQ '
-                        + 'FROM ps_acad_subplan'
+                        + 'FROM PS_ACAD_SUBPLAN'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ACAD_SUBPLN_TBL',
-                    query: 'SELECT * FROM ps_acad_subpln_tbl'
-                });
-                PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'PS_AUDIT_AD_ASTRA7',
-                    query: 'Select * from PS_AUDIT_AD_ASTRA7'
+                    query: 'SELECT * FROM PS_ACAD_SUBPLN_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CAMPUS_EVENT',
-                    query: 'Select * from PS_CAMPUS_EVENT'
+                    query: 'SELECT * FROM PS_CAMPUS_EVENT'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CAMPUS_EVNT_LNG',
-                    query: 'Select * from PS_CAMPUS_EVNT_LNG'
+                    query: 'SELECT * FROM PS_CAMPUS_EVNT_LNG'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CAMPUS_LOC_TBL',
-                    query: 'Select * from PS_CAMPUS_LOC_TBL'
+                    query: 'SELECT * FROM PS_CAMPUS_LOC_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CAMPUS_MTG',
-                    query: 'Select * from PS_CAMPUS_MTG'
+                    query: 'SELECT * FROM PS_CAMPUS_MTG'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CAMPUS_TBL',
-                    query: 'Select * from PS_CAMPUS_TBL'
+                    query: 'SELECT * FROM PS_CAMPUS_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CLASS_INSTR',
-                    query: 'Select * from PS_CLASS_INSTR'
+                    query: 'SELECT * FROM PS_CLASS_INSTR'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CLASS_MTG_PAT',
-                    query: 'Select * from PS_CLASS_MTG_PAT'
+                    query: 'SELECT * FROM PS_CLASS_MTG_PAT'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CLASS_TBL',
@@ -732,7 +720,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CRSE_COMPONENT',
-                    query: 'Select * from PS_CRSE_COMPONENT'
+                    query: 'SELECT * FROM PS_CRSE_COMPONENT'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CRSE_OFFER',
@@ -740,23 +728,23 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_DEGREE_TBL',
-                    query: 'Select * from PS_DEGREE_TBL'
+                    query: 'SELECT * FROM PS_DEGREE_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_EMAIL_ADDRESSES',
-                    query: 'Select EmplId, Pref_Email_Flag, Email_Addr From PS_EMAIL_ADDRESSES'
+                    query: 'SELECT EMPLID, PREF_EMAIL_FLAG, EMAIL_ADDR FROM PS_EMAIL_ADDRESSES'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_EVENT_LAST_TBL',
-                    query: 'Select * from PS_EVENT_LAST_TBL'
+                    query: 'SELECT * FROM PS_EVENT_LAST_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_FACILITY_TBL',
-                    query: 'Select * from PS_FACILITY_TBL'
+                    query: 'SELECT * FROM PS_FACILITY_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_MILESTONE_TBL',
-                    query: 'Select * from PS_MILESTONE_TBL'
+                    query: 'SELECT * FROM PS_MILESTONE_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_NAMES',
@@ -764,35 +752,35 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_COND_LINE',
-                    query: 'Select CONDITION_SPEC, EFFDT, COND_LINE_SEQ, COND_PROCESS_TYPE, COND_PROCESS_ID, CONDITION_CODE, CONDITION_OPERATOR, CONDITION_DATA, '
+                    query: 'SELECT CONDITION_SPEC, EFFDT, COND_LINE_SEQ, COND_PROCESS_TYPE, COND_PROCESS_ID, CONDITION_CODE, CONDITION_OPERATOR, CONDITION_DATA, '
                         + 'TEST_ID, TEST_COMPONENT, SCORE, SAA_MAX_VALID_AGE, SAA_BEST_TEST_OPT '
-                        + 'from PS_RQ_COND_LINE'
+                        + 'FROM PS_RQ_COND_LINE'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_COND_LN_DETL',
-                    query: 'Select CONDITION_SPEC, EFFDT, COND_LINE_SEQ, COND_LN_DETL_SEQ, INSTITUTION, ACAD_CAREER, ACAD_PROG, ACAD_PLAN, ACAD_SUB_PLAN, MILESTONE, '
+                    query: 'SELECT CONDITION_SPEC, EFFDT, COND_LINE_SEQ, COND_LN_DETL_SEQ, INSTITUTION, ACAD_CAREER, ACAD_PROG, ACAD_PLAN, ACAD_SUB_PLAN, MILESTONE, '
                         + 'MILESTONE_COMPLETE, MILESTONE_LEVEL, MILESTONE_NBR, MILESTONE_TITLE, GRADE_POINTS_MIN, DEGREE '
-                        + 'from PS_RQ_COND_LN_DETL'
+                        + 'FROM PS_RQ_COND_LN_DETL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_CONDITION',
-                    query: 'Select CONDITION_SPEC, EFFDT, EFF_STATUS, INSTITUTION, RQ_CONNECT_TYPE, RQRMNT_USEAGE, COND_TYPE, SAA_CALC_TST_SCORE, SAA_CALC_TST_MTHD, '
+                    query: 'SELECT CONDITION_SPEC, EFFDT, EFF_STATUS, INSTITUTION, RQ_CONNECT_TYPE, RQRMNT_USEAGE, COND_TYPE, SAA_CALC_TST_SCORE, SAA_CALC_TST_MTHD, '
                         + 'SAA_TST_SCORE_GRP, TEST_ID, CONDITION_OPERATOR, SCORE, SAA_MAX_VALID_AGE, SAA_BEST_TEST_OPT, DESCR, DESCRSHORT, DESCR254A '
-                        + 'from PS_RQ_CONDITION'
+                        + 'FROM PS_RQ_CONDITION'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_ENT_GRP_DETL',
-                    query: 'Select RQ_ENTITY_GROUP, EFFDT, ENT_GRP_ITEM_NBR, ACAD_PROG, ACAD_PLAN, ACAD_SUB_PLAN, ACAD_STNDNG_STAT, STDNT_GROUP, INSTITUTION '
-                        + 'from PS_RQ_ENT_GRP_DETL'
+                    query: 'SELECT RQ_ENTITY_GROUP, EFFDT, ENT_GRP_ITEM_NBR, ACAD_PROG, ACAD_PLAN, ACAD_SUB_PLAN, ACAD_STNDNG_STAT, STDNT_GROUP, INSTITUTION '
+                        + 'FROM PS_RQ_ENT_GRP_DETL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_ENTITY_GROUP',
-                    query: 'Select RQ_ENTITY_GROUP, EFFDT, EFF_STATUS, INSTITUTION, ACAD_CAREER, RQRMNT_USEAGE, ENTITY_GROUP_TYPE, DESCR, DESCRSHORT, DESCR254A ' +
-                        'from PS_RQ_ENTITY_GROUP'
+                    query: 'SELECT RQ_ENTITY_GROUP, EFFDT, EFF_STATUS, INSTITUTION, ACAD_CAREER, RQRMNT_USEAGE, ENTITY_GROUP_TYPE, DESCR, DESCRSHORT, DESCR254A ' +
+                        'FROM PS_RQ_ENTITY_GROUP'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_GRP_DETL_TBL',
-                    query: 'Select RQRMNT_GROUP, EFFDT, RQ_LINE_KEY_NBR, RQ_GRP_LINE_NBR, RQ_GRP_LINE_TYPE, MIN_UNITS_REQD, MIN_CRSES_REQD, REQUISITE_TYPE, REQUIREMENT, CONDITION_CODE, '
+                    query: 'SELECT RQRMNT_GROUP, EFFDT, RQ_LINE_KEY_NBR, RQ_GRP_LINE_NBR, RQ_GRP_LINE_TYPE, MIN_UNITS_REQD, MIN_CRSES_REQD, REQUISITE_TYPE, REQUIREMENT, CONDITION_CODE, '
                         + 'CONDITION_OPERATOR, CONDITION_DATA, INSTITUTION, ACAD_GROUP, SUBJECT, CATALOG_NBR, WILD_PATTERN_TYPE, CRSE_ID, TRNSFR_LVL_ALLOWD, TEST_CRDT_ALLOWD, OTHR_CRDT_ALLOWD, '
                         + 'INCL_GPA_REQ, EXCL_IP_CREDIT, GRADE_POINTS_MIN, UNITS_MINIMUM, INCLUDE_EQUIVALENT, CRSVALID_BEGIN, CRSVALID_END, STRM, ASSOCIATED_CLASS, CRS_TOPIC_ID, '
                         + 'RQMNT_DESIGNTN, RQ_CONNECT, PARENTHESIS, TEST_ID, TEST_COMPONENT, SCORE, SAA_MAX_VALID_AGE, SAA_BEST_TEST_OPT, SSR_DESCR80 '
@@ -817,7 +805,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQ_LN_DETL_TBL',
-                    query: 'Select  REQUIREMENT, EFFDT, RQ_LINE_KEY_NBR, RQ_LINE_DET_SEQ, RQ_LINE_DET_TYPE, LIST_INCLUDE_MODE, LIST_RECALL_MODE, LIST_INTERP, RQRMNT_GROUP, REF_REQUIREMENT, RQ_LINE_NBR, '
+                    query: 'SELECT  REQUIREMENT, EFFDT, RQ_LINE_KEY_NBR, RQ_LINE_DET_SEQ, RQ_LINE_DET_TYPE, LIST_INCLUDE_MODE, LIST_RECALL_MODE, LIST_INTERP, RQRMNT_GROUP, REF_REQUIREMENT, RQ_LINE_NBR, '
                     + 'REF_NUMBER, REF_DATA, COURSE_LIST, INSTITUTION, ACAD_CAREER, CONDITION_CODE, CONDITION_OPERATOR, CONDITION_DATA, IGNORE_MSNG_TGT, TEST_ID, TEST_COMPONENT, SCORE, '
                     + 'SAA_MAX_VALID_AGE, SAA_BEST_TEST_OPT, CRSE_ATTR, CRSE_ATTR_VALUE, DESCR254A '
                     + 'FROM PS_RQ_LN_DETL_TBL'
@@ -832,15 +820,15 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_RQMNT_DESIG_TBL',
-                    query: 'Select * from PS_RQMNT_DESIG_TBL'
+                    query: 'SELECT * FROM PS_RQMNT_DESIG_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_SCTN_CMBND',
-                    query: 'Select * from PS_SCTN_CMBND'
+                    query: 'SELECT * FROM PS_SCTN_CMBND'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_SCTN_CMBND_TBL',
-                    query: 'Select * from PS_SCTN_CMBND_TBL'
+                    query: 'SELECT * FROM PS_SCTN_CMBND_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_CAR_MLSTN',
@@ -856,7 +844,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_CRS_SUBS',
-                    query: 'Select * from PS_STDNT_CRS_SUBS'
+                    query: 'SELECT * FROM PS_STDNT_CRS_SUBS'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_ENRL',
@@ -867,7 +855,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_GROUP_TBL',
-                    query: 'Select * from PS_STDNT_GROUP_TBL'
+                    query: 'SELECT * FROM PS_STDNT_GROUP_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_GRPS_HIST',
@@ -876,7 +864,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_MLSTN',
-                    query: 'Select * from PS_STDNT_MLSTN'
+                    query: 'SELECT * FROM PS_STDNT_MLSTN'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_STDNT_TEST_COMP',
@@ -885,7 +873,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_SUBJECT_TBL',
-                    query: 'Select * from PS_SUBJECT_TBL'
+                    query: 'SELECT * FROM PS_SUBJECT_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_TERM_TBL',
@@ -916,62 +904,62 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_TST_CREDIT_COMP',
-                    query: 'Select * from PS_TST_CREDIT_COMP'
+                    query: 'SELECT * FROM PS_TST_CREDIT_COMP'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PSXLATITEM',
-                    query: 'Select * from PSXLATITEM'
+                    query: 'SELECT * from PSXLATITEM'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_UA_DT_SEQ',
-                    query: 'Select UA_DT_UNITS, UA_DT_REQ_SEM, UA_DT_REQ_PRIORITY, REQUIREMENT, EFFDT, RQ_LINE_KEY_NBR '
+                    query: 'SELECT UA_DT_UNITS, UA_DT_REQ_SEM, UA_DT_REQ_PRIORITY, REQUIREMENT, EFFDT, RQ_LINE_KEY_NBR '
                         + 'FROM PS_UA_DT_SEQ'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_UA_DT_STD_RSLT',
-                    query: 'Select EMPLID, UA_DT_PLNR_CRS_SEQ, ITEM_R_STATUS, UA_DT_SOURCE, STRM, UA_DT_COMP_STRM, CRSE_ID, UA_DT_COMP_CRSE_ID, '
+                    query: 'SELECT EMPLID, UA_DT_PLNR_CRS_SEQ, ITEM_R_STATUS, UA_DT_SOURCE, STRM, UA_DT_COMP_STRM, CRSE_ID, UA_DT_COMP_CRSE_ID, '
                         + 'CRSE_OFFER_NBR,	UA_DT_UNITS, UA_DT_REQ_SEM, UA_DT_REMOVED, UA_DT_MODE '
                         + 'FROM PS_UA_DT_STD_RSLT'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'PS_SAA_ADB_Results',
-                    query: "Select EMPLID, ANALYSIS_DB_SEQ,SAA_ENTRY_SEQ, RPT_DATE, TSCRPT_TYPE, ENTRY_R_TYPE, RQ_DATE, RQRMNT_GROUP, "
-                        + "RQ_GRP_LINE_NBR, REQUIREMENT, RQ_LINE_NBR, UNITS_REQUIRED, SAA_UNITS_USED, CRSES_REQUIRED, SAA_CRSES_USED, "
-                        + "GPA_ACTUAL, ITEM_R_STATUS, SAA_PRINT_CNTL, SAA_CAREER_RPT "
-                        + "FROM PS_SAA_ADB_Results WHERE RPT_DATE >= To_Date('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
+                    name: 'PS_SAA_ADB_RESULTS',
+                    query: 'SELECT EMPLID, ANALYSIS_DB_SEQ,SAA_ENTRY_SEQ, RPT_DATE, TSCRPT_TYPE, ENTRY_R_TYPE, RQ_DATE, RQRMNT_GROUP, '
+                        + 'RQ_GRP_LINE_NBR, REQUIREMENT, RQ_LINE_NBR, UNITS_REQUIRED, SAA_UNITS_USED, CRSES_REQUIRED, SAA_CRSES_USED, '
+                        + 'GPA_ACTUAL, ITEM_R_STATUS, SAA_PRINT_CNTL, SAA_CAREER_RPT '
+                        + "FROM PS_SAA_ADB_RESULTS WHERE RPT_DATE >= To_Date('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_SAA_ADB_COURSES',
-                    query: "SELECT DISTINCT EMPLID, ANALYSIS_DB_SEQ, CRSE_TAG, RPT_DATE, TSCRPT_TYPE, Earn_Credit, grading_basis_enrl, "
-                        + "UNT_EARNED, INCLUDE_IN_GPA, GRADE_POINTS, CRSE_ID, CATALOG_NBR, SAA_CAREER_RPT, RQMNT_DESIGNTN, SUBJECT "
+                    query: 'SELECT DISTINCT EMPLID, ANALYSIS_DB_SEQ, CRSE_TAG, RPT_DATE, TSCRPT_TYPE, Earn_Credit, grading_basis_enrl, '
+                        + 'UNT_EARNED, INCLUDE_IN_GPA, GRADE_POINTS, CRSE_ID, CATALOG_NBR, SAA_CAREER_RPT, RQMNT_DESIGNTN, SUBJECT '
                         + "FROM PS_SAA_ADB_COURSES WHERE RPT_DATE >= To_Date('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_SAA_ADB_CRSEUSE',
-                    query: "SELECT RQRMNT_GROUP, REQUIREMENT, RQ_LINE_NBR, SAA_ENTRY_SEQ, SAA_COURSE_SEQ, Emplid, analysis_db_seq, crse_tag, "
-                        + "TSCRPT_TYPE, SAA_CAREER_RPT, RPT_DATE, SEL_PROCESS_TYPE, SEL_MODE, UNT_EARNED "
-                        + "FROM PS_SAA_ADB_CRSEUSE WHERE RPT_DATE >= To_Date('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
+                    query: 'SELECT RQRMNT_GROUP, REQUIREMENT, RQ_LINE_NBR, SAA_ENTRY_SEQ, SAA_COURSE_SEQ, EMPLID, ANALYSIS_DB_SEQ, CRSE_TAG, '
+                        + 'TSCRPT_TYPE, SAA_CAREER_RPT, RPT_DATE, SEL_PROCESS_TYPE, SEL_MODE, UNT_EARNED '
+                        + "FROM PS_SAA_ADB_CRSEUSE WHERE RPT_DATE >= TO_DATE('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'ps_saa_adb_crseavl',
-                    query: "SELECT Emplid, analysis_db_seq, saa_entry_seq, CRSE_ID, rqmnt_designtn, Subject, Catalog_Nbr, "
-                        + "SAA_Course_Seq, rqrmnt_group, requirement, rq_line_nbr, SAA_CAREER_RPT, TSCRPT_TYPE, RPT_DATE "
-                        + "FROM ps_saa_adb_crseavl WHERE RPT_DATE >= To_Date('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
+                    name: 'PS_SAA_ADB_CRSEAVL',
+                    query: 'SELECT EMPLID, ANALYSIS_DB_SEQ, SAA_ENTRY_SEQ, CRSE_ID, RQMNT_DESIGNTN, SUBJECT, CATALOG_NBR, '
+                        + 'SAA_COURSE_SEQ, RQRMNT_GROUP, REQUIREMENT, RQ_LINE_NBR, SAA_CAREER_RPT, TSCRPT_TYPE, RPT_DATE '
+                        + "FROM PS_SAA_ADB_CRSEAVL WHERE RPT_DATE >= TO_DATE('01/01/2017 01:01:01 AM', 'MM/DD/YYYY HH:MI:SS AM')"
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_CLASS_CHRSTC',
-                    query: 'Select * from PS_CLASS_CHRSTC'
+                    query: 'SELECT * FROM PS_CLASS_CHRSTC'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_ROOM_CHRSTC_TBL',
-                    query: 'Select * from PS_ROOM_CHRSTC_TBL'
+                    query: 'SELECT * FROM PS_ROOM_CHRSTC_TBL'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'PS_AA_OVERRIDE_Schema',
-                    query: 'Select rowId,A.* from PS_AA_OVERRIDE'
+                    name: 'PS_AA_OVERRIDE_SCHEMA',
+                    query: 'SELECT ROWID,A.* FROM PS_AA_OVERRIDE'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
-                    name: 'PS_AA_OVRD_CRSDATA_Schema',
+                    name: 'PS_AA_OVRD_CRSDATA_SCHEMA',
                     query: 'SELECT ROWID FROM PS_AA_OVRD_CRSDATA'
                 });
 
