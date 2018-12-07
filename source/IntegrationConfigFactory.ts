@@ -966,7 +966,7 @@ export default class IntegrationConfigFactory {
                 return {
                     queries: PEOPLESOFT_TEMPLATE_STATEMENTS,
                     type: integrationType
-                }
+                };
             }
             case IntegrationType.Demo: {
                 const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
