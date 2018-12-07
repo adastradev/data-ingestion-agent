@@ -75,7 +75,7 @@ describe('OracleDDLHelper', () => {
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);
-            const prioritizedObjects = await (helper as any).prioritizeObjects(['a', 'b', 'c', 'd']);
+            const prioritizedObjects = await (helper as any).prioritizeTables(['a', 'b', 'c', 'd']);
 
             expect(prioritizedObjects).to.have.lengthOf(4);
             expect(prioritizedObjects).to.deep.equal(['c', 'b', 'a', 'd']);
@@ -86,7 +86,7 @@ describe('OracleDDLHelper', () => {
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);
-            const prioritizedObjects = await (helper as any).prioritizeObjects(['a', 'b', 'c', 'd', 'e']);
+            const prioritizedObjects = await (helper as any).prioritizeTables(['a', 'b', 'c', 'd', 'e']);
 
             expect(prioritizedObjects).to.have.lengthOf(5);
             expect(prioritizedObjects).to.deep.equal(['c', 'b', 'a', 'd', 'e']);
@@ -97,7 +97,7 @@ describe('OracleDDLHelper', () => {
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);
-            expect((helper as any).prioritizeObjects(['a', 'b', 'c', 'd']))
+            expect((helper as any).prioritizeTables(['a', 'b', 'c', 'd']))
                 .to.eventually.be
                 .rejectedWith(Error, 'Dependency Cycle Found: a -> b -> c -> a');
         });
