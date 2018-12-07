@@ -96,7 +96,8 @@ describe('Data Ingestion Agent on CentOS 7', () => {
             const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
             const authManager = new AuthManager(poolLocator, region);
             const cognitoSession = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
-
+            AWS.config.credentials = await authManager.getIamCredentials();
+            AWS.config.region = region;
             const credentialsBearerToken: BearerTokenCredentials = {
                 idToken: cognitoSession.getIdToken().getJwtToken(),
                 type: 'BearerToken'
