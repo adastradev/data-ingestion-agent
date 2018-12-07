@@ -14,7 +14,5 @@ export default interface IDDLHelper {
      *
      * @memberof IDDLHelper
      */
-    getDDLQuery: (validObjects: string[]) => string;
-
-    prioritizeObjects: (validObjects: string[]) => Promise<string[]>;
+    getDDLQuery: (validObjects: string[]) => Promise<string>;
 }

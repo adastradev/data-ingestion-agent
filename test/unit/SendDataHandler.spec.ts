@@ -41,8 +41,17 @@ describe('SendDataHandler', () => {
 
             const logger = container.get<Logger>(TYPES.Logger);
             const writer = container.get<IDataWriter>(TYPES.DataWriter);
-            const pool = container.get<IConnectionPool>(TYPES.ConnectionPool);
-            const oracleDDLHelper = new OracleDDLHelper();
+            const tableAssociations: Array<[string, string]> = [];
+            const stubConnection = {
+                execute: async () => Promise.resolve({ rows: tableAssociations })
+            };
+            const pool: IConnectionPool = {
+                open: async () => Promise.resolve(),
+                close: async () => Promise.resolve(),
+                getConnection: async () => Promise.resolve(stubConnection),
+                releaseConnection: async () => Promise.resolve()
+            };
+            const oracleDDLHelper = new OracleDDLHelper(pool);
 
             const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
 
