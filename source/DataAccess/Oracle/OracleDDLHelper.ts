@@ -12,7 +12,7 @@ export default class OracleDDLHelper implements IDDLHelper {
     }
 
     public async getDDLQuery(validTableNames: string[]): Promise<string> {
-        const prioritizedObjects: string[] = await this.prioritizeTables(validTableNames);
+        const prioritizedTables: string[] = await this.prioritizeTables(validTableNames);
 
         // Having the ability to use DBMS_METADATA.SET_TRANSFORM_PARAM would help here to remove things like
         // disabling the scripting of the 'user' in create statements but this system function does not seem
@@ -28,7 +28,7 @@ export default class OracleDDLHelper implements IDDLHelper {
             .map((name) => {
                 // This apparently does not return metadata for some system tables/views like ALL_TABLES but will return
                 // proper DDL otherwise
-                return `SELECT ${prioritizedObjects.indexOf(name)} as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl ` +
+                return `SELECT ${prioritizedTables.indexOf(name)} as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl ` +
                 `FROM ALL_TABLES WHERE TABLE_NAME = \'${name}\' `;
 
                 // Getting index DDL statements has proven to be even more cumbersome than getting table DDL. Specifying an owner
