@@ -36,7 +36,7 @@ export default class DataAccessDoc {
     private _getQueryInfo(): any {
         return this._queries.map((query) => {
             const tableName = query.name;
-            const splitQuery = query.query.replace(/,/g , '').toUpperCase().split(' ');
+            const splitQuery = query.query.replace(/,/g , '').toUpperCase().replace('ROWIDA.*', 'ROWID, *').split(' ');
             const fields = splitQuery.slice(1, splitQuery.indexOf('FROM'));
             return { tableName, fields };
         });
