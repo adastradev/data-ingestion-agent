@@ -13,6 +13,7 @@ import { Logger } from 'winston';
 import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
+import DurationLogger from '../../source/Util/DurationLogger';
 
 const expect = chai.expect;
 
@@ -52,8 +53,8 @@ describe('SendDataHandler', () => {
                 releaseConnection: async () => Promise.resolve()
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
-
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
+            const durationLogger = new DurationLogger(logger);
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test', durationLogger);
 
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 

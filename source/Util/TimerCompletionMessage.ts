@@ -5,7 +5,6 @@ export default class TimerCompletionMessage {
     }
 
     public generate(durationDescription: string): string {
-
         return this.message.replace(`${this.token}`, durationDescription);
     }
 }

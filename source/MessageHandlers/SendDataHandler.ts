@@ -86,7 +86,7 @@ export default class SendDataHandler implements IMessageHandler {
         const aggregateMetadata: IQueryMetadata[] = new Array<IQueryMetadata>();
 
         return new Promise<void>((resolve, reject) => {
-            let completionDescription: string;
+            let durationDescription: string;
             const validTables = {};
             for (const tbl of integrationConfig.queries.map((q) => q.name)) {
                 validTables[tbl] = tbl;
@@ -103,7 +103,7 @@ export default class SendDataHandler implements IMessageHandler {
                         const queryResult: IQueryResult = await reader.read(queryDefinition);
                         itemMetadata = queryResult.metadata;
                         await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
-                        this._durationLogger.stop();
+                        durationDescription = this._durationLogger.stop();
                     } catch (err) {
                         delete validTables[queryDefinition.name];
                         if (err instanceof TableNotFoundException) {
@@ -140,7 +140,7 @@ export default class SendDataHandler implements IMessageHandler {
 
                         await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        await this.raiseSnapshotCompletionEvent(integrationType, completionDescription, this._bucketPath + '/' + folderPath);
+                        await this.raiseSnapshotCompletionEvent(integrationType, durationDescription, this._bucketPath + '/' + folderPath);
 
                         resolve();
                     }
@@ -149,9 +149,9 @@ export default class SendDataHandler implements IMessageHandler {
         });
     }
 
-    private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string, snapshotFolder: string) {
+    private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, durationTimeDescription: string, snapshotFolder: string) {
         const tenantId = this._bucketPath.split('/')[1];
-        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, snapshotFolder, completionTimeDescription, this._tenantName));
+        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, snapshotFolder, durationTimeDescription, this._tenantName));
         const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
 
         this._logger.info('Sending snapshot upload completion notification');
