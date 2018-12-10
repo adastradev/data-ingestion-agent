@@ -28,8 +28,16 @@ class DataAccessDoc implements IDataAccessDoc {
         this.queries = cfg.queries;
     }
 
-    getQueryInfo() { return null };
+    getQueryInfo(): any {
+        return this.queries.map(query => {
+            let tableName = query.name;
+            let splitQuery = query.query.replace(/,/g , '').toUpperCase().split(' ');
+            let fields = splitQuery.slice(1, splitQuery.indexOf('FROM'))
+            return { tableName, fields }
+        });
+    }
+
     createTable() { return [""] }
     create() { };
-    
+
 }
