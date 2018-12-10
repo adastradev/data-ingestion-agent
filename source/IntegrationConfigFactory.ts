@@ -956,7 +956,7 @@ export default class IntegrationConfigFactory {
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_AA_OVERRIDE_SCHEMA',
-                    query: 'SELECT ROWID,A.* FROM PS_AA_OVERRIDE'
+                    query: 'SELECT ROWID, A.* FROM PS_AA_OVERRIDE A'
                 });
                 PEOPLESOFT_TEMPLATE_STATEMENTS.push({
                     name: 'PS_AA_OVRD_CRSDATA_SCHEMA',
