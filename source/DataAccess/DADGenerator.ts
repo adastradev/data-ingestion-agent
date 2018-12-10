@@ -51,7 +51,7 @@ class DataAccessDoc implements IDataAccessDoc {
 
     create(): void {
         let path = './docs/DataAccess/' + this.integrationType + '.md';
-        let data = this.header.join('\n') + '\n' + this.createTable().join('\n') + '\n' + this.footer.join('\n');
+        let data = this.header.join('  ') + '  ' + this.createTable().join('  ') + '  ' + this.footer.join('  ');
         writeFile(path, data, (err) => {
             if (err) { 
                 console.log(err);
