@@ -19,7 +19,8 @@ class DataAccessDoc implements IDataAccessDoc {
 
     constructor(integrationType: string) {
         this.integrationType = integrationType;
-        this.header.push('The following tables and fields are required for the DIA in config: ' + this.integrationType);
+        this.header.push(`# Data Access Requirements: ${this.integrationType}`);
+        this.header.push('The following tables and fields are required for the DIA with integrationConfig: ' + this.integrationType);
         this.footer.push('');
         
         let icf = new IntegrationConfigFactory();
