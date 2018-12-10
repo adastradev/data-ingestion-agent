@@ -12,6 +12,9 @@
     "start": "node dist/start.js",
     "dad-gen": "node -r ts-node/register ./source/DataAccess/DADGenerator.ts && git add ./docs/DataAccess"
   },
+  "pre-commit": [
+    "dad-gen"
+  ],
   "nyc": {
     "extension": [
       ".ts",
@@ -88,6 +91,7 @@
     "mocha": "^5.2.0",
     "npm": "^6.4.1",
     "nyc": "^13.0.1",
+    "pre-commit": "^1.2.2",
     "sinon": "^7.0.0",
     "ssh2": "^0.6.1",
     "ts-node": "^7.0.1",
