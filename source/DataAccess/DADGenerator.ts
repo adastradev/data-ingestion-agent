@@ -7,7 +7,8 @@ import IDataAccessDoc from './IDataAccessDoc';
 
 let integrationTypes = [
     IntegrationType.Banner,
-    IntegrationType.DegreeWorks
+    IntegrationType.DegreeWorks,
+    IntegrationType.PeopleSoft
 ];
 
 class DataAccessDoc implements IDataAccessDoc {
