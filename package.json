@@ -10,7 +10,7 @@
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js",
-    "dad-gen": "node -r ts-node/register ./source/DataAccess/DADGenerator.ts && git add ./docs/DataAccess"
+    "dad-gen": "node -r ts-node/register ./source/util/pre-commits.ts && git add ./docs/DataAccess"
   },
   "pre-commit": [
     "dad-gen"
