@@ -2,7 +2,7 @@
 
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import { IIntegrationConfig, IntegrationType } from '../IIntegrationConfig';
-import { writeFile } from 'fs';
+import { writeFile, mkdir } from 'fs';
 import IDataAccessDoc from './IDataAccessDoc';
 
 let integrationTypes = [
@@ -14,8 +14,8 @@ class DataAccessDoc implements IDataAccessDoc {
     
     integrationType;
     queries;
-    header;
-    footer;
+    header: string[] = [];
+    footer: string[] = [];
 
     constructor(integrationType: string) {
         this.integrationType = integrationType;
@@ -48,6 +48,14 @@ class DataAccessDoc implements IDataAccessDoc {
         return table;
     }
 
-    create() { };
+    create(): void {
+        let path = './docs/DataAccess/' + this.integrationType + '.md'
+        let data = this.header.join('\n') + '\n' + this.createTable().join('\n') + '\n' + this.footer.join('\n');
+        writeFile(path, data, (err) => {
+            if (err) { 
+                console.log(err)
+            }
+        });
+    }
 
 }
