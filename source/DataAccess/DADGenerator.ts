@@ -59,3 +59,8 @@ class DataAccessDoc implements IDataAccessDoc {
     }
 
 }
+
+integrationTypes.forEach(type => {
+    let DAD = new DataAccessDoc(type);
+    DAD.create()
+});
