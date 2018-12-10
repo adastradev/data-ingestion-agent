@@ -5,11 +5,10 @@ import { IIntegrationConfig, IntegrationType } from '../IIntegrationConfig';
 import { writeFile, mkdir } from 'fs';
 import IDataAccessDoc from './IDataAccessDoc';
 
-let integrationTypes = [
-    IntegrationType.Banner,
-    IntegrationType.DegreeWorks,
-    IntegrationType.PeopleSoft
-];
+let integrationEnumKeys = Object.keys(IntegrationType).slice(0, -2)
+let integrationTypes = integrationEnumKeys.map(key => {
+    return IntegrationType[key];
+})
 
 class DataAccessDoc implements IDataAccessDoc {
     
