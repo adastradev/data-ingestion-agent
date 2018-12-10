@@ -20,6 +20,7 @@ import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
+import DurationLogger from '../Util/DurationLogger';
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -44,6 +45,7 @@ export default class SendDataHandler implements IMessageHandler {
     private _sns: SNS;
     private _bucketPath: string;
     private _tenantName: string;
+    private _durationLogger: DurationLogger;
 
     constructor(
         @inject(TYPES.DataWriter) writer: IDataWriter,
@@ -57,7 +59,8 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.DDLHelper)
         @named(IntegrationSystemType.Oracle)
         private readonly _oracleDDLHelper: IDDLHelper,
-        @inject(TYPES.TenantName) tenantName: string) {
+        @inject(TYPES.TenantName) tenantName: string,
+        @inject(TYPES.DurationLogger) durationLogger: DurationLogger) {
 
         this._writer = writer;
         this._logger = logger;
@@ -68,6 +71,7 @@ export default class SendDataHandler implements IMessageHandler {
         this._snapshotReceivedArn = snapshotReceivedArn;
         this._bucketPath = bucketPath;
         this._tenantName = tenantName;
+        this._durationLogger = durationLogger;
     }
 
     public async handle(message: SendDataMessage) {
@@ -94,19 +98,12 @@ export default class SendDataHandler implements IMessageHandler {
                     let itemMetadata: Readable;
 
                     try {
-                        const startTime = Date.now();
-
+                        this._durationLogger.start(`Ingestion for '${queryDefinition.name} took ${DurationLogger.DURATION_TOKEN}`);
                         reader = this._container.get<IDataReader>(TYPES.DataReader);
                         const queryResult: IQueryResult = await reader.read(queryDefinition);
                         itemMetadata = queryResult.metadata;
                         await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
-                        const endTime = Date.now();
-                        const diff = moment.duration(endTime - startTime);
-                        completionDescription = diff.humanize(false);
-                        this._logger.info(
-                            `Ingestion for '${queryDefinition.name}' ` +
-                            `took ${completionDescription} (${diff.asMilliseconds()}ms)`
-                        );
+                        this._durationLogger.stop();
                     } catch (err) {
                         delete validTables[queryDefinition.name];
                         if (err instanceof TableNotFoundException) {
@@ -169,9 +166,11 @@ export default class SendDataHandler implements IMessageHandler {
         const ddlQuery = await this._oracleDDLHelper.getDDLQuery(Object.keys(validTables));
         const reader = this._container.get<IDataReader>(TYPES.DataReader);
         const ddlPrefix = 'ddl';
-        const queryResult = await reader.read({name: ddlPrefix, query: ddlQuery});
 
+        this._durationLogger.start(`Ingestion for 'ddl' took ${DurationLogger.DURATION_TOKEN}`);
+        const queryResult = await reader.read({name: ddlPrefix, query: ddlQuery});
         await this._writer.ingest(queryResult.result, folderPath, ddlPrefix);
+        this._durationLogger.stop();
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
@@ -194,6 +193,8 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(JSON.stringify(allTableMetadata));
         compiledMetadataStream.push(null);
 
+        this._durationLogger.start(`Ingestion for 'metadata' took ${DurationLogger.DURATION_TOKEN}`);
         await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
+        this._durationLogger.stop();
     }
 }

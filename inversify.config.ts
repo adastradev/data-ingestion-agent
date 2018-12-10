@@ -44,6 +44,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Agent } from './source/Agent';
 import { SNS, SQS } from 'aws-sdk';
 
+// Utilities
+import DurationLogger from './source/Util/DurationLogger';
+
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
 
@@ -176,6 +179,9 @@ const startup = async () => {
         // Agent Commands
         container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);
         container.bind<ICommand>(TYPES.PREVIEW).to(AdHocPreviewCommand);
+
+        // Utilities
+        container.bind<DurationLogger>(TYPES.DurationLogger).to(DurationLogger);
 
         // TODO: Revisit, is this necessary?
         container.bind<Container>(TYPES.Container).toConstantValue(container);
