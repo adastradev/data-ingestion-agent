@@ -8,7 +8,7 @@ import IDataAccessDoc from './IDataAccessDoc';
 let integrationTypes = [
     IntegrationType.Banner,
     IntegrationType.DegreeWorks
-]
+];
 
 class DataAccessDoc implements IDataAccessDoc {
     
@@ -32,15 +32,15 @@ class DataAccessDoc implements IDataAccessDoc {
         return this.queries.map(query => {
             let tableName = query.name;
             let splitQuery = query.query.replace(/,/g , '').toUpperCase().split(' ');
-            let fields = splitQuery.slice(1, splitQuery.indexOf('FROM'))
-            return { tableName, fields }
+            let fields = splitQuery.slice(1, splitQuery.indexOf('FROM'));
+            return { tableName, fields };
         });
     }
 
     createTable(): string[] {
-        let tableHead = [ '| Tables | Fields |' , '| ------ | ------ |' ]
+        let tableHead = [ '| Tables | Fields |' , '| ------ | ------ |' ];
         let queryInfo = this.getQueryInfo();
-        let tableBody = []
+        let tableBody = [];
         queryInfo.forEach(query => {
             tableBody.push(`| ${ query.tableName } | ${ query.fields.join(', ') } |`)
         });
@@ -49,12 +49,12 @@ class DataAccessDoc implements IDataAccessDoc {
     }
 
     create(): void {
-        let path = './docs/DataAccess/' + this.integrationType + '.md'
+        let path = './docs/DataAccess/' + this.integrationType + '.md';
         let data = this.header.join('\n') + '\n' + this.createTable().join('\n') + '\n' + this.footer.join('\n');
         writeFile(path, data, (err) => {
             if (err) { 
-                console.log(err)
-            }
+                console.log(err);
+            };
         });
     }
 
@@ -62,5 +62,5 @@ class DataAccessDoc implements IDataAccessDoc {
 
 integrationTypes.forEach(type => {
     let DAD = new DataAccessDoc(type);
-    DAD.create()
+    DAD.create();
 });
