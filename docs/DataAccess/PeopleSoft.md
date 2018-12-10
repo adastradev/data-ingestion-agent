@@ -1,5 +1,6 @@
 # Data Access Requirements: PeopleSoft
 The following tables and fields are required for the DIA with integrationConfig: PeopleSoft
+
 | Tables | Fields |
 | ------ | ------ |
 | PS_AA_OVERRIDE | DESCR254A, ACAD_SUB_PLAN, ACAD_PLAN, ACAD_PROG, ACAD_CAREER, INSTITUTION, OPRID, RQ_AA_OVRD_OPLEVEL, RQ_AA_OVRD_OPCODE, RQ_AA_WHO_DATA, RQ_AA_WHO_CODE, DESCRSHORT, DESCR, EFF_STATUS, EFFDTRQ_AA_OVERRIDE, ROWID |
@@ -76,3 +77,4 @@ The following tables and fields are required for the DIA with integrationConfig:
 | PS_ROOM_CHRSTC_TBL | * |
 | PS_AA_OVERRIDE_SCHEMA | ROWIDA.* |
 | PS_AA_OVRD_CRSDATA_SCHEMA | ROWID |
+

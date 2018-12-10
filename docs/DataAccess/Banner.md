@@ -1,5 +1,6 @@
 # Data Access Requirements: Banner
 The following tables and fields are required for the DIA with integrationConfig: Banner
+
 | Tables | Fields |
 | ------ | ------ |
 | SORCONT | * |
@@ -131,3 +132,4 @@ The following tables and fields are required for the DIA with integrationConfig:
 | GTVMTYP | * |
 | GTVINSM | * |
 | GOREMAL | * |
+
