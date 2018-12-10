@@ -1,6 +1,12 @@
 import { Readable } from 'stream';
 
-export enum IntegrationType { Banner = 'Banner', PeopleSoft = 'PeopleSoft', DegreeWorks = 'DegreeWorks', Demo = 'Demo', Unknown = 'Unknown'}
+export enum IntegrationType {
+    Banner = 'Banner',
+    DegreeWorks = 'DegreeWorks',
+    PeopleSoft = 'PeopleSoft',
+    Demo = 'Demo',
+    Unknown = 'Unknown'
+}
 export enum IntegrationSystemType { 'Oracle' = 'Oracle' }
 
 /**

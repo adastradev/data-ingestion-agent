@@ -16,7 +16,7 @@ describe('IntegrationConfigFactory', () => {
 
             const cfg: IIntegrationConfig = icf.create(IntegrationType.Banner);
 
-            expect(cfg.queries).to.have.length.greaterThan(0);
+            expect(cfg.queries).to.not.be.empty;
             expect(cfg.type).to.equal(IntegrationType.Banner);
         });
 
@@ -25,8 +25,17 @@ describe('IntegrationConfigFactory', () => {
 
             const cfg: IIntegrationConfig = icf.create(IntegrationType.DegreeWorks);
 
-            expect(cfg.queries).to.have.length.greaterThan(0);
+            expect(cfg.queries).to.not.be.empty;
             expect(cfg.type).to.equal(IntegrationType.DegreeWorks);
+        });
+
+        it('should return queries for PeopleSoft', async () => {
+            const icf = new IntegrationConfigFactory();
+
+            const cfg: IIntegrationConfig = icf.create(IntegrationType.PeopleSoft);
+
+            expect(cfg.queries).to.not.be.empty;
+            expect(cfg.type).to.equal(IntegrationType.PeopleSoft);
         });
 
         it('should return queries for Demo', async () => {
@@ -34,7 +43,7 @@ describe('IntegrationConfigFactory', () => {
 
             const cfg: IIntegrationConfig = icf.create(IntegrationType.Demo);
 
-            expect(cfg.queries).to.have.length.greaterThan(0);
+            expect(cfg.queries).to.not.be.empty;
             expect(cfg.type).to.equal(IntegrationType.Demo);
         });
 
