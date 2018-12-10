@@ -37,7 +37,17 @@ class DataAccessDoc implements IDataAccessDoc {
         });
     }
 
-    createTable() { return [""] }
+    createTable(): string[] {
+        let tableHead = [ '| Tables | Fields |' , '| ------ | ------ |' ]
+        let queryInfo = this.getQueryInfo();
+        let tableBody = []
+        queryInfo.forEach(query => {
+            tableBody.push(`| ${ query.tableName } | ${ query.fields.join(', ') } |`)
+        });
+        let table = tableHead.concat(tableBody);
+        return table;
+    }
+
     create() { };
 
 }
