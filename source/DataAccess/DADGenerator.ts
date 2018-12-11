@@ -35,8 +35,10 @@ export default class DataAccessDoc {
     private _getQueryInfo(): any {
         return this._queries.map((query) => {
             const tableName = query.name;
+
             // First regex turns 'X.*' instances into '*', second regex removes all commas
             const splitQuery = query.query.replace(/[^ ]*\.\*/gi, '*').replace(/,/g , '').toUpperCase().split(' ');
+
             const fields = splitQuery.slice(1, splitQuery.indexOf('FROM'));
             return { tableName, fields };
         });
