@@ -1,21 +1,19 @@
 'use strict';
 
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
-import { IIntegrationConfig, IntegrationType } from '../IIntegrationConfig';
-import { mkdir, writeFile } from 'fs';
+import { IIntegrationConfig } from '../IIntegrationConfig';
+import { writeFile } from 'fs';
 
 export default class DataAccessDoc {
 
     private _integrationType;
     private _queries;
-    private _header: string[] = [];
+    private _header: string[] = [`The following tables and fields are required for the DIA with integrationConfig: ${this._integrationType}`];
     private _footer: string[] = [];
 
     constructor(integrationType: string) {
         this._integrationType = integrationType;
         this._header.push(`# Data Access Requirements: ${this._integrationType}`);
-        this._header.push('The following tables and fields are required for the DIA with integrationConfig: ' + this._integrationType);
-        this._footer.push('');
 
         const icf = new IntegrationConfigFactory();
         const cfg: IIntegrationConfig = icf.create(this._integrationType);
@@ -36,6 +34,7 @@ export default class DataAccessDoc {
     private _getQueryInfo(): any {
         return this._queries.map((query) => {
             const tableName = query.name;
+            // First regex turns 'X.*' instances into '*', second regex removes all commas
             const splitQuery = query.query.replace(/[^ ]*\.\*/gi, '*').replace(/,/g , '').toUpperCase().split(' ');
             const fields = splitQuery.slice(1, splitQuery.indexOf('FROM'));
             return { tableName, fields };

@@ -1,5 +1,5 @@
+The following tables and fields are required for the DIA with integrationConfig: undefined
 # Data Access Requirements: PeopleSoft
-The following tables and fields are required for the DIA with integrationConfig: PeopleSoft
 
 | Tables | Fields |
 | ------ | ------ |
