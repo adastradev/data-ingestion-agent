@@ -1,9 +1,10 @@
 import TimerCompletionMessage from './TimerCompletionMessage';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import TYPES from '../../ioc.types';
 import { Logger } from 'winston';
 import * as moment from 'moment';
 
+@injectable()
 export default class DurationLogger {
 
     public static readonly DURATION_TOKEN: string = '{DURATION}';
