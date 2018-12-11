@@ -14,5 +14,5 @@ export default interface IDDLHelper {
      *
      * @memberof IDDLHelper
      */
-    getDDLQuery: (validObjects: string[]) => string;
+    getDDLQuery: (validObjects: string[]) => Promise<string>;
 }

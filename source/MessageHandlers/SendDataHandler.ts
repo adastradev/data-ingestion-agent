@@ -166,7 +166,7 @@ export default class SendDataHandler implements IMessageHandler {
     }
 
     private async ingestDDL(validTables: any, folderPath) {
-        const ddlQuery = this._oracleDDLHelper.getDDLQuery(Object.keys(validTables));
+        const ddlQuery = await this._oracleDDLHelper.getDDLQuery(Object.keys(validTables));
         const reader = this._container.get<IDataReader>(TYPES.DataReader);
         const ddlPrefix = 'ddl';
         const queryResult = await reader.read({name: ddlPrefix, query: ddlQuery});
