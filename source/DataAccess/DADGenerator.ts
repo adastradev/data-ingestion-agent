@@ -20,16 +20,18 @@ export default class DataAccessDoc {
         this._header.push(`DIA requires access to the following tables/fields in the ${this._integrationType} integration type.`);
     }
 
-    public create(): void {
+    public create(debug?: boolean): void {
         const path = './docs/DataAccess/' + this._integrationType + '.md';
         const n = '\n';
         const dn = n + n;
         const data = this._header.join(n) + dn + this._createTable().join(n) + dn + this._footer.join(n);
-        writeFile(path, data, (err) => {
-            if (err) {
-                console.log(err);
-            }
-        });
+        if (!debug) {
+            writeFile(path, data, (err) => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
     }
 
     private _getQueryInfo(): any {
