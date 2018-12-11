@@ -1,29 +1,30 @@
 'use strict';
 
 import IntegrationConfigFactory from '../IntegrationConfigFactory';
-import { IIntegrationConfig } from '../IIntegrationConfig';
+import { IIntegrationConfig, IntegrationType } from '../IIntegrationConfig';
 import { writeFile } from 'fs';
 
 export default class DataAccessDoc {
 
     private _integrationType;
     private _queries;
-    private _header: string[] = [`The following tables and fields are required for the DIA with integrationConfig: ${this._integrationType}`];
+    private _header: string[] = [];
     private _footer: string[] = [];
 
-    constructor(integrationType: string) {
-        this._integrationType = integrationType;
-        this._header.push(`# Data Access Requirements: ${this._integrationType}`);
-
+    constructor(integrationType: IntegrationType) {
+        this._integrationType = integrationType.toString();
         const icf = new IntegrationConfigFactory();
         const cfg: IIntegrationConfig = icf.create(this._integrationType);
-
         this._queries = cfg.queries;
+        this._header.push(`# Data Access Requirements: ${this._integrationType}`);
+        this._header.push(`DIA requires access to the following tables/fields in the ${this._integrationType} integration type.`);
     }
 
     public create(): void {
         const path = './docs/DataAccess/' + this._integrationType + '.md';
-        const data = this._header.join('\n') + '\n\n' + this._createTable().join('\n') + '\n\n' + this._footer.join('\n');
+        const n = '\n';
+        const dn = n + n;
+        const data = this._header.join(n) + dn + this._createTable().join(n) + dn + this._footer.join(n);
         writeFile(path, data, (err) => {
             if (err) {
                 console.log(err);
