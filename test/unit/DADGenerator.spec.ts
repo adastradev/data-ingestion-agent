@@ -21,7 +21,6 @@ describe('DADGenerator', () => {
                 dad = new DataAccessDoc(IntegrationType.Demo);
                 sandbox = sinon.createSandbox();
                 write = sandbox.stub(fs, 'writeFile');
-                write.returns(undefined);
                 sandbox.stub(dad, '_createTable');
                 dad._createTable.returns([
                     'ROW 1',
@@ -31,10 +30,6 @@ describe('DADGenerator', () => {
 
             afterEach(() => {
                 sandbox.restore();
-            });
-
-            it('Should not return anything', () => {
-                expect(dad.create()).to.be.equal(undefined);
             });
 
             it('Should call createTable()', () => {
@@ -57,23 +52,24 @@ describe('DADGenerator', () => {
             beforeEach(() => {
                 dad = new DataAccessDoc(IntegrationType.Demo);
                 sandbox = sinon.createSandbox();
-                dad._queries = [{
-                    name: 'TABLE_NAME',
-                    query: 'SELECT * FROM TABLE_NAME'
-                }];
             });
 
             afterEach(() => {
                 sandbox.restore();
             });
 
-            it('Should return an array of query objects: { tableName: string, fields: string[] }', () => {
-                const queryInfo = dad._getQueryInfo();
-                expect(queryInfo).to.be.an('array');
-                expect(queryInfo[0]).to.not.be.empty;
-                expect(queryInfo[0]).to.be.an('object');
-                expect(queryInfo[0].tableName).to.be.a('string');
-                expect(queryInfo[0].fields).to.be.an('array');
+            it('Should return properly formatted query info', () => {
+
+                let queryInfo;
+
+                dad._queries = [{ name: 'TABLE_NAME', query: 'SELECT ROWID, A.* FROM TABLE_NAME' }];
+                queryInfo =  dad._getQueryInfo();
+                expect(queryInfo).to.deep.equal([{ tableName: 'TABLE_NAME', fields: ['ROWID', '*'] }]);
+
+                dad._queries = [{ name: 'TABLE_NAME_CC_DD_EE', query: 'SELECT FIELD1, field2, FiEl_D3, TEST.* FROM TABLE_NAME' }];
+                queryInfo =  dad._getQueryInfo();
+                expect(queryInfo).to.deep.equal([{ tableName: 'TABLE_NAME_CC_DD_EE', fields: ['FIELD1', 'FIELD2', 'FIEL_D3', '*'] }]);
+
             });
 
         });
@@ -89,7 +85,7 @@ describe('DADGenerator', () => {
                 sandbox.stub(dad, '_getQueryInfo' as any);
                 dad._getQueryInfo.returns([{
                     tableName: 'TABLE_NAME',
-                    fields: ['FIELD1', 'FIELD2']
+                    fields: ['ROWID', '*']
                 }]);
             });
 
@@ -100,9 +96,11 @@ describe('DADGenerator', () => {
             it('Should return an array of strings (markdown lines)', () => {
                 const table = dad._createTable();
                 expect(dad._getQueryInfo.called).to.be.true;
-                expect(table).to.be.an('array');
-                expect(table).to.not.be.empty;
-                expect(table[0]).to.be.a('string');
+                expect(table).to.deep.equal([
+                    '| Tables | Fields |',
+                    '| ------ | ------ |',
+                    '| TABLE_NAME | ROWID, * |'
+                ]);
             });
 
         });
