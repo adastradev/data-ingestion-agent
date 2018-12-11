@@ -8,22 +8,32 @@ import DataAccessDoc from '../../source/DataAccess/DADGenerator';
 
 const expect = chai.expect;
 
-const integrationTypeKeys = Object.keys(IntegrationType).slice(0, -1);
+const integrationTypeKeys = Object.keys(IntegrationType).slice(0, -2);
 
 describe('DADGenerator', () => {
 
     describe('DataAccessDoc', () => {
 
-        const write = sinon.stub(fs, 'writeFile');
-        write.returns(undefined);
+        let sandbox: sinon.SinonSandbox;
+        let dad;
 
-        it('Should successfully construct for each integration type', () => {
-            integrationTypeKeys.forEach((key) => {
-                const dad = new DataAccessDoc(IntegrationType[key]);
-                expect(dad).is.an.instanceOf(DataAccessDoc);
-                const spyCreate = sinon.spy(dad, 'create');
-                expect(dad.create()).is.undefined;
-                expect(spyCreate.called).to.be.true;
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('Should successfully write file for each integration type', () => {
+            integrationTypeKeys.forEach(async (key) => {
+                if (fs.existsSync(`./docs/DataAccess/${IntegrationType[key]}.md`)) {
+                    fs.unlinkSync(`./docs/DataAccess/${IntegrationType[key]}.md`);
+                }
+                expect(fs.existsSync(`./docs/DataAccess/${IntegrationType[key]}.md`)).to.be.false;
+                dad = new DataAccessDoc(IntegrationType[key]);
+                await dad.create();
+                expect(fs.existsSync(`./docs/DataAccess/${IntegrationType[key]}.md`)).to.be.true;
             });
         });
 
