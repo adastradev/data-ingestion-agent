@@ -22,9 +22,8 @@ export default class DataAccessDoc {
 
     public create(): void {
         const path = './docs/DataAccess/' + this._integrationType + '.md';
-        const n = '\n';
-        const dn = n + n;
-        const data = this._header.join(n) + dn + this._createTable().join(n) + dn + this._footer.join(n);
+        const newLine = '\n';
+        const data = this._header.join(newLine) + newLine.repeat(2) + this._createTable().join(newLine) + newLine.repeat(2) + this._footer.join(newLine);
         writeFile(path, data, (err) => {
             if (err) {
                 console.log(err);
