@@ -16,13 +16,13 @@ export default class DataAccessDocGenerator {
         const icf = new IntegrationConfigFactory();
         const cfg: IIntegrationConfig = icf.create(this._integrationType);
         this._queries = cfg.queries;
-        this._header.push(`# Data Access Requirements: ${this._integrationType}`);
-        this._header.push(`DIA requires access to the following tables/fields in the ${this._integrationType} integration type.`);
     }
 
     public async create() {
         const path = './docs/DataAccess/' + this._integrationType + '.md';
         const newLine = '\n';
+        this._header.push(`# Data Access Requirements: ${this._integrationType}`);
+        this._header.push(`DIA requires access to the following tables/fields in the ${this._integrationType} integration type.`);
         const data = this._header.join(newLine) + newLine.repeat(2) + this._createMarkdownTable().join(newLine) + newLine.repeat(2) + this._footer.join(newLine);
         await writeFile(path, data, (err) => {
             if (err) {
