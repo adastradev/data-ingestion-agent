@@ -1,5 +1,5 @@
 import { IntegrationType } from '../IIntegrationConfig';
-import DataAccessDoc from '../DataAccess/DADGenerator';
+import DataAccessDoc from '../DataAccess/DataAccessDocGenerator';
 
 const integrationEnumKeys = Object.keys(IntegrationType).slice(0, -2);
 const integrationTypes = integrationEnumKeys.map((key) => {

@@ -3,12 +3,12 @@ import * as chai from 'chai';
 import * as sinon from 'sinon';
 
 import { IntegrationType } from '../../source/IIntegrationConfig';
-import DataAccessDoc from '../../source/DataAccess/DADGenerator';
+import DataAccessDoc from '../../source/DataAccess/DataAccessDocGenerator';
 import * as fs from 'fs';
 
 const expect = chai.expect;
 
-describe('DADGenerator', () => {
+describe('DataAccessDocGenerator', () => {
     describe('DataAccessDoc', () => {
 
         describe('create()', () => {

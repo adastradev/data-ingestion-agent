@@ -4,13 +4,13 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 import { IntegrationType } from '../../source/IIntegrationConfig';
-import DataAccessDoc from '../../source/DataAccess/DADGenerator';
+import DataAccessDoc from '../../source/DataAccess/DataAccessDocGenerator';
 
 const expect = chai.expect;
 
 const integrationTypeKeys = Object.keys(IntegrationType).slice(0, -2);
 
-describe('DADGenerator', () => {
+describe('DataAccessDocGenerator', () => {
 
     describe('DataAccessDoc', () => {
 
