@@ -3,7 +3,7 @@ import * as chai from 'chai';
 import * as sinon from 'sinon';
 
 import { IntegrationType } from '../../source/IIntegrationConfig';
-import DataAccessDoc from '../../source/DataAccess/DataAccessDocGenerator';
+import DataAccessDocGenerator from '../../source/DataAccess/DataAccessDocGenerator';
 import * as fs from 'fs';
 
 const expect = chai.expect;
@@ -18,7 +18,7 @@ describe('DataAccessDocGenerator', () => {
             let write;
 
             beforeEach(() => {
-                dad = new DataAccessDoc(IntegrationType.Demo);
+                dad = new DataAccessDocGenerator(IntegrationType.Demo);
                 sandbox = sinon.createSandbox();
                 write = sandbox.stub(fs, 'writeFile');
                 sandbox.stub(dad, '_createTable');
@@ -50,7 +50,7 @@ describe('DataAccessDocGenerator', () => {
             let dad;
 
             beforeEach(() => {
-                dad = new DataAccessDoc(IntegrationType.Demo);
+                dad = new DataAccessDocGenerator(IntegrationType.Demo);
                 sandbox = sinon.createSandbox();
             });
 
@@ -80,7 +80,7 @@ describe('DataAccessDocGenerator', () => {
             let dad;
 
             beforeEach(() => {
-                dad = new DataAccessDoc(IntegrationType.Demo);
+                dad = new DataAccessDocGenerator(IntegrationType.Demo);
                 sandbox = sinon.createSandbox();
                 sandbox.stub(dad, '_getQueryInfo' as any);
                 dad._getQueryInfo.returns([{

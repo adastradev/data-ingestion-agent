@@ -4,7 +4,7 @@ import IntegrationConfigFactory from '../IntegrationConfigFactory';
 import { IIntegrationConfig, IntegrationType } from '../IIntegrationConfig';
 import { writeFile } from 'fs';
 
-export default class DataAccessDoc {
+export default class DataAccessDocGenerator {
 
     private _integrationType;
     private _queries;

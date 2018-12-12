@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 import { IntegrationType } from '../../source/IIntegrationConfig';
-import DataAccessDoc from '../../source/DataAccess/DataAccessDocGenerator';
+import DataAccessDocGenerator from '../../source/DataAccess/DataAccessDocGenerator';
 
 const expect = chai.expect;
 
@@ -31,14 +31,14 @@ describe('DataAccessDocGenerator', () => {
                     fs.unlinkSync(`./docs/DataAccess/${IntegrationType[key]}.md`);
                 }
                 expect(fs.existsSync(`./docs/DataAccess/${IntegrationType[key]}.md`)).to.be.false;
-                dad = new DataAccessDoc(IntegrationType[key]);
+                dad = new DataAccessDocGenerator(IntegrationType[key]);
                 await dad.create();
                 expect(fs.existsSync(`./docs/DataAccess/${IntegrationType[key]}.md`)).to.be.true;
             });
         });
 
         it('Should should throw an error for unknown integration types', () => {
-            expect(() => { new DataAccessDoc(IntegrationType.Unknown); }).to.throw;
+            expect(() => { new DataAccessDocGenerator(IntegrationType.Unknown); }).to.throw;
         });
 
     });
