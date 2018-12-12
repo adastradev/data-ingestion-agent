@@ -21,8 +21,8 @@ describe('DataAccessDocGenerator', () => {
                 dad = new DataAccessDocGenerator(IntegrationType.Demo);
                 sandbox = sinon.createSandbox();
                 write = sandbox.stub(fs, 'writeFile');
-                sandbox.stub(dad, '_createTable');
-                dad._createTable.returns([
+                sandbox.stub(dad, '_createMarkdownTable');
+                dad._createMarkdownTable.returns([
                     'ROW 1',
                     'ROW 2'
                 ]);
@@ -32,9 +32,9 @@ describe('DataAccessDocGenerator', () => {
                 sandbox.restore();
             });
 
-            it('Should call createTable()', () => {
+            it('Should call createMarkdownTable()', () => {
                 dad.create();
-                expect(dad._createTable.called).to.be.true;
+                expect(dad._createMarkdownTable.called).to.be.true;
             });
 
             it('Should call writeFile()', () => {
@@ -74,7 +74,7 @@ describe('DataAccessDocGenerator', () => {
 
         });
 
-        describe('_createTable()', () => {
+        describe('_createMarkdownTable()', () => {
 
             let sandbox: sinon.SinonSandbox;
             let dad;
@@ -94,7 +94,7 @@ describe('DataAccessDocGenerator', () => {
             });
 
             it('Should return an array of strings (markdown lines)', () => {
-                const table = dad._createTable();
+                const table = dad._createMarkdownTable();
                 expect(dad._getQueryInfo.called).to.be.true;
                 expect(table).to.deep.equal([
                     '| Tables | Fields |',

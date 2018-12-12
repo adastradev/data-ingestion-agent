@@ -23,7 +23,7 @@ export default class DataAccessDocGenerator {
     public async create() {
         const path = './docs/DataAccess/' + this._integrationType + '.md';
         const newLine = '\n';
-        const data = this._header.join(newLine) + newLine.repeat(2) + this._createTable().join(newLine) + newLine.repeat(2) + this._footer.join(newLine);
+        const data = this._header.join(newLine) + newLine.repeat(2) + this._createMarkdownTable().join(newLine) + newLine.repeat(2) + this._footer.join(newLine);
         await writeFile(path, data, (err) => {
             if (err) {
                 console.log(err);
@@ -44,7 +44,7 @@ export default class DataAccessDocGenerator {
         });
     }
 
-    private _createTable(): string[] {
+    private _createMarkdownTable(): string[] {
         const tableHead = [ '| Tables | Fields |' , '| ------ | ------ |' ];
         const queryInfo = this._getQueryInfo();
         const tableBody = [];
