@@ -30,6 +30,29 @@ pipelines:
 
             # Run system test
             - . ./pipeline/run-system-tests.sh
+    feature/get-combined-ddl:
+      - step:
+          services:
+            - docker
+          script: 
+            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
+            - export IMAGE_NAME=adastradev/data-ingestion-agent:$NORMALIZED_DOCKER_TAG
+            - . ./pipeline/build-docker-image.sh
+            - docker tag $IMAGE_NAME $REMOTE_IMAGE_NAME
+            - docker push $REMOTE_IMAGE_NAME
+
+            # Install prereqs for wait script
+            - apt-get update
+            - apt-get install -y jq
+
+            # Waiting on docker to publish the new image from its automated build
+            # and running system tests both rely on knowing the tag of the image.
+            # Dockerhub takes the branch name and slightly mangles it to be used as
+            # an image tag.
+            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
+
+            # Run system test
+            - . ./pipeline/run-system-tests.sh
     feature/*:
       - step:
           services:
