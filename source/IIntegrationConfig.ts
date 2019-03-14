@@ -4,6 +4,7 @@ export enum IntegrationType {
     Banner = 'Banner',
     DegreeWorks = 'DegreeWorks',
     PeopleSoft = 'PeopleSoft',
+    Colleague = 'Colleague',
     Demo = 'Demo',
     Unknown = 'Unknown'
 }
