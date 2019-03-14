@@ -36,7 +36,8 @@ pipelines:
             - docker
           script: 
             - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
-            - export IMAGE_NAME=adastradev/data-ingestion-agent:$NORMALIZED_DOCKER_TAG
+            - export IMAGE_NAME=data-ingestion-agent:$NORMALIZED_DOCKER_TAG
+            - export REMOTE_IMAGE_NAME=adastradev/$IMAGE_NAME
             - . ./pipeline/build-docker-image.sh
             - docker tag $IMAGE_NAME $REMOTE_IMAGE_NAME
             - docker push $REMOTE_IMAGE_NAME
