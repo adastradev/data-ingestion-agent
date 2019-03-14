@@ -40,6 +40,7 @@ pipelines:
             - export REMOTE_IMAGE_NAME=adastradev/$IMAGE_NAME
             - . ./pipeline/build-docker-image.sh
             - docker tag $IMAGE_NAME $REMOTE_IMAGE_NAME
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
             - docker push $REMOTE_IMAGE_NAME
 
             # Install prereqs for wait script
