@@ -6,6 +6,7 @@ export enum IntegrationType {
     PeopleSoft = 'PeopleSoft',
     Colleague = 'Colleague',
     Demo = 'Demo',
+    NotImplemented = 'NotImplemented',
     Unknown = 'Unknown'
 }
 export enum IntegrationSystemType { 'Oracle' = 'Oracle' }

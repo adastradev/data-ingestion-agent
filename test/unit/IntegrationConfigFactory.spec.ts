@@ -49,8 +49,9 @@ describe('IntegrationConfigFactory', () => {
 
         it('should fail when an unsupported type is specified', async () => {
             const icf = new IntegrationConfigFactory();
+            const unsupportedType = IntegrationType.Unknown;
 
-            expect(icf.create.bind(IntegrationType.Unknown)).to.throw(Error, 'Unsupported integration type in IntegrationConfigFactory');
+            expect(() => { icf.create(unsupportedType); }).to.throw(Error, `Unknown integration type ${unsupportedType}`);
         });
     });
 });

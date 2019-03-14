@@ -1176,22 +1176,25 @@ export default class IntegrationConfigFactory {
                     name: 'CATALOGS',
                     query: 'Select * from CATALOGS'
                 });
+
+                return {
+                    queries: statements,
+                    type: IntegrationType.NotImplemented
+                };
             }
             case IntegrationType.Demo: {
-                const DEMO_TEMPLATE_STATEMENTS: IQueryDefinition[] = new Array<IQueryDefinition>();
-
-                DEMO_TEMPLATE_STATEMENTS.push({
+                statements.push({
                     name: 'ALL_TABLES',
                     query: 'SELECT * FROM ALL_TABLES'
                 });
 
                 return {
-                    queries: DEMO_TEMPLATE_STATEMENTS,
+                    queries: statements,
                     type: integrationType
                 };
             }
             default: {
-                throw Error('Unsupported integration type in IntegrationConfigFactory');
+                throw Error(`Unknown integration type ${integrationType.toString()}`);
             }
         }
     }
