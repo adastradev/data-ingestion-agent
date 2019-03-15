@@ -56,7 +56,7 @@ To see a demo of the agent without connecting it to any data source, omit the OR
 
 The docker agent also supports the following optional arguments:
 ```sh
-# [Demo, Banner]
+# [Demo, Banner, PeopleSoft, Colleague]
 -e INTEGRATION_TYPE=Banner \
 # [dev, prod]
 -e DEFAULT_STAGE=prod \
