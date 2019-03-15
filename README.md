@@ -6,6 +6,15 @@ Ad Astra Docker agent code base for cloud integration without VPN tunnels
 ## Pre-requisites
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
+#### Oracle
+When connecting to an Oracle database the user specified must be read/execute given access to:
+
+- DBMS_METADATA.GET_DDL (function)
+- ALL_TABLES (view)
+- ALL_CONS_COLUMNS (view)
+- ALL_CONSTRAINTS (view)
+- All tables referenced by this agent (see 'Query Preview' section below)
+
 ## Resource Requirements
 
 #### Docker Host
