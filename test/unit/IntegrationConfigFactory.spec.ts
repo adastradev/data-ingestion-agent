@@ -47,6 +47,15 @@ describe('IntegrationConfigFactory', () => {
             expect(cfg.type).to.equal(IntegrationType.Demo);
         });
 
+        it('should return queries for Colleague and indicate it is not fully implemented', async () => {
+            const icf = new IntegrationConfigFactory();
+
+            const cfg: IIntegrationConfig = icf.create(IntegrationType.Colleague);
+
+            expect(cfg.queries).to.not.be.empty;
+            expect(cfg.type).to.equal(IntegrationType.NotImplemented);
+        });
+
         it('should fail when an unsupported type is specified', async () => {
             const icf = new IntegrationConfigFactory();
             const unsupportedType = IntegrationType.Unknown;
