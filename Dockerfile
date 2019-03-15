@@ -21,10 +21,10 @@ COPY docs ./docs
 
 RUN npm ci &&\
     npm run build &&\
-    npm run test &&\
-    npm run test:coveralls &&\
-    if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi &&\
-    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi
+    npm run test:clean &&\
+    npm run unit-test &&\
+    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi &&\
+    if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi
 RUN rm -rf node_modules dist/test &&\
     npm ci --production &&\
     apt-get -y remove git-core && apt-get clean
