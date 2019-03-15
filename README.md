@@ -7,7 +7,7 @@ Ad Astra Docker agent code base for cloud integration without VPN tunnels
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
 #### Oracle
-When connecting to an Oracle database the user specified must be read/execute given access to:
+When connecting to an Oracle database the specified database user must be given read/execute access to the following:
 
 - DBMS_METADATA.GET_DDL (function)
 - ALL_TABLES (view)
