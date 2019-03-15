@@ -35,23 +35,21 @@ pipelines:
           services:
             - docker
           script: 
-            - export IMAGE_NAME=adastradev/data-ingestion-agent:automated-$BITBUCKET_COMMIT
+            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
+            - export IMAGE_NAME=data-ingestion-agent:$NORMALIZED_DOCKER_TAG
+            - export REMOTE_IMAGE_NAME=adastradev/$IMAGE_NAME
             - . ./pipeline/build-docker-image.sh
+            - docker tag $IMAGE_NAME $REMOTE_IMAGE_NAME
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            - docker push $REMOTE_IMAGE_NAME
 
             # Install prereqs for wait script
             - apt-get update
             - apt-get install -y jq
 
-            # Waiting on docker to publish the new image from its automated build
-            # and running system tests both rely on knowing the tag of the image.
-            # Dockerhub takes the branch name and slightly mangles it to be used as
-            # an image tag.
-            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
-
-            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
-
             # Run system test
             - . ./pipeline/run-system-tests.sh
+
 definitions:
   services:
     docker:

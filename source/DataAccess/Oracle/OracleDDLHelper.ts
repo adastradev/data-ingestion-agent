@@ -53,8 +53,12 @@ export default class OracleDDLHelper implements IDDLHelper {
     private async prioritizeTables(validTableNames: string[]): Promise<string[]> {
         const connection: oracledb.IConnection = await this._connectionPool.getConnection();
 
-        const tableConstraintQueries = validTableNames.map((tableOrViewName) => {
-            return `SELECT
+        const tableInClause = validTableNames.map((tableOrViewName) => {
+            return `'${tableOrViewName}'`;
+        })
+        .join(',');
+
+        const tableConstraintQueries = `SELECT
                 cons.TABLE_NAME as child_table,
                 col.TABLE_NAME parent_table
             FROM
@@ -62,9 +66,7 @@ export default class OracleDDLHelper implements IDDLHelper {
                 JOIN ALL_CONSTRAINTS cons
                 ON cons.R_OWNER = col.OWNER
                 AND cons.R_CONSTRAINT_NAME = col.CONSTRAINT_NAME
-            WHERE cons.TABLE_NAME = '${tableOrViewName}'`;
-        })
-        .join('\nUNION ALL\n');
+            WHERE cons.TABLE_NAME in (${tableInClause})`;
 
         const records = await connection.execute(tableConstraintQueries);
 
