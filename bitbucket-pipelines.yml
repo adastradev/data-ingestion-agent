@@ -30,7 +30,7 @@ pipelines:
 
             # Run system test
             - . ./pipeline/run-system-tests.sh
-    feature/get-combined-ddl:
+    feature/*:
       - step:
           services:
             - docker
@@ -47,36 +47,9 @@ pipelines:
             - apt-get update
             - apt-get install -y jq
 
-            # Waiting on docker to publish the new image from its automated build
-            # and running system tests both rely on knowing the tag of the image.
-            # Dockerhub takes the branch name and slightly mangles it to be used as
-            # an image tag.
-            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
-
             # Run system test
             - . ./pipeline/run-system-tests.sh
-    feature/*:
-      - step:
-          services:
-            - docker
-          script: 
-            - export IMAGE_NAME=adastradev/data-ingestion-agent:automated-$BITBUCKET_COMMIT
-            - . ./pipeline/build-docker-image.sh
 
-            # Install prereqs for wait script
-            - apt-get update
-            - apt-get install -y jq
-
-            # Waiting on docker to publish the new image from its automated build
-            # and running system tests both rely on knowing the tag of the image.
-            # Dockerhub takes the branch name and slightly mangles it to be used as
-            # an image tag.
-            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
-
-            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
-
-            # Run system test
-            - . ./pipeline/run-system-tests.sh
 definitions:
   services:
     docker:
