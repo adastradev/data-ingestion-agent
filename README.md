@@ -70,6 +70,7 @@ Note: To see required table/field access for each integration type, see the foll
 - [DegreeWorks](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DataAccess/DegreeWorks.md)
 - [PeopleSoft](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DataAccess/PeopleSoft.md)
 
+
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
 
 ```sh

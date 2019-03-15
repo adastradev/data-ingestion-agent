@@ -11,7 +11,7 @@
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js",
-    "generate-docs": "node -r ts-node/register ./source/util/pre-commit.ts && git add ./docs/DataAccess"
+    "generate-docs": "node -r ts-node/register ./source/Util/pre-commit.ts && git add ./docs/DataAccess"
   },
   "pre-commit": [
     "generate-docs"
