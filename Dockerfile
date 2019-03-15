@@ -22,6 +22,7 @@ COPY docs ./docs
 RUN npm ci &&\
     npm run build &&\
     npm run test &&\
+    npm run test:coveralls &&\
     if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run coveralls ; fi &&\
     if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi
 RUN rm -rf node_modules dist/test &&\
