@@ -137,8 +137,14 @@ const startup = async () => {
         const tenantName = poolListResponse.data.tenantName;
 
         logger.info('Looking up ingestion configuration info');
-        const globalConfigResponse = await dataIngestionApi.getSettings();
-        const snsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
+        let snsTopicArn;
+        try {
+            const globalConfigResponse = await dataIngestionApi.getSettings();
+            snsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
+        } catch (error) {
+            logger.error(error);
+            throw new Error(error);
+        }
 
         // App
         container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
