@@ -35,10 +35,17 @@ pipelines:
           services:
             - docker
           script: 
-            - export NORMALIZED_DOCKER_TAG=automated-$BITBUCKET_COMMIT
-            - export IMAGE_NAME=adastradev/data-ingestion-agent:$NORMALIZED_DOCKER_TAG
+            - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
+            - export IMAGE_NAME=data-ingestion-agent:$NORMALIZED_DOCKER_TAG
+            - export REMOTE_IMAGE_NAME=adastradev/$IMAGE_NAME
             - . ./pipeline/build-docker-image.sh
-            - . ./pipeline/publish-docker-image.sh
+            - docker tag $IMAGE_NAME $REMOTE_IMAGE_NAME
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            - docker push $REMOTE_IMAGE_NAME
+
+            # Install prereqs for wait script
+            - apt-get update
+            - apt-get install -y jq
 
             # Run system test
             - . ./pipeline/run-system-tests.sh
