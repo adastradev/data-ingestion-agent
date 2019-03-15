@@ -41,11 +41,12 @@
     ],
     "reporter": [
       "lcov",
-      "html",
       "text"
     ],
     "sourceMap": true,
-    "all": true
+    "all": true,
+    "clean": false,
+    "cache": false
   },
   "author": "Ad Astra",
   "contributors": [
