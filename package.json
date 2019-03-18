@@ -6,12 +6,19 @@
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc --sourceMap true",
-    "test": "nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
+    "test:clean": "npm run test:clean-coverage && npm run test:clean-nyc",
+    "test:clean-coverage": "rimraf ./coverage",
+    "test:clean-nyc": "rimraf ./.nyc_output",
+    "test:coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test:coverage-check": "nyc check-coverage",
+    "test:coverage-report": "nyc report --reporter=\"text-summary\"",
+    "test": "npm run test:clean && npm run unit-test && npm run integration-test",
+    "unit-test": "nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
     "integration-test": "nyc --require ts-node/register mocha --timeout 999999 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js",
-    "generate-docs": "node -r ts-node/register ./source/util/pre-commit.ts && git add ./docs/DataAccess"
+    "generate-docs": "node -r ts-node/register ./source/Util/pre-commit.ts && git add ./docs/DataAccess"
   },
   "pre-commit": [
     "generate-docs"
@@ -34,11 +41,12 @@
     ],
     "reporter": [
       "lcov",
-      "html",
       "text"
     ],
     "sourceMap": true,
-    "all": true
+    "all": true,
+    "clean": false,
+    "cache": false
   },
   "author": "Ad Astra",
   "contributors": [
@@ -94,6 +102,7 @@
     "npm": "^6.4.1",
     "nyc": "^13.0.1",
     "pre-commit": "^1.2.2",
+    "rimraf": "^2.6.3",
     "sinon": "^7.0.0",
     "ssh2": "^0.6.1",
     "ts-node": "^7.0.1",

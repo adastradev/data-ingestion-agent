@@ -4,7 +4,9 @@ export enum IntegrationType {
     Banner = 'Banner',
     DegreeWorks = 'DegreeWorks',
     PeopleSoft = 'PeopleSoft',
+    Colleague = 'Colleague',
     Demo = 'Demo',
+    NotImplemented = 'NotImplemented',
     Unknown = 'Unknown'
 }
 export enum IntegrationSystemType { 'Oracle' = 'Oracle' }

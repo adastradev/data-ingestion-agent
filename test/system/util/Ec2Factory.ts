@@ -1,5 +1,6 @@
 import * as aws from 'aws-sdk';
 import InstanceConfig from '../InstanceConfig';
+import { TerminateInstancesRequest } from 'aws-sdk/clients/ec2';
 
 /**
  * Manages EC2 instance creation and teardown
@@ -71,7 +72,7 @@ export default class Ec2Factory {
 
         this.instance = results.Instances[0];
 
-        const instanceIdsParam = { InstanceIds: [results.Instances[0].InstanceId]} as any;
+        const instanceIdsParam = { InstanceIds: [this.instance.InstanceId]} as any;
         await this.client.waitFor('instanceRunning', instanceIdsParam).promise();
         await this.client.waitFor('instanceStatusOk', instanceIdsParam).promise();
 
@@ -97,11 +98,19 @@ export default class Ec2Factory {
             throw new Error('Cannot terminate a non-existant image; please create one first');
         }
 
-        const params = {
+        const params: TerminateInstancesRequest = {
             InstanceIds: [this.instance.InstanceId]
         };
 
         await this.client.terminateInstances(params).promise();
+        await this.client.waitFor('instanceTerminated', params).promise();
+
+        // EBS volumes don't seem to respect the delete on termination instruction
+        // in the instance creation config so we must terminate first then wait for
+        // the instance to become available before also deleting the volume
+        const ebsVolumeId = this.instance.BlockDeviceMappings[0].Ebs.VolumeId;
+        await this.client.waitFor('volumeAvailable', { VolumeIds: [ebsVolumeId]});
+        await this.client.deleteVolume({ VolumeId: ebsVolumeId }).promise();
 
         this.instance = null;
     }

@@ -75,6 +75,11 @@ export default class SendDataHandler implements IMessageHandler {
 
         const integrationType = IntegrationType[process.env.INTEGRATION_TYPE] || IntegrationType.Banner;
         const integrationConfig = this._integrationConfigFactory.create(integrationType);
+
+        if (integrationConfig.type === IntegrationType.NotImplemented) {
+            throw new Error(`Ingest commands for '${integrationType}' integrations are not yet supported`);
+        }
+
         const folderPath = integrationType + '-' + moment().toISOString();
 
         await this._connectionPool.open();

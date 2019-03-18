@@ -6,6 +6,15 @@ Ad Astra Docker agent code base for cloud integration without VPN tunnels
 ## Pre-requisites
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
+#### Oracle
+When connecting to an Oracle database the specified database user must be given read/execute access to the following:
+
+- DBMS_METADATA.GET_DDL (function)
+- ALL_TABLES (view)
+- ALL_CONS_COLUMNS (view)
+- ALL_CONSTRAINTS (view)
+- All tables referenced by this agent (see 'Query Preview' section below)
+
 ## Resource Requirements
 
 #### Docker Host
@@ -47,7 +56,7 @@ To see a demo of the agent without connecting it to any data source, omit the OR
 
 The docker agent also supports the following optional arguments:
 ```sh
-# [Demo, Banner]
+# [Demo, Banner, PeopleSoft, Colleague]
 -e INTEGRATION_TYPE=Banner \
 # [dev, prod]
 -e DEFAULT_STAGE=prod \
@@ -69,6 +78,7 @@ Note: To see required table/field access for each integration type, see the foll
 - [Banner](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DataAccess/Banner.md)
 - [DegreeWorks](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DataAccess/DegreeWorks.md)
 - [PeopleSoft](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DataAccess/PeopleSoft.md)
+- [Colleague](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DataAccess/Colleague.md) (Not Fully Supported)
 
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.
 
