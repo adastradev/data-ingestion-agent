@@ -41,6 +41,7 @@
     ],
     "reporter": [
       "lcov",
+      "html",
       "text"
     ],
     "sourceMap": true,

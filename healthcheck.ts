@@ -1,4 +1,5 @@
 import * as http from 'http';
+import { errorHandler, requestHandler  } from './source/healthCheckHandler';
 
 const options = {
     host : 'localhost',
@@ -6,18 +7,8 @@ const options = {
     timeout : 2000
 };
 
-const request = http.request(options, (res) => {
-    console.log(`STATUS: ${res.statusCode}`);
-    if (res.statusCode === 200) {
-        process.exit(0);
-    } else {
-        process.exit(1);
-    }
-});
+const request = http.request(options, requestHandler);
 
-request.on('error', (err) => {
-    console.log('ERROR');
-    process.exit(1);
-});
+request.on('error', errorHandler);
 
 request.end();
