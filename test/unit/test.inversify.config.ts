@@ -26,6 +26,7 @@ import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import IDDLHelper from '../../source/DataAccess/IDDLHelper';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import { IntegrationSystemType } from '../../source/IIntegrationConfig';
+import IOutputEncoder from '../../source/DataAccess/IOutputEncoder';
 
 const container = new Container();
 
@@ -52,6 +53,8 @@ container.bind<IMessage>(TYPES.SendDataMessage).to(SendDataMessage);
 container.bind<IDataReader>(TYPES.DataReader).to(DummyReader);
 const mockWriter = stubInterface<IDataWriter>();
 container.bind<IDataWriter>(TYPES.DataWriter).toConstantValue(mockWriter);
+const mockEncoder = stubInterface<IOutputEncoder>();
+container.bind<IOutputEncoder>(TYPES.OutputEncoder).toConstantValue(mockEncoder);
 
 container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
 
