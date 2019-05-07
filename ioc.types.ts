@@ -14,6 +14,7 @@ const TYPES = {
     Logger: Symbol('Logger'),
     MessageFactory: Symbol('MessageFactory'),
     MessageHandlerFactory: Symbol('MessageHandlerFactory'),
+    OutputEncoder: Symbol('OutputEncoder'),
     PREVIEW: Symbol('Preview'),
     PreviewHandler: Symbol('PreviewHandler'),
     PreviewMessage: Symbol('PreviewMessage'),

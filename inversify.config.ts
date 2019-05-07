@@ -43,6 +43,8 @@ import { IntegrationSystemType } from './source/IIntegrationConfig';
 import axios, { AxiosRequestConfig } from 'axios';
 import { Agent } from './source/Agent';
 import { SNS, SQS } from 'aws-sdk';
+import IOutputEncoder from './source/DataAccess/IOutputEncoder';
+import GZipOutputEncoder from './source/DataAccess/GZipOutputEncoder';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -172,6 +174,7 @@ const startup = async () => {
         container.bind<IDataReader>(TYPES.DataReader).to(OracleReader);
         container.bind<IDataWriter>(TYPES.DataWriter).to(S3Writer);
         container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
+        container.bind<IOutputEncoder>(TYPES.OutputEncoder).to(GZipOutputEncoder);
 
         // Agent Commands
         container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);

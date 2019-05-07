@@ -6,6 +6,7 @@ import * as crypto from 'crypto';
 import IDataWriter from '../IDataWriter';
 import { Logger } from 'winston';
 import AWS = require('aws-sdk');
+import IOutputEncoder from '../IOutputEncoder';
 
 let S3_PART_SIZE_MB = 10;
 if (process.env.S3_PART_SIZE_MB) {
@@ -27,15 +28,24 @@ if (process.env.S3_QUEUE_SIZE) {
 export default class S3Writer implements IDataWriter {
     constructor(
         @inject(TYPES.Bucket) private _bucketPath: string,
+        @inject(TYPES.OutputEncoder) private _outputEncoder: IOutputEncoder,
         @inject(TYPES.Logger) private _logger: Logger) {
     }
 
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
-        const dataBody = stream;
+        let dataBody = stream;
+        let extension = '';
+
+        if (this.shouldEncodeInput(fileNamePrefix)) {
+            const encodingResult = this._outputEncoder.encode(stream);
+            dataBody = encodingResult.outputStream;
+            extension = '.' + encodingResult.extension.replace('.', '');
+        }
+
         const parms = {
             Body: dataBody,
             Bucket:  this._bucketPath + '/' + folderPath,
-            Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex')
+            Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex') + extension
         };
 
         // Parallelize multi-part upload
@@ -48,5 +58,15 @@ export default class S3Writer implements IDataWriter {
         });
 
         await managedUpload.promise();
+    }
+
+    private shouldEncodeInput(fileNamePrefix): boolean {
+        switch (fileNamePrefix) {
+            case 'ddl':
+            case 'metadata':
+                return false;
+            default:
+                return true;
+        }
     }
 }
