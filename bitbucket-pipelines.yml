@@ -10,6 +10,8 @@ pipelines:
           services:
             - docker
           script:
+            - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_PROD
+
             # Set $DOCKER_HUB_USERNAME and $DOCKER_HUB_PASSWORD as environment variables in repository settings
             - export IMAGE_NAME=adastradev/data-ingestion-agent:latest
 
@@ -35,6 +37,8 @@ pipelines:
           services:
             - docker
           script: 
+            - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_DEV
+
             - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
             - export IMAGE_NAME=data-ingestion-agent:$NORMALIZED_DOCKER_TAG
             - export REMOTE_IMAGE_NAME=adastradev/$IMAGE_NAME

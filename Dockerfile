@@ -1,6 +1,8 @@
 # compile image intended for building and testing
 FROM node:8-slim AS build-env
 ENV LD_LIBRARY_PATH /usr/lib/oracle/18.3/client64/lib
+ENV DISCOVERY_SERVICE=$DISCOVERY_SERVICE
+ENV AWS_REGION=$AWS_REGION
 ARG INTEGRATION_TESTS_ENABLED=false
 ARG ORACLE_ENDPOINT
 ARG ORACLE_USER
@@ -31,6 +33,8 @@ RUN rm -rf node_modules dist/test &&\
 
 # compile image intended for production use
 FROM node:8-slim AS prod-env
+ENV DISCOVERY_SERVICE=$DISCOVERY_SERVICE
+ENV AWS_REGION=$AWS_REGION
 ENV LD_LIBRARY_PATH /usr/lib/oracle/18.3/client64/lib
 ENV LOG_PATH /var/log/dia
 RUN mkdir /var/log/dia

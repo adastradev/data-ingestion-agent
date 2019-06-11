@@ -13,12 +13,12 @@ export default class DataAccessDocGenerator {
 
     constructor(integrationType: IntegrationType) {
         this._integrationType = integrationType.toString();
-        const icf = new IntegrationConfigFactory();
-        const cfg: IIntegrationConfig = icf.create(this._integrationType);
-        this._queries = cfg.queries;
     }
 
     public async create() {
+        const icf = new IntegrationConfigFactory();
+        const cfg: IIntegrationConfig = await icf.create(this._integrationType);
+        this._queries = cfg.queries;
         const path = './docs/DataAccess/' + this._integrationType + '.md';
         const newLine = '\n';
         this._header.push(`# Data Access Requirements: ${this._integrationType}`);
