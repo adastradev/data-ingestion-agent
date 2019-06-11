@@ -37,7 +37,7 @@ export default class IntegrationConfigFactory {
         try {
             // const queryServiceURI = (await this.discovery.lookupService('elt-queries'))[0];
             // Change this when service is registered
-            const queryServiceURI = 'https://n5obyc9vwa.execute-api.us-east-1.amazonaws.com/clrdev/';
+            const queryServiceURI = 'https://n5obyc9vwa.execute-api.us-east-1.amazonaws.com/clrdev';
             const queryServiceAPI = new QueryService(queryServiceURI, process.env.AWS_REGION);
             const response = await queryServiceAPI.getTemplateQueries(integrationType, 'Ingestion', 'false');
             responseBody = response.data;
