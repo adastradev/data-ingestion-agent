@@ -32,20 +32,21 @@ export default class IntegrationConfigFactory {
 
     public async create(integrationType: IntegrationType): Promise<IIntegrationConfig> {
 
-        let responseBody: IIntegrationConfig;
+        let queries: IIntegrationConfig;
 
         try {
             // const queryServiceURI = (await this.discovery.lookupService('elt-queries'))[0];
             // Change this when service is registered
             const queryServiceURI = 'https://n5obyc9vwa.execute-api.us-east-1.amazonaws.com/clrdev';
             const queryServiceAPI = new QueryService(queryServiceURI, process.env.AWS_REGION);
+
+            // Fetch template queries from service
             const response = await queryServiceAPI.getTemplateQueries(integrationType, 'Ingestion', 'false');
-            responseBody = response.data;
-            console.log(responseBody);
+            queries = response.data;
         } catch (err) {
             throw new Error(`Something went wrong fetching queries for integration type ${integrationType}`);
         }
 
-        return responseBody;
+        return queries;
     }
 }
