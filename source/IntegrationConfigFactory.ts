@@ -35,9 +35,8 @@ export default class IntegrationConfigFactory {
         let queries: IIntegrationConfig;
 
         try {
-            // const queryServiceURI = (await this.discovery.lookupService('elt-queries'))[0];
-            // Change this when service is registered
-            const queryServiceURI = 'https://n5obyc9vwa.execute-api.us-east-1.amazonaws.com/clrdev';
+            const queryServiceURI = (await this.discovery.lookupService('platform-service-elt-queries'))[0];
+            // const queryServiceURI = 'https://4utk1njkqe.execute-api.us-east-1.amazonaws.com/0-1-0-feat7326';
             const queryServiceAPI = new QueryService(queryServiceURI, process.env.AWS_REGION);
 
             // Fetch template queries from service
