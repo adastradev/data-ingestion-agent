@@ -40,15 +40,15 @@ export class QueryService {
         // }
     }
 
-    public async getTemplateQueries(integrationType: string, integrationStage: string, formatted: string) {
+    public async getTemplateQueries(integrationtype: string, integrationstage: string, formatted: string) {
         const params = {};
         const pathTemplate = '/queries';
         const method = 'GET';
         const additionalParams = Object.assign({}, {
             queryParams: {
-                IntegrationType: integrationType,
-                IntegrationStage: integrationStage,
-                Formatted: formatted
+                integrationtype,
+                integrationstage,
+                formatted
             }
         });
         const body = {};
