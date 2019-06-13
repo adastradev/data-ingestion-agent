@@ -38,7 +38,7 @@ export default class IntegrationConfigFactory {
         let queries: IIntegrationConfig;
 
         try {
-            const queryServiceURI = (await this.discovery.lookupService('platform-service-elt-queries'))[0];
+            const queryServiceURI = (await this.discovery.lookupService('elt-queries'))[0];
             this.logger.silly(`Query Service URI: ${queryServiceURI}`);
             const queryServiceAPI = new QueryService(queryServiceURI, process.env.AWS_REGION);
 

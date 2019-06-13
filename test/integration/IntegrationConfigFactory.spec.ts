@@ -1,4 +1,3 @@
-
 import 'reflect-metadata';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -12,12 +11,12 @@ import TYPES from '../../ioc.types';
 
 const expect = chai.expect;
 
-describe.only('IntegrationConfigFactory', () => {
+describe('IntegrationConfigFactory', () => {
 
     describe('create', () => {
         const logger = container.get<Logger>(TYPES.Logger);
 
-        it.only('should return queries for Banner', async () => {
+        it('should return queries for Banner', async () => {
             const icf = new IntegrationConfigFactory(logger);
 
             const cfg: IIntegrationConfig = await icf.create(IntegrationType.Banner);
