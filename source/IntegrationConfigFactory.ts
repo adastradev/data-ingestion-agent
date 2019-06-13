@@ -1,10 +1,9 @@
 // tslint:disable:no-string-literal
 
 import TYPES from '../ioc.types';
-import { inject, injectable, named } from 'inversify';
-import * as path from 'path';
+import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from './IIntegrationConfig';
+import { IIntegrationConfig, IntegrationType } from './IIntegrationConfig';
 import { DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
 import { QueryService } from './queryServiceAPI';
 import getCloudDependencies from './Util/getCloudDependencies';
