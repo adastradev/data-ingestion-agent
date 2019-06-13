@@ -19,6 +19,9 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js"
   },
+  "pre-commit": [
+    "unit-test"
+  ],
   "nyc": {
     "extension": [
       ".ts",
@@ -108,6 +111,6 @@
     "tslint-no-unused-expression-chai": "^0.1.4"
   },
   "cloudDependencies": {
-    "platform-service-elt-queries": "0.1.0-feat7326"
+    "platform-service-elt-queries": "0.1.0"
   }
 }

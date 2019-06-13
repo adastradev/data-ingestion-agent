@@ -2,10 +2,13 @@
 
 import TYPES from '../ioc.types';
 import { inject, injectable, named } from 'inversify';
+import * as path from 'path';
 import 'reflect-metadata';
 import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from './IIntegrationConfig';
 import { DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
 import { QueryService } from './queryServiceAPI';
+import getCloudDependencies from './Util/getCloudDependencies';
+import * as Winston from 'winston';
 
 /**
  * Given an integration type, return a set of integration queries to run
@@ -21,13 +24,14 @@ export default class IntegrationConfigFactory {
      * @memberof MessageHandlerFactory
      */
     private discovery: DiscoverySdk;
-    constructor() {
+    constructor(@inject(TYPES.Logger)private logger: Winston.Logger) {
+        const cloudDependenciesMap = getCloudDependencies();
         this.discovery = new DiscoverySdk(
             process.env.DISCOVERY_SERVICE,
             process.env.AWS_REGION,
             undefined,
             undefined,
-            new Map(Object.entries(require('../package.json')['cloudDependencies'])));
+            cloudDependenciesMap);
     }
 
     public async create(integrationType: IntegrationType): Promise<IIntegrationConfig> {
@@ -36,13 +40,15 @@ export default class IntegrationConfigFactory {
 
         try {
             const queryServiceURI = (await this.discovery.lookupService('platform-service-elt-queries'))[0];
-            // const queryServiceURI = 'https://4utk1njkqe.execute-api.us-east-1.amazonaws.com/0-1-0-feat7326';
+            this.logger.silly(`Query Service URI: ${queryServiceURI}`);
             const queryServiceAPI = new QueryService(queryServiceURI, process.env.AWS_REGION);
 
             // Fetch template queries from service
+            this.logger.silly(`Fetching ingestion queries for '${integrationType}`);
             const response = await queryServiceAPI.getTemplateQueries(integrationType, 'Ingestion', 'false');
             queries = response.data;
         } catch (err) {
+            this.logger.error(JSON.stringify(err));
             throw new Error(`Something went wrong fetching queries for integration type ${integrationType}`);
         }
 

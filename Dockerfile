@@ -1,7 +1,7 @@
 # compile image intended for building and testing
 FROM node:8-slim AS build-env
 ENV LD_LIBRARY_PATH /usr/lib/oracle/18.3/client64/lib
-ENV AWS_REGION=$AWS_REGION
+
 ARG INTEGRATION_TESTS_ENABLED=false
 ARG ORACLE_ENDPOINT
 ARG ORACLE_USER
@@ -9,7 +9,9 @@ ARG ORACLE_PASSWORD
 ARG COVERALLS_REPO_TOKEN=false
 ARG COVERALLS_GIT_COMMIT
 ARG COVERALLS_GIT_BRANCH
+ARG AWS_REGION
 ARG DISCOVERY_SERVICE
+ENV AWS_REGION=$AWS_REGION
 ENV DISCOVERY_SERVICE=$DISCOVERY_SERVICE
 
 RUN apt-get update && apt-get -y install git-core
@@ -34,6 +36,8 @@ RUN rm -rf node_modules dist/test &&\
 
 # compile image intended for production use
 FROM node:8-slim AS prod-env
+ARG DISCOVERY_SERVICE
+ARG AWS_REGION
 ENV DISCOVERY_SERVICE=$DISCOVERY_SERVICE
 ENV AWS_REGION=$AWS_REGION
 ENV LD_LIBRARY_PATH /usr/lib/oracle/18.3/client64/lib
