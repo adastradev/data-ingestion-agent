@@ -1,5 +1,6 @@
 
 docker build \
+--build-arg DEFAULT_STAGE=$DEFAULT_STAGE \
 --build-arg DISCOVERY_SERVICE=$DISCOVERY_SERVICE \
 --build-arg ORACLE_ENDPOINT=$ORACLE_ENDPOINT \
 --build-arg ORACLE_USER=$ORACLE_USER \
