@@ -1,0 +1,2 @@
+#!/bin/bash
+docker build --build-arg DEFAULT_STAGE=$DEFAULT_STAGE --build-arg DISCOVERY_SERVICE=$DISCOVERY_SERVICE --build-arg AWS_REGION=$AWS_REGION -t $IMAGE_NAME .
