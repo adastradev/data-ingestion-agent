@@ -88,6 +88,16 @@ adastradev/data-ingestion-agent:latest \
 preview
 ```
 
+The following links display the default set of queries that run for each of the respective SIS integrations:
+
+[Banner Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=Banner)
+
+[PeopleSoft Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=PeopleSoft)
+
+[DegreeWorks Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=DegreeWorks)
+
+[Colleague Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=Colleague)
+
 ### Adhoc Ingestion
 To immediately begin the ingestion process you can run the following with the 'ingest' flag. This command will terminate the container once the process has completed.
 
