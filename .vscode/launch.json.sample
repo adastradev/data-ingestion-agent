@@ -1,0 +1,99 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch DIA",
+            "protocol": "inspector",
+            "args": [ "ingest" ],
+            "cwd": "${workspaceRoot}",
+            "runtimeArgs": [
+                "--max-old-space-size=2048",
+                "--abort-on-uncaught-exception",
+                "-r",
+                "ts-node/register"
+            ],
+            "console": "integratedTerminal",
+            "program": "${workspaceFolder}/index.ts",
+            "env": {
+                "ASTRA_CLOUD_USERNAME": "youruser@aais.com",
+                "ASTRA_CLOUD_PASSWORD": "yourpwd",
+                "ORACLE_ENDPOINT": "10.95.2.42:1521/DTEORA.aaiscloud.local",
+                "ORACLE_USER": "SISCacheUCMerced",
+                "ORACLE_PASSWORD": "SISCacheUCMerced",
+                "DEFAULT_STAGE": "dev",
+                "INTEGRATION_TYPE": "Banner",
+                "LOG_LEVEL": "silly",
+                "CONCURRENT_CONNECTIONS": "10",
+                "PROCESS_MAX_MEMORY_SIZE_MB": "4096",
+                "S3_QUEUE_SIZE": "10",
+                "S3_PART_SIZE_MB": "10"
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "DIA Integration Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-r",
+                "ts-node/register",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/test/integration/**/*.spec.ts"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+                "ORACLE_ENDPOINT": "oracle-test-automation.ce036htyysuc.us-east-1.rds.amazonaws.com:1521/ORCL",
+                "ORACLE_USER": "admin",
+                "ORACLE_PASSWORD": ""
+            }
+        },
+        {           
+            "type": "node",
+            "request": "launch",
+            "name": "DIA System Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-r",
+                "ts-node/register",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/test/system/**/*.spec.ts"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+                "ASTRA_CLOUD_USERNAME": "youruser@aais.com",
+                "ASTRA_CLOUD_PASSWORD": "",
+                "NORMALIZED_DOCKER_TAG": "feature_7983",
+                "AWS_SECRET_ACCESS_KEY": "yoursecretekeyforEC2access",
+                "AWS_ACCESS_KEY": "yourkeyforEC2access",
+                "DISCOVERY_SERVICE": "",
+                "AWS_REGION": "us-east-1",
+                "S3_BUCKET_DEPLOY": "adastra-dev-data-ingestion",
+                "DEFAULT_STAGE": "dev"
+            }
+        },
+        {           
+            "type": "node",
+            "request": "launch",
+            "name": "DIA Unit Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-r",
+                "ts-node/register",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/test/unit/**/*.spec.ts"
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}

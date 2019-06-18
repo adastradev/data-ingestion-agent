@@ -74,7 +74,7 @@ export default class SendDataHandler implements IMessageHandler {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
         const integrationType = IntegrationType[process.env.INTEGRATION_TYPE] || IntegrationType.Banner;
-        const integrationConfig = this._integrationConfigFactory.create(integrationType);
+        const integrationConfig = await this._integrationConfigFactory.create(integrationType);
 
         if (integrationConfig.type === IntegrationType.NotImplemented) {
             throw new Error(`Ingest commands for '${integrationType}' integrations are not yet supported`);

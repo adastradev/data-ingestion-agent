@@ -2,6 +2,7 @@ import { Container } from 'inversify';
 import TYPES from './ioc.types';
 
 // Config
+import getCloudDependencies from './source/Util/getCloudDependencies';
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
@@ -74,10 +75,8 @@ const logger: Winston.Logger = Winston.createLogger({
     transports
 });
 
-// NOTE: updates to the discovery service itself would require pushing a new docker image.
-// This should still be an environment variable rather than hardcoded
-process.env.DISCOVERY_SERVICE = 'https://4w35qhpotd.execute-api.us-east-1.amazonaws.com/prod';
-const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region);
+const cloudDependenciesMap: Map<any, any> = getCloudDependencies();
+const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region, null, null, cloudDependenciesMap);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
 const authManager = new AuthManager(poolLocator, region);
@@ -110,17 +109,40 @@ const startup = async () => {
 
         // Authentication & Resource lookups
         logger.info('Looking up user management service address');
-        let endpoints = await sdk.lookupService('user-management', stage);
-        process.env.USER_MANAGEMENT_URI = endpoints[0];
+        let endpoints;
+        try {
+            endpoints = await sdk.lookupService('user-management', stage);
+            process.env.USER_MANAGEMENT_URI = endpoints[0];
+        } catch (error) {
+            logger.error('Failed to find the user management service via the lookup service');
+            throw error;
+        }
 
-        logger.info('Looking up user management service address');
-        endpoints = await sdk.lookupService('data-ingestion', stage);
-        process.env.DATA_INGESTION_URI = endpoints[0];
+        logger.info('Looking up data ingestion service address');
+        try {
+            endpoints = await sdk.lookupService('data-ingestion', stage);
+            process.env.DATA_INGESTION_URI = endpoints[0];
+        } catch (error) {
+            logger.error('Failed to find the data ingestion service via the lookup service');
+            throw error;
+        }
 
         logger.silly('authManager.signIn');
-        const cognitoSession = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+        let cognitoSession;
+        try {
+            cognitoSession = await authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+        } catch (error) {
+            logger.error('Failed to sign in, please confirm the specified user exists and is in a valid state');
+            throw error;
+        }
+
         logger.silly('authManager.getIamCredentials');
-        AWS.config.credentials = await authManager.getIamCredentials();
+        try {
+            AWS.config.credentials = await authManager.getIamCredentials();
+        } catch (error) {
+            logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
+            throw error;
+        }
 
         // lookup SQS queue for this tenant
         const credentialsBearerToken: BearerTokenCredentials = {
@@ -132,14 +154,25 @@ const startup = async () => {
             region,
             credentialsBearerToken);
 
-        logger.info('Looking up ingestion tenant configuration info');
-        const poolListResponse = await dataIngestionApi.getTenantSettings();
-        const queueUrl = poolListResponse.data.tenantDataIngestionQueueUrl;
-        const bucketPath = poolListResponse.data.dataIngestionBucketPath;
-        const tenantName = poolListResponse.data.tenantName;
+        logger.info('Looking up ingestion user specific ingestion settings');
+        let tenantSettingsResponse;
+        try {
+            tenantSettingsResponse = await dataIngestionApi.getTenantSettings();
+        } catch (error) {
+            logger.error('Could not find user specific ingestion settings');
+            throw error;
+        }
+        const queueUrl = tenantSettingsResponse.data.tenantDataIngestionQueueUrl;
+        const bucketPath = tenantSettingsResponse.data.dataIngestionBucketPath;
+        const tenantName = tenantSettingsResponse.data.tenantName;
 
-        logger.info('Looking up ingestion configuration info');
-        const globalConfigResponse = await dataIngestionApi.getSettings();
+        logger.info('Looking up ingestion settings');
+        let globalConfigResponse;
+        try {
+            globalConfigResponse = await dataIngestionApi.getSettings();
+        } catch (error) {
+            logger.error('Could not find ingestion settings');
+        }
         const snsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
 
         // App

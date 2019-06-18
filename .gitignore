@@ -7,7 +7,7 @@ typings/
 .npm
 *.tgz
 config.ts
-.vscode
+.vscode/*.json
 instantclient_18_3
 *.zip
 *.rpm

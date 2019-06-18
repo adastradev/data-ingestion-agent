@@ -1,6 +1,6 @@
 {
   "name": "@adastradev/data-ingestion-agent",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Ad Astra Docker agent code base for cloud integration without VPN tunnels",
   "main": "dist/index.js",
   "scripts": {
@@ -17,11 +17,10 @@
     "integration-test": "nyc --require ts-node/register mocha --timeout 999999 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "start": "node dist/start.js",
-    "generate-docs": "node -r ts-node/register ./source/Util/pre-commit.ts && git add ./docs/DataAccess"
+    "start": "node dist/start.js"
   },
   "pre-commit": [
-    "generate-docs"
+    "unit-test"
   ],
   "nyc": {
     "extension": [
@@ -58,7 +57,7 @@
   "license": "MIT",
   "dependencies": {
     "@adastradev/data-ingestion-sdk": "^1.0.2",
-    "@adastradev/serverless-discovery-sdk": "0.0.7",
+    "@adastradev/serverless-discovery-sdk": "^2.0.1",
     "@adastradev/user-management-sdk": "^1.0.3",
     "@types/bluebird-global": "^3.5.9",
     "@types/chai": "^4.1.6",
@@ -110,5 +109,8 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-no-unused-expression-chai": "^0.1.4"
+  },
+  "cloudDependencies": {
+    "elt-queries": "1.0.0"
   }
 }
