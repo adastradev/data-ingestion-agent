@@ -96,7 +96,7 @@ The following links display the default set of queries that run for each of the 
 
 [DegreeWorks Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=DegreeWorks)
 
-[Colleague Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=Colleague)
+[Colleague SQL Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=Colleague)
 
 ### Adhoc Ingestion
 To immediately begin the ingestion process you can run the following with the 'ingest' flag. This command will terminate the container once the process has completed.
