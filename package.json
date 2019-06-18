@@ -111,6 +111,6 @@
     "tslint-no-unused-expression-chai": "^0.1.4"
   },
   "cloudDependencies": {
-    "elt-queries": "1.0.0"
+    "elt-queries": "1.x.x"
   }
 }
