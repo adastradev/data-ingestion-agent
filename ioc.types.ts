@@ -24,7 +24,9 @@ const TYPES = {
     SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
     SNS: Symbol('SNS'),
     SQS: Symbol('SQS'),
-    TenantName: Symbol('TenantName')
+    TenantName: Symbol('TenantName'),
+    QueryService: Symbol('QueryService'),
+    Token: Symbol('Token')
 };
 
 export default TYPES;

@@ -1,3 +1,5 @@
+import { QueryService } from "../../source/queryServiceAPI";
+
 import 'reflect-metadata';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -6,7 +8,7 @@ chai.use(chaiAsPromised);
 
 import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import { IIntegrationConfig, IntegrationType } from '../../source/IIntegrationConfig';
-import { Logger } from 'winston';
+import { Logger, query } from 'winston';
 import TYPES from '../../ioc.types';
 
 const expect = chai.expect;
@@ -15,9 +17,10 @@ describe('IntegrationConfigFactory', () => {
 
     describe('create', () => {
         const logger = container.get<Logger>(TYPES.Logger);
+        const queryServiceAPI = container.get<QueryService>(TYPES.QueryService);
 
         it('should return queries for Banner', async () => {
-            const icf = new IntegrationConfigFactory(logger);
+            const icf = new IntegrationConfigFactory(logger, queryServiceAPI);
 
             const cfg: IIntegrationConfig = await icf.create(IntegrationType.Banner);
 
@@ -26,7 +29,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should return queries for DegreeWorks', async () => {
-            const icf = new IntegrationConfigFactory(logger);
+            const icf = new IntegrationConfigFactory(logger, queryServiceAPI);
 
             const cfg: IIntegrationConfig = await icf.create(IntegrationType.DegreeWorks);
 
@@ -35,7 +38,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should return queries for PeopleSoft', async () => {
-            const icf = new IntegrationConfigFactory(logger);
+            const icf = new IntegrationConfigFactory(logger, queryServiceAPI);
 
             const cfg: IIntegrationConfig = await icf.create(IntegrationType.PeopleSoft);
 
@@ -44,7 +47,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should return queries for Demo', async () => {
-            const icf = new IntegrationConfigFactory(logger);
+            const icf = new IntegrationConfigFactory(logger, queryServiceAPI);
 
             const cfg: IIntegrationConfig = await icf.create(IntegrationType.Demo);
 
@@ -53,7 +56,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should return queries for Colleague and indicate it is not fully implemented', async () => {
-            const icf = new IntegrationConfigFactory(logger);
+            const icf = new IntegrationConfigFactory(logger, queryServiceAPI);
 
             const cfg: IIntegrationConfig = await icf.create(IntegrationType.Colleague);
 
@@ -62,7 +65,7 @@ describe('IntegrationConfigFactory', () => {
         });
 
         it('should fail when an unsupported type is specified', async () => {
-            const icf = new IntegrationConfigFactory(logger);
+            const icf = new IntegrationConfigFactory(logger, queryServiceAPI);
             const unsupportedType = IntegrationType.Unknown;
 
             expect(icf.create(unsupportedType)).to.eventually.be.rejectedWith(Error, `Something went wrong fetching queries for integration type ${unsupportedType}`);

@@ -6,11 +6,13 @@ import getCloudDependencies from './source/Util/getCloudDependencies';
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
-import { AuthManager,
+import {
+    AuthManager,
     CognitoUserPoolLocatorUserManagement,
     configureAwsProxy
 } from '@adastradev/user-management-sdk';
 import { DataIngestionApi } from '@adastradev/data-ingestion-sdk';
+import { QueryService } from './source/queryServiceAPI';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
 
 // Message Management
@@ -49,6 +51,7 @@ import GZipOutputEncoder from './source/DataAccess/GZipOutputEncoder';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
+const eltQueryUri = process.env.ELT_QUERY_URI || 'wq56cwh321.execute-api.us-east-1.amazonaws.com/1-0-0-feat7328';
 
 // AWS module configuration
 configureAwsProxy(AWS.config);
@@ -154,6 +157,12 @@ const startup = async () => {
             region,
             credentialsBearerToken);
 
+        // Is here the right place for this?
+        const queryService = new QueryService(
+            eltQueryUri,
+            region,
+            credentialsBearerToken);
+
         logger.info('Looking up ingestion user specific ingestion settings');
         let tenantSettingsResponse;
         try {
@@ -177,6 +186,12 @@ const startup = async () => {
 
         // App
         container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
+
+        // Authentication
+        container.bind<QueryService>(TYPES.QueryService).toConstantValue(queryService);
+        container.bind<BearerTokenCredentials>(TYPES.Token).toConstantValue(credentialsBearerToken);
+
+        // should there be a bind for the API?
 
         // AWS
         container.bind<SQS>(TYPES.SQS).toConstantValue(new SQS());
