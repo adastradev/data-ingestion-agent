@@ -23,16 +23,8 @@ export default class IntegrationConfigFactory {
      * @param {Container} container The IOC container used to resolve other dependencies
      * @memberof MessageHandlerFactory
      */
-    private discovery: DiscoverySdk;
-    constructor(@inject(TYPES.Logger)private logger: Winston.Logger, @inject(TYPES.QueryService)private queryService: QueryService) {
-        const cloudDependenciesMap = getCloudDependencies();
-        this.discovery = new DiscoverySdk(
-            process.env.DISCOVERY_SERVICE,
-            process.env.AWS_REGION,
-            undefined,
-            undefined,
-            cloudDependenciesMap);
 
+    constructor(@inject(TYPES.Logger)private logger: Winston.Logger, @inject(TYPES.QueryService)private queryService: QueryService) {
     }
 
     public async create(integrationType: IntegrationType): Promise<IIntegrationConfig> {
@@ -40,9 +32,6 @@ export default class IntegrationConfigFactory {
         let queries: IIntegrationConfig;
 
         try {
-            const queryServiceURI = (await this.discovery.lookupService('elt-queries'))[0];
-            this.logger.silly(`Query Service URI: ${queryServiceURI}`);
-
             // Fetch template queries from service
             this.logger.silly(`Fetching ingestion queries for '${integrationType}`);
             const response = await this.queryService.getTenantQueries(integrationType, 'Ingestion', 'false');

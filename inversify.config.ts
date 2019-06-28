@@ -51,7 +51,6 @@ import GZipOutputEncoder from './source/DataAccess/GZipOutputEncoder';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
-const eltQueryUri = process.env.ELT_QUERY_URI || 'wq56cwh321.execute-api.us-east-1.amazonaws.com/1-0-0-feat7328';
 
 // AWS module configuration
 configureAwsProxy(AWS.config);
@@ -130,6 +129,15 @@ const startup = async () => {
             throw error;
         }
 
+        logger.info('Looking up elt query service address');
+        try {
+            endpoints = await sdk.lookupService('elt-queries', stage);
+            process.env.ELT_QUERY_URI = endpoints[0];
+        } catch (error) {
+            logger.error('Failed to find the elt query service via the lookup service');
+            throw error;
+        }
+
         logger.silly('authManager.signIn');
         let cognitoSession;
         try {
@@ -159,7 +167,7 @@ const startup = async () => {
 
         // Is here the right place for this?
         const queryService = new QueryService(
-            eltQueryUri,
+            process.env.ELT_QUERY_URI,
             region,
             credentialsBearerToken);
 
