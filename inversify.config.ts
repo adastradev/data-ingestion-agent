@@ -78,7 +78,7 @@ const logger: Winston.Logger = Winston.createLogger({
 });
 
 const cloudDependenciesMap: Map<any, any> = getCloudDependencies();
-const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region, null, null, cloudDependenciesMap);
+const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region, process.env.DEFAULT_STAGE, null, cloudDependenciesMap);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
 const authManager = new AuthManager(poolLocator, region);
