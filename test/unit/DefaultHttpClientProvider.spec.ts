@@ -41,7 +41,7 @@ describe('DefaultHttpClientProvider', () => {
                         accessKeyId: 'AKIAJE7N000000000000',
                         secretAccessKey: 'NQV69ecK9Eo0Na4paIrs0000000000000/000000',
                         type: 'IAM'
-                    }
+                    };
                     const client = provider.getClient('http://something.com', 'us-east-1', creds);
 
                     expect(client).to.exist;
@@ -55,7 +55,7 @@ describe('DefaultHttpClientProvider', () => {
                     const creds: BearerTokenCredentials = {
                         idToken: 'notavalidtoken',
                         type: 'BearerToken'
-                    }
+                    };
                     const client = provider.getClient('http://something.com', 'us-east-1', creds);
 
                     expect(client).to.exist;
@@ -69,7 +69,7 @@ describe('DefaultHttpClientProvider', () => {
                     const creds: BearerTokenCredentials = {
                         idToken: 'notavalidtoken',
                         type: 'BearerToken'
-                    }
+                    };
                     const client = provider.getClient('http://something.com', 'us-east-1', creds);
 
                     expect(client).to.exist;
@@ -82,7 +82,7 @@ describe('DefaultHttpClientProvider', () => {
 
                     const creds: ApiCredentials = {
                         type: 'unknown' as any
-                    }
+                    };
                     expect(() => provider.getClient('http://something.com', 'us-east-1', creds)).to.throw(Error, 'Unsupported credential type in TenantApi');
                 });
             });

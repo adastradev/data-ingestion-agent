@@ -1,5 +1,5 @@
 import { IHttpClientProvider } from './IHttpClientProvider';
-import { ApiCredentials, IAMCredentials, BearerTokenCredentials } from '@adastradev/serverless-discovery-sdk';
+import { ApiCredentials, BearerTokenCredentials, IAMCredentials } from '@adastradev/serverless-discovery-sdk';
 import { IHttpClient } from './IHttpClient';
 
 const apigClientFactory: any = require('aws-api-gateway-client').default; // tslint:disable-line

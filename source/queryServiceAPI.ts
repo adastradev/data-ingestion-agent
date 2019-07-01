@@ -23,7 +23,7 @@ export class QueryService {
             queryParams['formatted'] = formatted;
         }
 
-        const additionalParams = Object.assign(this.apigClient.defaultAdditionalParams, { queryParams });
+        const additionalParams = Object.assign(this.apigClient.defaultAdditionalParams || {}, { queryParams });
 
         return await this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
