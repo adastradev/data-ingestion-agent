@@ -15,14 +15,15 @@ const expect = chai.expect;
 describe('IntegrationConfigFactory', () => {
     let queryService;
     let container: Container;
+    let logger;
 
-    before(async() => {
+    before(async () => {
         container = await startup();
         queryService = container.get(TYPES.QueryService);
+        logger = container.get<Logger>(TYPES.Logger);
     });
 
     describe('create', () => {
-        const logger = container.get<Logger>(TYPES.Logger);
 
         it('should return queries for Banner', async () => {
             const icf = new IntegrationConfigFactory(logger, queryService);
