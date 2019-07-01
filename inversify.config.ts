@@ -168,7 +168,6 @@ const startup = async () => {
             region,
             credentialsBearerToken);
 
-        // Is here the right place for this?
         const queryService = new QueryService(
             process.env.ELT_QUERY_URI,
             region,
@@ -200,9 +199,6 @@ const startup = async () => {
 
         // Authentication
         container.bind<QueryService>(TYPES.QueryService).toConstantValue(queryService);
-        container.bind<BearerTokenCredentials>(TYPES.Token).toConstantValue(credentialsBearerToken);
-
-        // should there be a bind for the API?
 
         // AWS
         container.bind<SQS>(TYPES.SQS).toConstantValue(new SQS());
