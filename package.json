@@ -15,40 +15,13 @@
     "test": "npm run test:clean && npm run unit-test && npm run integration-test",
     "unit-test": "nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
     "integration-test": "nyc --require ts-node/register mocha --timeout 120000 test/integration/**/*.spec.ts",
-    "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
+    "system-test": "mocha --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js"
   },
   "pre-commit": [
     "unit-test"
   ],
-  "nyc": {
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "exclude": [
-      "**/*.d.ts",
-      "pipeline/**",
-      "coverage/**",
-      "dist/**",
-      "test/**",
-      "webpack.config.js",
-      "source-map-install.js",
-      "inversify.config.ts",
-      "**/I[A-Z]*.ts",
-      "source/Util/pre-commit.ts"
-    ],
-    "reporter": [
-      "lcov",
-      "html",
-      "text"
-    ],
-    "sourceMap": true,
-    "all": true,
-    "clean": false,
-    "cache": false
-  },
   "author": "Ad Astra",
   "contributors": [
     "Cory Routledge <croutledge@aais.com>",
@@ -90,10 +63,12 @@
     "through2": "^2.0.3",
     "ts-loader": "^5.2.1",
     "ts-sinon": "^1.0.12",
+    "tsconfig-paths": "^3.8.0",
     "typescript": "^3.0.3",
     "winston": "^3.1.0"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "@types/oracledb": "^1.11.34",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -103,8 +78,10 @@
     "npm": "^6.9.0",
     "nyc": "^14.1.0",
     "pre-commit": "^1.2.2",
+    "remap-istanbul": "^0.13.0",
     "rimraf": "^2.6.3",
     "sinon": "^7.0.0",
+    "source-map-support": "^0.5.12",
     "ssh2": "^0.6.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
