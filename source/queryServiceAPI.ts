@@ -5,7 +5,6 @@ import { IHttpClient } from './Util/IHttpClient';
 export class QueryService {
     // TODO: create an interface for client to allow plugging in clients for cloud providers other than AWS
     private apigClient: IHttpClient;
-    private additionalParams: any;
 
     constructor(serviceEndpointUri: string, region: string, clientProvider: IHttpClientProvider, credentials?: ApiCredentials) {
         this.apigClient = clientProvider.getClient(serviceEndpointUri, region, credentials);
@@ -15,7 +14,6 @@ export class QueryService {
         const params = {};
         const pathTemplate = '/admin/queries';
         const method = 'GET';
-        this.apigClient.defaultAdditionalParams = Object.assign({}, this.additionalParams);
         const body = {};
         const queryParams = {
             integrationstage,
@@ -25,8 +23,8 @@ export class QueryService {
             queryParams['formatted'] = formatted;
         }
 
-        Object.assign(this.apigClient.defaultAdditionalParams, { queryParams });
+        const additionalParams = Object.assign(this.apigClient.defaultAdditionalParams, { queryParams });
 
-        return await this.apigClient.invokeApi(params, pathTemplate, method, this.additionalParams, body);
+        return await this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
 }
