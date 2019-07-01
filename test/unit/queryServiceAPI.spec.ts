@@ -9,9 +9,10 @@ import { QueryService } from '../../source/queryServiceAPI';
 
 const expect = chai.expect;
 
-const createQueryService = (sandbox: sinon.SinonSandbox) => {
+const createQueryService = (sandbox: sinon.SinonSandbox, headers?: any) => {
     const invokeSpy = sandbox.stub().resolves({ type: 'Banner', queries: [] });
     const clientStub = {
+        defaultAdditionalParams: headers,
         invokeApi: invokeSpy
     };
 
@@ -76,6 +77,29 @@ describe('queryServiceApi', () => {
                             integrationstage: 'Ingestion',
                             integrationtype: 'Banner'
                         }
+                    });
+                    expect(invokeSpy.getCall(0).args[4]).to.be.empty;
+                });
+            });
+            describe('and the request does not provide a formatted filter', () => {
+                it('then the provider should return a properly configured client without specifying formatted or not', async () => {
+                    const testCfg = createQueryService(sandbox, { Authorization: 'Bearer something' });
+
+                    const queryService = testCfg.queryService;
+                    const invokeSpy = testCfg.invokeSpy;
+                    const result = await queryService.getTenantQueries('Banner', 'Ingestion', undefined);
+
+                    expect(result).to.exist;
+                    expect(invokeSpy.calledOnce).to.be.true;
+                    expect(invokeSpy.getCall(0).args[0]).to.be.empty;
+                    expect(invokeSpy.getCall(0).args[1]).to.eq('/admin/queries');
+                    expect(invokeSpy.getCall(0).args[2]).to.eq('GET');
+                    expect(invokeSpy.getCall(0).args[3]).to.deep.eq({
+                        queryParams: {
+                            integrationstage: 'Ingestion',
+                            integrationtype: 'Banner'
+                        },
+                        Authorization: 'Bearer something'
                     });
                     expect(invokeSpy.getCall(0).args[4]).to.be.empty;
                 });
