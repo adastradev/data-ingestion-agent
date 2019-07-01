@@ -45,14 +45,17 @@ export class QueryService {
         const params = {};
         const pathTemplate = '/admin/queries';
         const method = 'GET';
-        this.additionalParams = Object.assign({}, {
-            queryParams: {
-                integrationtype,
-                integrationstage,
-                formatted
-            }
-        });
+        this.additionalParams = Object.assign({}, this.additionalParams);
         const body = {};
+        const queryParams = {
+            integrationstage,
+            integrationtype
+        };
+        if (formatted) {
+            queryParams['formatted'] = formatted;
+        }
+
+        Object.assign(this.additionalParams, { queryParams });
 
         return await this.apigClient.invokeApi(params, pathTemplate, method, this.additionalParams, body);
     }
