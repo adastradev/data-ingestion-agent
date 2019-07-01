@@ -4,11 +4,8 @@ import TYPES from '../ioc.types';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { IIntegrationConfig, IntegrationType } from './IIntegrationConfig';
-import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
 import { QueryService } from './queryServiceAPI';
-import getCloudDependencies from './Util/getCloudDependencies';
 import * as Winston from 'winston';
-// import { Credentials } from 'aws-sdk';
 
 /**
  * Given an integration type, return a set of integration queries to run

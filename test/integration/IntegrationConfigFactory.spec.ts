@@ -1,37 +1,25 @@
 import 'reflect-metadata';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import container from '../unit/test.inversify.config';
 chai.use(chaiAsPromised);
 
 import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import { IIntegrationConfig, IntegrationType } from '../../source/IIntegrationConfig';
 import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
-import {AuthManager, CognitoUserPoolLocatorUserManagement} from '@adastradev/user-management-sdk';
-import { BearerTokenCredentials, ApiCredentialType} from '@adastradev/serverless-discovery-sdk';
-import { QueryService } from '../../source/queryServiceAPI';
-import { CognitoUserSession } from 'amazon-cognito-identity-js';
+import startup from '../../inversify.config';
+import { Container } from 'inversify';
 
 const expect = chai.expect;
 
 describe('IntegrationConfigFactory', () => {
     let queryService;
-    const region = 'us-east-1';
-    let credentials: ApiCredentialType;
-    queryService = new QueryService('https://wq56cwh321.execute-api.us-east-1.amazonaws.com/1-0-0-feat7328', region);
-    console.log('here');
-    // before(async () => {
-    //     const poolLocator = await new CognitoUserPoolLocatorUserManagement(region);
-    //     const authManager = await new AuthManager(poolLocator, region);
-    //     let cognitoSession: CognitoUserSession;
-    //     cognitoSession = await authManager.signIn('lbaais@yahoo.com', 'Apple123');
-    //     const credentialsBearerToken: BearerTokenCredentials = {
-    //         idToken: cognitoSession.getIdToken().getJwtToken(),
-    //         type: 'BearerToken'
-    //     };
-    //     queryService = new QueryService('someurl', 'us-east-1');
-    // });
+    let container: Container;
+
+    before(async() => {
+        container = await startup();
+        queryService = container.get(TYPES.QueryService);
+    });
 
     describe('create', () => {
         const logger = container.get<Logger>(TYPES.Logger);
