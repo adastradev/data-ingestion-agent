@@ -113,7 +113,7 @@ const startup = async () => {
         logger.info('Looking up user management service address');
         let endpoints;
         try {
-            endpoints = await sdk.lookupService('user-management', stage);
+            endpoints = await sdk.lookupService('user-management');
             process.env.USER_MANAGEMENT_URI = endpoints[0];
         } catch (error) {
             logger.error('Failed to find the user management service via the lookup service');
@@ -122,7 +122,7 @@ const startup = async () => {
 
         logger.info('Looking up data ingestion service address');
         try {
-            endpoints = await sdk.lookupService('data-ingestion', stage);
+            endpoints = await sdk.lookupService('data-ingestion');
             process.env.DATA_INGESTION_URI = endpoints[0];
         } catch (error) {
             logger.error('Failed to find the data ingestion service via the lookup service');
@@ -131,7 +131,7 @@ const startup = async () => {
 
         logger.info('Looking up elt query service address');
         try {
-            endpoints = await sdk.lookupService('elt-queries', stage);
+            endpoints = await sdk.lookupService('elt-queries');
             process.env.ELT_QUERY_URI = endpoints[0];
         } catch (error) {
             logger.error('Failed to find the elt query service via the lookup service');
