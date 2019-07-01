@@ -7,8 +7,8 @@ export class QueryService {
     private apigClient: any;
     private additionalParams: any;
 
-    constructor(serviceEndpointUri: string, region: string, credentials: ApiCredentials) {
-        if (credentials.type === 'None') {
+    constructor(serviceEndpointUri: string, region: string, credentials?: ApiCredentials) {
+        if (!credentials || credentials.type === 'None') {
             this.apigClient = apigClientFactory.newClient({
                 accessKey: '',
                 invokeUrl: serviceEndpointUri,
