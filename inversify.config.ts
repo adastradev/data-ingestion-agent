@@ -48,6 +48,7 @@ import { Agent } from './source/Agent';
 import { SNS, SQS } from 'aws-sdk';
 import IOutputEncoder from './source/DataAccess/IOutputEncoder';
 import GZipOutputEncoder from './source/DataAccess/GZipOutputEncoder';
+import { DefaultHttpClientProvider } from './source/Util/DefaultHttpClientProvider';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -168,9 +169,11 @@ const startup = async () => {
             region,
             credentialsBearerToken);
 
+        const httpClientProvider = new DefaultHttpClientProvider();
         const queryService = new QueryService(
             process.env.ELT_QUERY_URI,
             region,
+            httpClientProvider,
             credentialsBearerToken);
 
         logger.info('Looking up ingestion user specific ingestion settings');
