@@ -25,8 +25,7 @@ const TYPES = {
     SNS: Symbol('SNS'),
     SQS: Symbol('SQS'),
     TenantName: Symbol('TenantName'),
-    QueryService: Symbol('QueryService'),
-    Token: Symbol('Token')
+    QueryService: Symbol('QueryService')
 };
 
 export default TYPES;
