@@ -8,15 +8,6 @@ import { Logger } from 'winston';
 import AWS = require('aws-sdk');
 import IOutputEncoder from '../IOutputEncoder';
 
-let S3_PART_SIZE_MB = 10;
-if (process.env.S3_PART_SIZE_MB) {
-    S3_PART_SIZE_MB = Number(process.env.S3_PART_SIZE_MB);
-}
-let S3_QUEUE_SIZE = 10;
-if (process.env.S3_QUEUE_SIZE) {
-    S3_QUEUE_SIZE = Number(process.env.S3_QUEUE_SIZE);
-}
-
 /**
  * Given a readable stream ingest data into an S3 bucket
  *
@@ -26,10 +17,22 @@ if (process.env.S3_QUEUE_SIZE) {
  */
 @injectable()
 export default class S3Writer implements IDataWriter {
+
+    private readonly S3_PART_SIZE_MB: number;
+    private readonly S3_QUEUE_SIZE: number;
     constructor(
         @inject(TYPES.Bucket) private _bucketPath: string,
         @inject(TYPES.OutputEncoder) private _outputEncoder: IOutputEncoder,
         @inject(TYPES.Logger) private _logger: Logger) {
+
+        this.S3_PART_SIZE_MB = 10;
+        if (process.env.S3_PART_SIZE_MB) {
+            this.S3_PART_SIZE_MB = Number(process.env.S3_PART_SIZE_MB);
+        }
+        this.S3_QUEUE_SIZE = 10;
+        if (process.env.S3_QUEUE_SIZE) {
+            this.S3_QUEUE_SIZE = Number(process.env.S3_QUEUE_SIZE);
+        }
     }
 
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
@@ -51,7 +54,7 @@ export default class S3Writer implements IDataWriter {
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
         const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms,
-            { partSize: 1024 * 1024 * S3_PART_SIZE_MB, queueSize: S3_QUEUE_SIZE });
+            { partSize: 1024 * 1024 * this.S3_PART_SIZE_MB, queueSize: this.S3_QUEUE_SIZE });
 
         managedUpload.on('httpUploadProgress', (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${parms.Key})`);
