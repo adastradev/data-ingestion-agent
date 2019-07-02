@@ -1,6 +1,9 @@
 
 import 'reflect-metadata';
 import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+chai.use(chaiAsPromised);
+
 import container from './test.inversify.config';
 import TYPES from '../../ioc.types';
 
@@ -13,6 +16,7 @@ import { Logger } from 'winston';
 import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
+import { TableNotFoundException } from '../../source/TableNotFoundException';
 
 const expect = chai.expect;
 
@@ -25,7 +29,7 @@ describe('SendDataHandler', () => {
         });
 
         afterEach(() => {
-            sandbox.reset();
+            sandbox.restore();
         });
 
         const integrationConfigFactory = sinon.createStubInstance(IntegrationConfigFactory);
@@ -55,6 +59,65 @@ describe('SendDataHandler', () => {
 
             const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
 
+            const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
+
+            await handler.handle(message);
+
+            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(3);
+            expect(raiseCompletionStub.calledOnce).to.be.true;
+        });
+
+        it('should fail to handle a message when ingestion failures occur', async () => {
+            const message: IMessage = SendDataMessage.create({}, '1234');
+
+            const logger = container.get<Logger>(TYPES.Logger);
+            const writer = container.get<IDataWriter>(TYPES.DataWriter);
+
+            (writer.ingest as sinon.SinonStub).reset();
+            (writer.ingest as sinon.SinonStub).onFirstCall().rejects(new Error('Failure to ingest'));
+            const tableAssociations: Array<[string, string]> = [];
+            const stubConnection = {
+                execute: async () => Promise.resolve({ rows: tableAssociations })
+            };
+            const pool: IConnectionPool = {
+                open: async () => Promise.resolve(),
+                close: async () => Promise.resolve(),
+                getConnection: async () => Promise.resolve(stubConnection),
+                releaseConnection: async () => Promise.resolve()
+            };
+            const oracleDDLHelper = new OracleDDLHelper(pool);
+
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
+
+            expect(handler.handle(message)).to.eventually.be.rejectedWith(Error, 'Failure to ingest');
+        });
+
+        it('should not fail to handle a message when a table is not found', async () => {
+            const message: IMessage = SendDataMessage.create({}, '1234');
+
+            const logger = container.get<Logger>(TYPES.Logger);
+            const writer = container.get<IDataWriter>(TYPES.DataWriter);
+            (writer.ingest as sinon.SinonStub).reset();
+            (writer.ingest as sinon.SinonStub)
+                .onFirstCall()
+                    .rejects(new TableNotFoundException('somequery', 'somequery table not found'))
+                .onSecondCall()
+                    .resolves()
+                .onThirdCall()
+                    .resolves();
+            const tableAssociations: Array<[string, string]> = [];
+            const stubConnection = {
+                execute: async () => Promise.resolve({ rows: tableAssociations })
+            };
+            const pool: IConnectionPool = {
+                open: async () => Promise.resolve(),
+                close: async () => Promise.resolve(),
+                getConnection: async () => Promise.resolve(stubConnection),
+                releaseConnection: async () => Promise.resolve()
+            };
+            const oracleDDLHelper = new OracleDDLHelper(pool);
+
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 
             await handler.handle(message);

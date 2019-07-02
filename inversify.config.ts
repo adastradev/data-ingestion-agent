@@ -6,11 +6,13 @@ import getCloudDependencies from './source/Util/getCloudDependencies';
 import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
-import { AuthManager,
+import {
+    AuthManager,
     CognitoUserPoolLocatorUserManagement,
     configureAwsProxy
 } from '@adastradev/user-management-sdk';
 import { DataIngestionApi } from '@adastradev/data-ingestion-sdk';
+import { QueryService } from './source/queryServiceAPI';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
 
 // Message Management
@@ -46,6 +48,7 @@ import { Agent } from './source/Agent';
 import { SNS, SQS } from 'aws-sdk';
 import IOutputEncoder from './source/DataAccess/IOutputEncoder';
 import GZipOutputEncoder from './source/DataAccess/GZipOutputEncoder';
+import { DefaultHttpClientProvider } from './source/Util/DefaultHttpClientProvider';
 
 const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
@@ -76,7 +79,7 @@ const logger: Winston.Logger = Winston.createLogger({
 });
 
 const cloudDependenciesMap: Map<any, any> = getCloudDependencies();
-const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region, null, null, cloudDependenciesMap);
+const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region, process.env.DEFAULT_STAGE, null, cloudDependenciesMap);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
 const authManager = new AuthManager(poolLocator, region);
@@ -111,8 +114,9 @@ const startup = async () => {
         logger.info('Looking up user management service address');
         let endpoints;
         try {
-            endpoints = await sdk.lookupService('user-management', stage);
+            endpoints = await sdk.lookupService('user-management');
             process.env.USER_MANAGEMENT_URI = endpoints[0];
+            logger.info(process.env.USER_MANAGEMENT_URI);
         } catch (error) {
             logger.error('Failed to find the user management service via the lookup service');
             throw error;
@@ -120,10 +124,21 @@ const startup = async () => {
 
         logger.info('Looking up data ingestion service address');
         try {
-            endpoints = await sdk.lookupService('data-ingestion', stage);
+            endpoints = await sdk.lookupService('data-ingestion');
             process.env.DATA_INGESTION_URI = endpoints[0];
+            logger.info(process.env.DATA_INGESTION_URI);
         } catch (error) {
             logger.error('Failed to find the data ingestion service via the lookup service');
+            throw error;
+        }
+
+        logger.info('Looking up elt query service address');
+        try {
+            endpoints = await sdk.lookupService('elt-queries');
+            process.env.ELT_QUERY_URI = endpoints[0];
+            logger.info( process.env.ELT_QUERY_URI);
+        } catch (error) {
+            logger.error('Failed to find the elt query service via the lookup service');
             throw error;
         }
 
@@ -154,6 +169,13 @@ const startup = async () => {
             region,
             credentialsBearerToken);
 
+        const httpClientProvider = new DefaultHttpClientProvider();
+        const queryService = new QueryService(
+            process.env.ELT_QUERY_URI,
+            region,
+            httpClientProvider,
+            credentialsBearerToken);
+
         logger.info('Looking up ingestion user specific ingestion settings');
         let tenantSettingsResponse;
         try {
@@ -177,6 +199,9 @@ const startup = async () => {
 
         // App
         container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
+
+        // Authentication
+        container.bind<QueryService>(TYPES.QueryService).toConstantValue(queryService);
 
         // AWS
         container.bind<SQS>(TYPES.SQS).toConstantValue(new SQS());

@@ -27,17 +27,30 @@ describe('S3Writer', () => {
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
 
         afterEach(() => {
+            if (process.env.S3_PART_SIZE_MB) {
+                delete process.env.S3_PART_SIZE_MB;
+            }
+            if (process.env.S3_QUEUE_SIZE) {
+                delete process.env.S3_QUEUE_SIZE;
+            }
             sandbox.restore();
         });
 
         const testCases = [
             { FileNamePrefix: 'somedatafile', ShouldEncode: true },
             { FileNamePrefix: 'metadata', ShouldEncode: false },
-            { FileNamePrefix: 'ddl', ShouldEncode: false }
+            { FileNamePrefix: 'ddl', ShouldEncode: false },
+            { FileNamePrefix: 'someotherdatafile', ShouldEncode: true, S3_PART_SIZE_MB: '15', S3_QUEUE_SIZE: '15' }
         ];
 
         for (const testCase of testCases) {
             it(`should upload data to S3 with a filePrefix of ${testCase.FileNamePrefix}`, async () => {
+                if (testCase.S3_PART_SIZE_MB) {
+                    process.env.S3_PART_SIZE_MB = testCase.S3_PART_SIZE_MB;
+                }
+                if (testCase.S3_QUEUE_SIZE) {
+                    process.env.S3_QUEUE_SIZE = testCase.S3_QUEUE_SIZE;
+                }
                 const logger: Logger = container.get<Logger>(TYPES.Logger);
                 const encoderStub = new DummyEncoder();
                 const encoderSpy = sandbox.spy(encoderStub, 'encode');
@@ -64,12 +77,20 @@ describe('S3Writer', () => {
                 await s3Writer.ingest(stream, 'mockPath', testCase.FileNamePrefix);
 
                 expect(upload.calledOnce).to.be.true;
-                expect(upload.getCalls()[0].args[0].Bucket).to.eq('some_bucket/some_tenant_id/mockPath');
-                expect(upload.getCalls()[0].args[0].Key).to.contain(`${testCase.FileNamePrefix}_`);
-
                 expect(encoderSpy.calledOnce).to.eq(testCase.ShouldEncode);
 
-                expect(upload.getCalls()[0].args[0].Body).to.be.instanceof(Readable);
+                const uploadArgOptions = upload.getCalls()[0].args[0];
+                expect(uploadArgOptions.Bucket).to.eq('some_bucket/some_tenant_id/mockPath');
+                expect(uploadArgOptions.Key).to.contain(`${testCase.FileNamePrefix}_`);
+                expect(uploadArgOptions.Body).to.be.instanceof(Readable);
+
+                const uploadArgPartConfig = upload.getCall(0).args[1] as any;
+                if (testCase.S3_QUEUE_SIZE) {
+                    expect(uploadArgPartConfig.queueSize).eq(Number(testCase.S3_QUEUE_SIZE));
+                }
+                if (testCase.S3_PART_SIZE_MB) {
+                    expect(uploadArgPartConfig.partSize).eq(1024 * 1024 * Number(testCase.S3_PART_SIZE_MB));
+                }
             });
         }
     });

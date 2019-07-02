@@ -12,8 +12,14 @@ ARG COVERALLS_GIT_COMMIT
 ARG COVERALLS_GIT_BRANCH
 ARG AWS_REGION
 ARG DISCOVERY_SERVICE
+ARG ASTRA_CLOUD_USERNAME
+ARG ASTRA_CLOUD_PASSWORD
+ARG LOG_LEVEL=silly
 ENV DEFAULT_STAGE=$DEFAULT_STAGE
+ENV ASTRA_CLOUD_USERNAME=$ASTRA_CLOUD_USERNAME
+ENV ASTRA_CLOUD_PASSWORD=$ASTRA_CLOUD_PASSWORD
 ENV AWS_REGION=$AWS_REGION
+ENV LOG_LEVEL=$LOG_LEVEL
 ENV DISCOVERY_SERVICE=$DISCOVERY_SERVICE
 
 RUN apt-get update && apt-get -y install git-core
@@ -30,7 +36,7 @@ RUN npm ci &&\
     npm run build &&\
     npm run test:clean &&\
     npm run unit-test &&\
-    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run integration-test ; else echo Integration tests disabled ; fi &&\
+    if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run test ; else echo Integration tests disabled ; fi &&\
     if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run test:coveralls ; fi
 RUN rm -rf node_modules dist/test &&\
     npm ci --production &&\

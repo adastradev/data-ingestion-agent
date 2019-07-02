@@ -1,57 +1,29 @@
-declare function require(name:string): any; // tslint:disable-line
-const apigClientFactory: any = require('aws-api-gateway-client').default; // tslint:disable-line
+import { ApiCredentials } from '@adastradev/serverless-discovery-sdk';
+import { IHttpClientProvider } from './Util/IHttpClientProvider';
+import { IHttpClient } from './Util/IHttpClient';
 
 export class QueryService {
     // TODO: create an interface for client to allow plugging in clients for cloud providers other than AWS
-    private apigClient: any;
-    // private additionalParams: any;
+    private apigClient: IHttpClient;
 
-    constructor(serviceEndpointUri: string, region: string) {
-        // if (credentials.type === 'None') {
-            this.apigClient = apigClientFactory.newClient({
-                accessKey: '',
-                invokeUrl: serviceEndpointUri,
-                region,
-                secretKey: ''
-            });
-        // } else if (credentials.type === 'IAM') {
-        //     const iamCreds = credentials as IAMCredentials;
-        //     this.apigClient = apigClientFactory.newClient({
-        //         accessKey: iamCreds.accessKeyId,
-        //         invokeUrl: serviceEndpointUri,
-        //         region,
-        //         secretKey: iamCreds.secretAccessKey
-        //     });
-        // } else if (credentials.type === 'BearerToken') {
-        //     const tokenCreds = credentials as BearerTokenCredentials;
-        //     this.additionalParams = {
-        //         headers: {
-        //             Authorization: 'Bearer ' + tokenCreds.idToken
-        //         }
-        //     };
-        //     this.apigClient = apigClientFactory.newClient({
-        //         accessKey: '',
-        //         invokeUrl: serviceEndpointUri,
-        //         region,
-        //         secretKey: ''
-        //     });
-        // } else {
-        //     throw(Error('Unsupported credential type in TenantApi'));
-        // }
+    constructor(serviceEndpointUri: string, region: string, clientProvider: IHttpClientProvider, credentials?: ApiCredentials) {
+        this.apigClient = clientProvider.getClient(serviceEndpointUri, region, credentials);
     }
 
-    public async getTemplateQueries(integrationtype: string, integrationstage: string, formatted: string) {
+    public async getTenantQueries(integrationtype: string, integrationstage: string, formatted: string) {
         const params = {};
-        const pathTemplate = '/queries';
+        const pathTemplate = '/admin/queries';
         const method = 'GET';
-        const additionalParams = Object.assign({}, {
-            queryParams: {
-                integrationtype,
-                integrationstage,
-                formatted
-            }
-        });
         const body = {};
+        const queryParams = {
+            integrationstage,
+            integrationtype
+        };
+        if (formatted) {
+            queryParams['formatted'] = formatted;
+        }
+
+        const additionalParams = Object.assign(this.apigClient.defaultAdditionalParams || {}, { queryParams });
 
         return await this.apigClient.invokeApi(params, pathTemplate, method, additionalParams, body);
     }
