@@ -17,7 +17,9 @@
     "integration-test": "nyc --require ts-node/register mocha --timeout 120000 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "start": "node dist/start.js"
+    "start": "node dist/start.js",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "pre-commit": [
     "unit-test"
@@ -91,7 +93,8 @@
     "ts-loader": "^5.2.1",
     "ts-sinon": "^1.0.12",
     "typescript": "^3.0.3",
-    "winston": "^3.1.0"
+    "winston": "^3.1.0",
+    "snyk": "^1.190.0"
   },
   "devDependencies": {
     "@types/oracledb": "^1.11.34",
@@ -112,5 +115,6 @@
   },
   "cloudDependencies": {
     "elt-queries": "1.x"
-  }
+  },
+  "snyk": true
 }
