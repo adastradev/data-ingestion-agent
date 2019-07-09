@@ -73,6 +73,9 @@ No *inbound* access to the agent is required.
 
 See [Getting started with HTTPS proxies](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/HttpsProxy.md) for more information.
 
+### Authentication
+The Data Ingestion Agent utilizes JWT/AWS IAM token authentication for all request authentication. The DIA does not currently use AWS Key Management, the JWT/IAM tokens are only valid for short periods (possibly an hour) at which point the DIA must re-authenticate. 
+
 ### Query Preview
 
 Prior to sending any data you can run the following docker command to log each query to the console to examine each query. No data is sent to the destination using this command.

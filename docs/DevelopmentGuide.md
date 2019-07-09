@@ -37,6 +37,13 @@ cp test/system/instanceConfig.json.sample test/system/instanceConfig.json
 npm run system-test
 ```
 
+To run the DIA in dev ensure that the following environment variables are set
+```sh
+-e DEFAULT_STAGE=dev \
+-e DISCOVERY_SERVICE= \
+```
+and that you use a valid URI for the most recent dev Discovery Service to access resources and services in the dev environment.
+
 ## Dependencies
 Data ingestion agent uses the [node-oracledb driver](https://github.com/oracle/node-oracledb/blob/master/doc/api.md) by Oracle.
 
