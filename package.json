@@ -1,6 +1,6 @@
 {
   "name": "@adastradev/data-ingestion-agent",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Ad Astra Docker agent code base for cloud integration without VPN tunnels",
   "main": "dist/index.js",
   "scripts": {
@@ -85,6 +85,6 @@
     "tslint-no-unused-expression-chai": "^0.1.4"
   },
   "cloudDependencies": {
-    "elt-queries": "1.0.0-feat7328"
+    "elt-queries": "1.x"
   }
 }
