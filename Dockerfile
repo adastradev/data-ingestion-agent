@@ -27,7 +27,7 @@ RUN apt-get update && apt-get -y install git-core
 WORKDIR /app
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib/oracle /usr/lib/oracle
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib64/libaio* /lib/
-COPY package.json package-lock.json *.ts *config* ./
+COPY package.json package-lock.json *.ts *config* *.mocharc.json *.nycrc ./
 COPY source ./source
 COPY test ./test
 COPY docs ./docs
