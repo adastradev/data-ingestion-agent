@@ -1,6 +1,7 @@
 
 import 'reflect-metadata';
 import * as v8 from 'v8';
+import * as shell from 'child_process';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);

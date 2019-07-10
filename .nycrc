@@ -1,0 +1,20 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "require": [
+    "ts-node/register"
+  ],
+  "exclude": [
+    "**/*.d.ts",
+    "pipeline/**",
+    "coverage/**",
+    "dist/**",
+    "test/**",
+    "webpack.config.js",
+    "source-map-install.js",
+    "inversify.config.ts",
+    "**/I[A-Z]*.ts",
+    "source/Util/pre-commit.ts"
+  ],
+  "reporter": ["lcov", "html", "text"],
+  "all": true
+}
