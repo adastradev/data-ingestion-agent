@@ -17,6 +17,7 @@ export default class StartController {
     constructor (
         private readonly processArgs: any[],
         private readonly healthCheckPort: number) {
+        console.log(processArgs.length);
         this.restartCounter = 0;
     }
 
@@ -35,7 +36,7 @@ export default class StartController {
         child.stdout.on('data', (data) => {
             console.log(data.toString());
         });
-        child.on('exit', this.onExitHandler);
+        child.on('exit', this.onExitHandler.bind(this));
         child.stderr.on('data', (data) => {
             console.log(data.toString());
         });
