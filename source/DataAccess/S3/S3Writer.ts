@@ -45,7 +45,7 @@ export default class S3Writer implements IDataWriter {
             extension = '.' + encodingResult.extension.replace('.', '');
         }
 
-        const parms = {
+        const params = {
             Body: dataBody,
             Bucket:  this._bucketPath + '/' + folderPath,
             Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex') + extension
@@ -53,20 +53,26 @@ export default class S3Writer implements IDataWriter {
 
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
-        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms,
+        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(params,
             { partSize: 1024 * 1024 * this.S3_PART_SIZE_MB, queueSize: this.S3_QUEUE_SIZE });
 
         managedUpload.on('httpUploadProgress', (evt) => {
-            this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${parms.Key})`);
+            this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
         });
 
         await managedUpload.promise();
+
+        return {
+            fileName: params.Key,
+            bucket: params.Bucket
+        };
     }
 
     private shouldEncodeInput(fileNamePrefix): boolean {
         switch (fileNamePrefix) {
             case 'ddl':
             case 'metadata':
+            case 'manifest':
                 return false;
             default:
                 return true;

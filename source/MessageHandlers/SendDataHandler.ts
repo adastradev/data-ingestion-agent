@@ -20,6 +20,17 @@ import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
+import * as stream from 'stream';
+
+interface IManifest {
+    files: string[];
+    ingestStartTime: string;
+    ingestEndTime?: string;
+    ingestDuration?: string;
+    integrationType: string;
+    tenantId: string;
+    tenantName: string;
+}
 
 let STATEMENT_CONCURRENCY = 5;
 if (process.env.CONCURRENT_CONNECTIONS) {
@@ -44,6 +55,7 @@ export default class SendDataHandler implements IMessageHandler {
     private _sns: SNS;
     private _bucketPath: string;
     private _tenantName: string;
+    private _tenantId: string;
 
     constructor(
         @inject(TYPES.DataWriter) writer: IDataWriter,
@@ -67,6 +79,7 @@ export default class SendDataHandler implements IMessageHandler {
         this._sns = sns;
         this._snapshotReceivedArn = snapshotReceivedArn;
         this._bucketPath = bucketPath;
+        this._tenantId = bucketPath.split('/')[1];
         this._tenantName = tenantName;
     }
 
@@ -80,7 +93,18 @@ export default class SendDataHandler implements IMessageHandler {
             throw new Error(`Ingest commands for '${integrationType}' integrations are not yet supported`);
         }
 
-        const folderPath = integrationType + '-' + moment().toISOString();
+        const ingestStartTime = moment();
+        const ingestStartTimeAsString = ingestStartTime.toISOString();
+
+        const manifest: IManifest = {
+            files: [],
+            ingestStartTime: ingestStartTimeAsString,
+            integrationType,
+            tenantName: this._tenantName,
+            tenantId: this._tenantId
+        };
+
+        const folderPath = integrationType + '-' + ingestStartTimeAsString;
 
         await this._connectionPool.open();
 
@@ -93,18 +117,25 @@ export default class SendDataHandler implements IMessageHandler {
                 validTables[tbl] = tbl;
             }
 
+            // This is a function that helps us manage backpressure while streaming data
             mapLimit(integrationConfig.queries, STATEMENT_CONCURRENCY,
                 async (queryDefinition: IQueryDefinition, queryCallback: any) => { // iterator value callback
+                    // This callback runs for each item in the first arg - integrationConfig.queries
                     let reader: IDataReader;
                     let itemMetadata: Readable;
 
                     try {
                         const startTime = Date.now();
 
+                        // Run query and get results from source DB
                         reader = this._container.get<IDataReader>(TYPES.DataReader);
                         const queryResult: IQueryResult = await reader.read(queryDefinition);
                         itemMetadata = queryResult.metadata;
-                        await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
+
+                        // Ingest this query's results to S3 ingestion bucket
+                        const uploaded = await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
+
+                        // Calculate duration data
                         const endTime = Date.now();
                         const diff = moment.duration(endTime - startTime);
                         completionDescription = diff.humanize(false);
@@ -112,6 +143,11 @@ export default class SendDataHandler implements IMessageHandler {
                             `Ingestion for '${queryDefinition.name}' ` +
                             `took ${completionDescription} (${diff.asMilliseconds()}ms)`
                         );
+
+                        // Push the resulting filename to the manifest as an expected file
+                        // for downstream processes
+                        manifest.files.push(uploaded.fileName);
+
                     } catch (err) {
                         delete validTables[queryDefinition.name];
                         if (err instanceof TableNotFoundException) {
@@ -129,13 +165,16 @@ export default class SendDataHandler implements IMessageHandler {
                             await reader.close();
                         }
                     }
-                    queryCallback(null, { name: queryDefinition.name, data: itemMetadata});
+                    queryCallback(null, { name: queryDefinition.name, data: itemMetadata });
                 },
                 async (err, results) => { // async.mapLimit callback
+                    // This will run after the iterator function above has completed for each query
                     if (err) {
                         await this._connectionPool.close();
                         reject(err);
                     } else {
+
+                        // Ingest DDL
                         await this.ingestDDL(validTables, folderPath);
 
                         await this._connectionPool.close();
@@ -146,9 +185,27 @@ export default class SendDataHandler implements IMessageHandler {
                             }
                         });
 
-                        await this.ingestMetadata(aggregateMetadata, folderPath);
+                        // Ingest metadata
+                        const uploaded = await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        await this.raiseSnapshotCompletionEvent(integrationType, completionDescription, this._bucketPath + '/' + folderPath);
+                        // Add to manifest file
+                        manifest.files.push(uploaded.fileName);
+
+                        // Calculate overall duration and write to manifest
+                        const ingestFinishTime = moment();
+                        const duration = moment.duration(
+                            ingestFinishTime.toDate().getDate() - ingestStartTime.toDate().getDate()
+                        ).toISOString();
+                        manifest.ingestDuration = duration;
+                        manifest.ingestEndTime = ingestFinishTime.toISOString();
+
+                        const rs = new stream.Readable();
+                        rs.push(JSON.stringify(manifest));
+                        rs.push(null);
+
+                        // Finally, ingest manifest file
+                        await this._writer.ingest(rs, folderPath, 'manifest');
+                        await this.raiseSnapshotCompletionEvent(integrationType as IntegrationType, completionDescription, this._bucketPath + '/' + folderPath);
 
                         resolve();
                     }
@@ -158,8 +215,7 @@ export default class SendDataHandler implements IMessageHandler {
     }
 
     private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string, snapshotFolder: string) {
-        const tenantId = this._bucketPath.split('/')[1];
-        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(tenantId, integrationType, snapshotFolder, completionTimeDescription, this._tenantName));
+        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(this._tenantId, integrationType, snapshotFolder, completionTimeDescription, this._tenantName));
         const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
 
         this._logger.info('Sending snapshot upload completion notification');
@@ -176,7 +232,7 @@ export default class SendDataHandler implements IMessageHandler {
         const ddlPrefix = 'ddl';
         const queryResult = await reader.read({name: ddlPrefix, query: ddlQuery});
 
-        await this._writer.ingest(queryResult.result, folderPath, ddlPrefix);
+        return await this._writer.ingest(queryResult.result, folderPath, ddlPrefix);
     }
 
     private async ingestMetadata(metadata: IQueryMetadata[], folderPath: string) {
@@ -199,6 +255,6 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(JSON.stringify(allTableMetadata));
         compiledMetadataStream.push(null);
 
-        await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
+        return await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
     }
 }
