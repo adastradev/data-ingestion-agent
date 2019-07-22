@@ -193,11 +193,10 @@ export default class SendDataHandler implements IMessageHandler {
                         // Add to manifest file
                         manifest.files.push(uploaded.fileName);
 
-                        // Calculate overall duration and write to manifest
+                        // Calculate overall duration in milliseconds and write to manifest
                         const ingestFinishTime = moment();
-                        const duration = moment.duration(
-                            ingestFinishTime.toDate().getDate() - ingestStartTime.toDate().getDate()
-                        ).toISOString();
+                        const duration = ingestStartTime.diff(ingestFinishTime).toString();
+
                         manifest.ingestDuration = duration;
                         manifest.ingestEndTime = ingestFinishTime.toISOString();
 
@@ -206,7 +205,7 @@ export default class SendDataHandler implements IMessageHandler {
                         rs.push(null);
 
                         // Finally, ingest manifest file
-                        await this._writer.ingest(rs, folderPath, 'manifest');
+                        await this._writer.ingest(rs, folderPath, 'manifest.json');
                         await this.raiseSnapshotCompletionEvent(integrationType as IntegrationType, completionDescription, this._bucketPath + '/' + folderPath);
 
                         resolve();

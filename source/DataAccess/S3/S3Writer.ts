@@ -37,9 +37,10 @@ export default class S3Writer implements IDataWriter {
 
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
         let dataBody = stream;
+        const dataFile = this.isDataFile(fileNamePrefix);
         let extension = '';
 
-        if (this.shouldEncodeInput(fileNamePrefix)) {
+        if (dataFile) {
             const encodingResult = this._outputEncoder.encode(stream);
             dataBody = encodingResult.outputStream;
             extension = '.' + encodingResult.extension.replace('.', '');
@@ -48,7 +49,8 @@ export default class S3Writer implements IDataWriter {
         const params = {
             Body: dataBody,
             Bucket:  this._bucketPath + '/' + folderPath,
-            Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex') + extension
+            // No explicit extension if not a data file
+            Key: `${fileNamePrefix}${dataFile ? '_' + crypto.randomBytes(8).toString('hex') + extension : ''}`
         };
 
         // Parallelize multi-part upload
@@ -68,7 +70,7 @@ export default class S3Writer implements IDataWriter {
         };
     }
 
-    private shouldEncodeInput(fileNamePrefix): boolean {
+    private isDataFile(fileNamePrefix): boolean {
         switch (fileNamePrefix) {
             case 'ddl':
             case 'metadata':

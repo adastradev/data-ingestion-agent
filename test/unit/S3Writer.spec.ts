@@ -82,7 +82,7 @@ describe('S3Writer', () => {
 
                 const uploadArgOptions = upload.getCalls()[0].args[0];
                 expect(uploadArgOptions.Bucket).to.eq('some_bucket/some_tenant_id/mockPath');
-                expect(uploadArgOptions.Key).to.contain(`${testCase.FileNamePrefix}_`);
+                expect(uploadArgOptions.Key).to.contain(`${testCase.FileNamePrefix}`);
                 expect(uploadArgOptions.Body).to.be.instanceof(Readable);
 
                 const uploadArgPartConfig = upload.getCall(0).args[1] as any;
