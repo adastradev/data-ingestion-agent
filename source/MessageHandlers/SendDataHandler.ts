@@ -30,6 +30,7 @@ interface IManifest {
     integrationType: string;
     tenantId: string;
     tenantName: string;
+    ingestionPath: string;
 }
 
 let STATEMENT_CONCURRENCY = 5;
@@ -96,15 +97,16 @@ export default class SendDataHandler implements IMessageHandler {
         const ingestStartTime = moment();
         const ingestStartTimeAsString = ingestStartTime.toISOString();
 
+        const folderPath = integrationType + '-' + ingestStartTimeAsString;
+
         const manifest: IManifest = {
             files: [],
             ingestStartTime: ingestStartTimeAsString,
             integrationType,
             tenantName: this._tenantName,
-            tenantId: this._tenantId
+            tenantId: this._tenantId,
+            ingestionPath: folderPath
         };
-
-        const folderPath = integrationType + '-' + ingestStartTimeAsString;
 
         await this._connectionPool.open();
 
