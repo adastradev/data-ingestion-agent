@@ -74,9 +74,10 @@ describe('S3Writer', () => {
                 const stream: Readable = new Readable();
                 stream.push('test');
                 stream.push(null);
-                await s3Writer.ingest(stream, 'mockPath', testCase.FileNamePrefix);
+                const ingested = await s3Writer.ingest(stream, 'mockPath', testCase.FileNamePrefix);
 
                 expect(upload.calledOnce).to.be.true;
+                expect(ingested.fileName).to.include(testCase.FileNamePrefix);
                 expect(encoderSpy.calledOnce).to.eq(testCase.ShouldEncode);
 
                 const uploadArgOptions = upload.getCalls()[0].args[0];
