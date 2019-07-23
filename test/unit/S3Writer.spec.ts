@@ -74,14 +74,15 @@ describe('S3Writer', () => {
                 const stream: Readable = new Readable();
                 stream.push('test');
                 stream.push(null);
-                await s3Writer.ingest(stream, 'mockPath', testCase.FileNamePrefix);
+                const ingested = await s3Writer.ingest(stream, 'mockPath', testCase.FileNamePrefix);
 
                 expect(upload.calledOnce).to.be.true;
+                expect(ingested.fileName).to.include(testCase.FileNamePrefix);
                 expect(encoderSpy.calledOnce).to.eq(testCase.ShouldEncode);
 
                 const uploadArgOptions = upload.getCalls()[0].args[0];
                 expect(uploadArgOptions.Bucket).to.eq('some_bucket/some_tenant_id/mockPath');
-                expect(uploadArgOptions.Key).to.contain(`${testCase.FileNamePrefix}_`);
+                expect(uploadArgOptions.Key).to.contain(`${testCase.FileNamePrefix}`);
                 expect(uploadArgOptions.Body).to.be.instanceof(Readable);
 
                 const uploadArgPartConfig = upload.getCall(0).args[1] as any;
@@ -93,5 +94,27 @@ describe('S3Writer', () => {
                 }
             });
         }
+    });
+
+    describe('isDataFile', () => {
+
+        const sandbox: sinon.SinonSandbox = sinon.createSandbox();
+
+        it('Should identify files correctly as data files', async () => {
+            const logger: Logger = container.get<Logger>(TYPES.Logger);
+            const encoderStub = new DummyEncoder();
+            const encoderSpy = sandbox.spy(encoderStub, 'encode');
+            const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger);
+
+            const table = (s3Writer as any).isDataFile('ABCDEF');
+            const metadata = (s3Writer as any).isDataFile('metadata');
+            const manifest = (s3Writer as any).isDataFile('manifest.json');
+            const ddl = (s3Writer as any).isDataFile('ddl');
+
+            expect(table).to.be.true;
+            expect(metadata).to.be.false;
+            expect(manifest).to.be.false;
+            expect(ddl).to.be.false;
+        });
     });
 });

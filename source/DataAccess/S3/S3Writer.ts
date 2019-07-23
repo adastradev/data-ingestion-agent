@@ -37,36 +37,50 @@ export default class S3Writer implements IDataWriter {
 
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
         let dataBody = stream;
+        const dataFile = this.isDataFile(fileNamePrefix);
         let extension = '';
 
-        if (this.shouldEncodeInput(fileNamePrefix)) {
+        if (dataFile) {
             const encodingResult = this._outputEncoder.encode(stream);
             dataBody = encodingResult.outputStream;
             extension = '.' + encodingResult.extension.replace('.', '');
         }
 
-        const parms = {
+        const fileSuffix = dataFile ?
+            // If it's a data file, add hash and extension
+            '_' + crypto.randomBytes(8).toString('hex') + extension
+            // Otherwise, don't
+            : '';
+
+        const params = {
             Body: dataBody,
             Bucket:  this._bucketPath + '/' + folderPath,
-            Key: fileNamePrefix + '_' + crypto.randomBytes(8).toString('hex') + extension
+            // No explicit extension if not a data file
+            Key: `${fileNamePrefix}${fileSuffix}`
         };
 
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
-        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(parms,
+        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(params,
             { partSize: 1024 * 1024 * this.S3_PART_SIZE_MB, queueSize: this.S3_QUEUE_SIZE });
 
         managedUpload.on('httpUploadProgress', (evt) => {
-            this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${parms.Key})`);
+            this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
         });
 
         await managedUpload.promise();
+
+        return {
+            fileName: params.Key,
+            bucket: params.Bucket
+        };
     }
 
-    private shouldEncodeInput(fileNamePrefix): boolean {
+    private isDataFile(fileNamePrefix): boolean {
         switch (fileNamePrefix) {
             case 'ddl':
             case 'metadata':
+            case 'manifest.json':
                 return false;
             default:
                 return true;

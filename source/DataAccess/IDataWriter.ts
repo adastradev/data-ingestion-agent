@@ -10,4 +10,9 @@ export default interface IDataWriter {
     ingest: IngestionFunction;
 }
 
-export type IngestionFunction = (stream: Readable, folderPath: string, fileNamePrefix: string) => Promise<void>;
+interface IUploadResponse {
+    fileName: string;
+    bucket: string;
+}
+
+export type IngestionFunction = (stream: Readable, folderPath: string, fileNamePrefix: string) => Promise<IUploadResponse>;

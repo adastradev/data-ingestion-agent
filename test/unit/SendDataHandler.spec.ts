@@ -45,6 +45,13 @@ describe('SendDataHandler', () => {
 
             const logger = container.get<Logger>(TYPES.Logger);
             const writer = container.get<IDataWriter>(TYPES.DataWriter);
+
+            (writer.ingest as sinon.SinonStub).reset();
+            (writer.ingest as sinon.SinonStub).resolves({
+                fileName: 'blah',
+                bucket: 'blah'
+            });
+
             const tableAssociations: Array<[string, string]> = [];
             const stubConnection = {
                 execute: async () => Promise.resolve({ rows: tableAssociations })
@@ -57,13 +64,13 @@ describe('SendDataHandler', () => {
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, 'test');
 
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 
             await handler.handle(message);
 
-            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(3);
+            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(4);
             expect(raiseCompletionStub.calledOnce).to.be.true;
         });
 
@@ -87,7 +94,7 @@ describe('SendDataHandler', () => {
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, 'test');
 
             expect(handler.handle(message)).to.eventually.be.rejectedWith(Error, 'Failure to ingest');
         });
@@ -102,9 +109,15 @@ describe('SendDataHandler', () => {
                 .onFirstCall()
                     .rejects(new TableNotFoundException('somequery', 'somequery table not found'))
                 .onSecondCall()
-                    .resolves()
+                    .resolves({
+                        fileName: 'blah',
+                        bucket: 'blah'
+                    })
                 .onThirdCall()
-                    .resolves();
+                    .resolves({
+                        fileName: 'blah',
+                        bucket: 'blah'
+                    });
             const tableAssociations: Array<[string, string]> = [];
             const stubConnection = {
                 execute: async () => Promise.resolve({ rows: tableAssociations })
@@ -117,12 +130,12 @@ describe('SendDataHandler', () => {
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, null, oracleDDLHelper, 'test');
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, 'test');
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 
             await handler.handle(message);
 
-            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(3);
+            expect((writer.ingest as sinon.SinonStub).callCount).to.eq(4);
             expect(raiseCompletionStub.calledOnce).to.be.true;
         });
     });
