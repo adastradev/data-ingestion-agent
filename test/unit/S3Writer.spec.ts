@@ -96,7 +96,7 @@ describe('S3Writer', () => {
         }
     });
 
-    describe.only('isDataFile', () => {
+    describe('isDataFile', () => {
 
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
 
