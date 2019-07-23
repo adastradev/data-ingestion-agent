@@ -95,4 +95,26 @@ describe('S3Writer', () => {
             });
         }
     });
+
+    describe.only('isDataFile', () => {
+
+        const sandbox: sinon.SinonSandbox = sinon.createSandbox();
+
+        it('Should identify files correctly as data files', async () => {
+            const logger: Logger = container.get<Logger>(TYPES.Logger);
+            const encoderStub = new DummyEncoder();
+            const encoderSpy = sandbox.spy(encoderStub, 'encode');
+            const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger);
+
+            const table = (s3Writer as any).isDataFile('ABCDEF');
+            const metadata = (s3Writer as any).isDataFile('metadata');
+            const manifest = (s3Writer as any).isDataFile('manifest.json');
+            const ddl = (s3Writer as any).isDataFile('ddl');
+
+            expect(table).to.be.true;
+            expect(metadata).to.be.false;
+            expect(manifest).to.be.false;
+            expect(ddl).to.be.false;
+        });
+    });
 });
