@@ -46,11 +46,17 @@ export default class S3Writer implements IDataWriter {
             extension = '.' + encodingResult.extension.replace('.', '');
         }
 
+        const fileSuffix = dataFile ?
+            // If it's a data file, add hash and extension
+            '_' + crypto.randomBytes(8).toString('hex') + extension
+            // Otherwise, don't
+            : '';
+
         const params = {
             Body: dataBody,
             Bucket:  this._bucketPath + '/' + folderPath,
             // No explicit extension if not a data file
-            Key: `${fileNamePrefix}${dataFile ? '_' + crypto.randomBytes(8).toString('hex') + extension : ''}`
+            Key: `${fileNamePrefix}${fileSuffix}`
         };
 
         // Parallelize multi-part upload
