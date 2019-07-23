@@ -74,7 +74,7 @@ export default class S3Writer implements IDataWriter {
         switch (fileNamePrefix) {
             case 'ddl':
             case 'metadata':
-            case 'manifest':
+            case 'manifest.json':
                 return false;
             default:
                 return true;
