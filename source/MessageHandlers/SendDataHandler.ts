@@ -177,7 +177,10 @@ export default class SendDataHandler implements IMessageHandler {
                     } else {
 
                         // Ingest DDL
-                        await this.ingestDDL(validTables, folderPath);
+                        const ingested = await this.ingestDDL(validTables, folderPath);
+
+                        // Add to manifest file
+                        manifest.files.push(ingested.fileName);
 
                         await this._connectionPool.close();
 
@@ -190,12 +193,11 @@ export default class SendDataHandler implements IMessageHandler {
                         // Ingest metadata
                         const uploaded = await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        // Add to manifest file
                         manifest.files.push(uploaded.fileName);
 
                         // Calculate overall duration in milliseconds and write to manifest
                         const ingestFinishTime = moment();
-                        const duration = ingestStartTime.diff(ingestFinishTime).toString();
+                        const duration = ingestFinishTime.diff(ingestStartTime).toString();
 
                         manifest.ingestDuration = duration;
                         manifest.ingestEndTime = ingestFinishTime.toISOString();
