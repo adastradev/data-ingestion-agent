@@ -15,6 +15,19 @@ When connecting to an Oracle database the specified database user must be given 
 - ALL_CONSTRAINTS (view)
 - All tables referenced by this agent (see 'Query Preview' section below)
 
+When specifying the 'ORACL_ENDPOINT' value (a connection string) to your Oracle instance you may use one of the following formats:
+
+```sh
+# Easy Connect Connection String
+CONNECTION_STRING="hostname:port/service_name"
+
+# TNS Style Connection String using SID
+# CONNECTION_STRING="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=port))(CONNECT_DATA=(SERVER=DEDICATED)(SID=sid)))"
+
+# TNS Style Connection String using SERVICE_NAME
+# CONNECTION_STRING="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=port))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_name)))"
+```
+
 ## Resource Requirements
 
 #### Docker Host
@@ -36,16 +49,21 @@ docker pull adastradev/data-ingestion-agent:latest
 
 ## Run
 
+For all possible Oracle connection string options, see the [Oracle section](####Oracle) at the top of this document
+
 ```sh
 # See Host System Requirements above for agent resource requirements
 PROCESS_MAX_MEMORY_SIZE_MB=4096
+
+# Define a variable to hold your connection string
+CONNECTION_STRING=your_connection_string
 
 docker run -d -t \
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
--e ORACLE_ENDPOINT=hostname:port/service_name \
+-e ORACLE_ENDPOINT=$CONNECTION_STRING \
 -e ORACLE_USER=user \
 -e ORACLE_PASSWORD=password \
 --network=bridge \
@@ -104,16 +122,21 @@ The following links display the default set of queries that run for each of the 
 ### Adhoc Ingestion
 To immediately begin the ingestion process you can run the following with the 'ingest' flag. This command will terminate the container once the process has completed.
 
+For all possible Oracle connection string options, see the [Oracle section](####Oracle) at the top of this document
+
 ```sh
 # See Host System Requirements above for agent resource requirements
 PROCESS_MAX_MEMORY_SIZE_MB=4096
+
+# Define a variable to hold your connection string
+CONNECTION_STRING=your_connection_string
 
 docker run -i \
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
 -e ASTRA_CLOUD_PASSWORD=<your_password> \
--e ORACLE_ENDPOINT=hostname:port/service_name \
+-e ORACLE_ENDPOINT=$CONNECTION_STRING \
 -e ORACLE_USER=user \
 -e ORACLE_PASSWORD=password \
 --network=bridge \
