@@ -15,7 +15,7 @@ When connecting to an Oracle database the specified database user must be given 
 - ALL_CONSTRAINTS (view)
 - All tables referenced by this agent (see 'Query Preview' section below)
 
-When specifying the 'ORACL_ENDPOINT' value (a connection string) to your Oracle instance you may use one of the following formats:
+When specifying the 'ORACLE_ENDPOINT' value (a connection string) to your Oracle instance you may use one of the following formats:
 
 ```sh
 # Easy Connect Connection String
