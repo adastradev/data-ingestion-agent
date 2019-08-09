@@ -17,6 +17,7 @@ import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
+import { AuthManager } from '@adastradev/user-management-sdk';
 
 const expect = chai.expect;
 
@@ -24,8 +25,12 @@ describe('SendDataHandler', () => {
 
     describe('when handling a message', () => {
         let sandbox: sinon.SinonSandbox;
+        const authManager: AuthManager = container.get<AuthManager>(TYPES.AuthManager);
+
         beforeEach(() => {
             sandbox = sinon.createSandbox();
+            sandbox.stub(authManager, 'getIamCredentials').resolves();
+            sandbox.stub(authManager, 'refreshCognitoCredentials').resolves();
         });
 
         afterEach(() => {
@@ -64,7 +69,7 @@ describe('SendDataHandler', () => {
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, 'test');
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, authManager, 'test');
 
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 
@@ -94,7 +99,7 @@ describe('SendDataHandler', () => {
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, 'test');
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, authManager, 'test');
 
             expect(handler.handle(message)).to.eventually.be.rejectedWith(Error, 'Failure to ingest');
         });
@@ -130,7 +135,7 @@ describe('SendDataHandler', () => {
             };
             const oracleDDLHelper = new OracleDDLHelper(pool);
 
-            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, 'test');
+            const handler = new SendDataHandler(writer, logger, integrationConfigFactory as any, pool, container, null, null, 'blah/blah', oracleDDLHelper, authManager, 'test');
             const raiseCompletionStub = sandbox.stub(handler, 'raiseSnapshotCompletionEvent' as any);
 
             await handler.handle(message);

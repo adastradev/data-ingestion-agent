@@ -3,7 +3,7 @@ import TYPES from './ioc.types';
 
 // Config
 import getCloudDependencies from './source/Util/getCloudDependencies';
-import * as AWS from 'aws-sdk';
+import { config as AWSconfig } from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
 import {
@@ -54,8 +54,8 @@ const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
 
 // AWS module configuration
-configureAwsProxy(AWS.config);
-AWS.config.region = region;
+configureAwsProxy(AWSconfig);
+AWSconfig.region = region;
 
 process.env.UV_THREADPOOL_SIZE = process.env.CONCURRENT_CONNECTIONS || '5';
 
@@ -153,7 +153,7 @@ const startup = async () => {
 
         logger.silly('authManager.getIamCredentials');
         try {
-            AWS.config.credentials = await authManager.getIamCredentials();
+            AWSconfig.credentials = await authManager.getIamCredentials();
         } catch (error) {
             logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
             throw error;

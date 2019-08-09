@@ -5,6 +5,7 @@ import TYPES from '../../ioc.types';
 
 import { Readable } from 'stream';
 import { Logger } from 'winston';
+import { config as AWSconfig } from 'aws-sdk';
 import { Container, inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
@@ -21,6 +22,7 @@ import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
 import * as stream from 'stream';
+import { AuthManager } from '@adastradev/user-management-sdk';
 
 interface IManifest {
     files: string[];
@@ -70,6 +72,7 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.DDLHelper)
         @named(IntegrationSystemType.Oracle)
         private readonly _oracleDDLHelper: IDDLHelper,
+        @inject(TYPES.AuthManager) private readonly authManager: AuthManager,
         @inject(TYPES.TenantName) tenantName: string) {
 
         this._writer = writer;
@@ -149,6 +152,9 @@ export default class SendDataHandler implements IMessageHandler {
                         // Push the resulting filename to the manifest as an expected file
                         // for downstream processes
                         manifest.files.push(uploaded.fileName);
+
+                        await this.authManager.refreshCognitoCredentials();
+                        AWSconfig.credentials = await this.authManager.getIamCredentials();
 
                     } catch (err) {
                         delete validTables[queryDefinition.name];
