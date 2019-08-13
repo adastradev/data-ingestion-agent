@@ -5,7 +5,6 @@ import TYPES from '../../ioc.types';
 
 import { Readable } from 'stream';
 import { Logger } from 'winston';
-import { config as AWSconfig } from 'aws-sdk';
 import { Container, inject, injectable, named } from 'inversify';
 import 'reflect-metadata';
 import * as moment from 'moment';
