@@ -153,9 +153,6 @@ export default class SendDataHandler implements IMessageHandler {
                         // for downstream processes
                         manifest.files.push(uploaded.fileName);
 
-                        await this.authManager.refreshCognitoCredentials();
-                        AWSconfig.credentials = await this.authManager.getIamCredentials();
-
                     } catch (err) {
                         delete validTables[queryDefinition.name];
                         if (err instanceof TableNotFoundException) {
