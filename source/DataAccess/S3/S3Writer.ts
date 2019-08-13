@@ -41,7 +41,7 @@ export default class S3Writer implements IDataWriter {
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
 
         const refreshed = await this._authManager.refreshCognitoCredentials();
-        if (refreshed) {
+        if (refreshed === true) {
             this._logger.info('Credentials were expired... Refreshed successfully.');
         } else {
             this._logger.info('Credentials still valid for upload - skipping refresh.');
