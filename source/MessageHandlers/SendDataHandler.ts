@@ -22,7 +22,6 @@ import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
 import * as stream from 'stream';
-import { AuthManager } from '@adastradev/user-management-sdk';
 
 interface IManifest {
     files: string[];
@@ -72,7 +71,6 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.DDLHelper)
         @named(IntegrationSystemType.Oracle)
         private readonly _oracleDDLHelper: IDDLHelper,
-        @inject(TYPES.AuthManager) private readonly authManager: AuthManager,
         @inject(TYPES.TenantName) tenantName: string) {
 
         this._writer = writer;
