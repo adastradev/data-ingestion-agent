@@ -17,7 +17,6 @@ import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
-import { AuthManager } from '@adastradev/user-management-sdk';
 
 const expect = chai.expect;
 
@@ -25,12 +24,9 @@ describe('SendDataHandler', () => {
 
     describe('when handling a message', () => {
         let sandbox: sinon.SinonSandbox;
-        const authManager: AuthManager = container.get<AuthManager>(TYPES.AuthManager);
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            sandbox.stub(authManager, 'getIamCredentials').resolves();
-            sandbox.stub(authManager, 'refreshCognitoCredentials').resolves();
         });
 
         afterEach(() => {
