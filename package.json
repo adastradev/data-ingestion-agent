@@ -16,7 +16,7 @@
     "unit-test": "nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
     "integration-test": "nyc --require ts-node/register mocha --timeout 120000 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "coveralls": "cat ./coverage/lcov.info | coveralls || exit 0",
     "start": "node dist/start.js"
   },
   "pre-commit": [
