@@ -153,7 +153,7 @@ const startup = async () => {
 
         logger.silly('authManager.getIamCredentials');
         try {
-            AWSconfig.credentials = await authManager.getIamCredentials();
+            AWSconfig.credentials = await authManager.getIamCredentials(60 * 60 * 6);
         } catch (error) {
             logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
             throw error;
