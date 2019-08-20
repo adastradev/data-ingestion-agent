@@ -21,6 +21,8 @@ import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
 import * as stream from 'stream';
+import { AuthManager } from '@adastradev/user-management-sdk';
+import { config } from 'aws-sdk/global';
 
 interface IManifest {
     files: string[];
@@ -57,6 +59,7 @@ export default class SendDataHandler implements IMessageHandler {
     private _bucketPath: string;
     private _tenantName: string;
     private _tenantId: string;
+    private _authManager: AuthManager;
 
     constructor(
         @inject(TYPES.DataWriter) writer: IDataWriter,
@@ -70,7 +73,8 @@ export default class SendDataHandler implements IMessageHandler {
         @inject(TYPES.DDLHelper)
         @named(IntegrationSystemType.Oracle)
         private readonly _oracleDDLHelper: IDDLHelper,
-        @inject(TYPES.TenantName) tenantName: string) {
+        @inject(TYPES.TenantName) tenantName: string,
+        @inject(TYPES.AuthManager) authManager: AuthManager) {
 
         this._writer = writer;
         this._logger = logger;
@@ -82,6 +86,7 @@ export default class SendDataHandler implements IMessageHandler {
         this._bucketPath = bucketPath;
         this._tenantId = bucketPath.split('/')[1];
         this._tenantName = tenantName;
+        this._authManager = authManager;
     }
 
     public async handle(message: SendDataMessage) {
@@ -133,6 +138,8 @@ export default class SendDataHandler implements IMessageHandler {
                         reader = this._container.get<IDataReader>(TYPES.DataReader);
                         const queryResult: IQueryResult = await reader.read(queryDefinition);
                         itemMetadata = queryResult.metadata;
+
+                        await this.refreshCreds();
 
                         // Ingest this query's results to S3 ingestion bucket
                         const uploaded = await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
@@ -259,5 +266,13 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(null);
 
         return await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
+    }
+
+    private refreshCreds = async () => {
+        if (this._authManager.needsRefresh()) {
+            await this._authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+            config.credentials = await this._authManager.getIamCredentials(21600);
+            await this._authManager.refreshCognitoCredentials();
+        }
     }
 }
