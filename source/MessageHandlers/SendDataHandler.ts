@@ -271,7 +271,7 @@ export default class SendDataHandler implements IMessageHandler {
     private refreshCreds = async () => {
         if (this._authManager.needsRefresh()) {
             await this._authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
-            config.credentials = await this._authManager.getIamCredentials(21600);
+            config.credentials = await this._authManager.getIamCredentials();
             await this._authManager.refreshCognitoCredentials();
         }
     }

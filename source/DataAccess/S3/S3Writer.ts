@@ -5,10 +5,10 @@ import * as crypto from 'crypto';
 
 import IDataWriter from '../IDataWriter';
 import { Logger } from 'winston';
-import AWS = require('aws-sdk');
 import IOutputEncoder from '../IOutputEncoder';
 
 import { AuthManager } from '@adastradev/user-management-sdk';
+import { S3 } from 'aws-sdk';
 
 /**
  * Given a readable stream ingest data into an S3 bucket
@@ -41,6 +41,7 @@ export default class S3Writer implements IDataWriter {
     public async ingest(stream: Readable, folderPath: string, fileNamePrefix: string) {
 
         let dataBody = stream;
+
         const dataFile = this.isDataFile(fileNamePrefix);
         let extension = '';
 
@@ -63,9 +64,33 @@ export default class S3Writer implements IDataWriter {
             Key: `${fileNamePrefix}${fileSuffix}`
         };
 
+        dataBody.on('pause', () => {
+            this._logger.silly(`Stream paused for ${fileNamePrefix}`);
+        });
+
+        dataBody.on('resume', () => {
+            this._logger.silly(`Stream resuming for ${fileNamePrefix}`);
+        });
+
+        dataBody.on('close', () => {
+            this._logger.silly(`Stream closed for ${fileNamePrefix}`);
+        });
+
+        dataBody.on('error', () => {
+            this._logger.silly(`Stream errored for ${fileNamePrefix}`);
+        });
+
+        dataBody.on('end', () => {
+            this._logger.silly(`Stream ended for ${fileNamePrefix}`);
+        });
+
+        dataBody.on('data', (chunk) => {
+            this._logger.silly(`${chunk.length} bytes of data received for ${fileNamePrefix}`);
+        });
+
         // Parallelize multi-part upload
-        const s3Obj = new AWS.S3();
-        const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(params,
+        const s3Obj = new S3();
+        const managedUpload: S3.ManagedUpload = s3Obj.upload(params,
             { partSize: 1024 * 1024 * this.S3_PART_SIZE_MB, queueSize: this.S3_QUEUE_SIZE });
 
         managedUpload.on('httpUploadProgress', (evt) => {

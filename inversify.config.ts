@@ -3,7 +3,7 @@ import TYPES from './ioc.types';
 
 // Config
 import getCloudDependencies from './source/Util/getCloudDependencies';
-import { config as AWSconfig } from 'aws-sdk';
+import { config as awsConfig } from 'aws-sdk/global';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
 import {
@@ -153,7 +153,7 @@ const startup = async () => {
 
         logger.silly('authManager.getIamCredentials');
         try {
-            AWSconfig.credentials = await authManager.getIamCredentials(60 * 60 * 6);
+            AWSconfig.credentials = await authManager.getIamCredentials();
         } catch (error) {
             logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
             throw error;
