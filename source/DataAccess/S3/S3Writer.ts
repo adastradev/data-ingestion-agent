@@ -92,8 +92,8 @@ export default class S3Writer implements IDataWriter {
 
         managedUpload.on('httpUploadProgress', async (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
-            await this._authManager.refreshCognitoCredentials();
             config.credentials = await this._authManager.getIamCredentials();
+            await this._authManager.refreshCognitoCredentials();
         });
 
         await managedUpload.promise();
