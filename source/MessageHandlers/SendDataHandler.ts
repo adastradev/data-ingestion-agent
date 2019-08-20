@@ -136,9 +136,6 @@ export default class SendDataHandler implements IMessageHandler {
 
                     try {
 
-                        await this._authManager.refreshCognitoCredentials();
-                        config.credentials = await this._authManager.getIamCredentials();
-
                         const startTime = Date.now();
 
                         // Run query and get results from source DB
