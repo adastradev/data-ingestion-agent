@@ -9,6 +9,7 @@ import IOutputEncoder from '../IOutputEncoder';
 
 import { AuthManager } from '@adastradev/user-management-sdk';
 import { S3 } from 'aws-sdk';
+import { config } from 'aws-sdk/global';
 
 /**
  * Given a readable stream ingest data into an S3 bucket
@@ -65,27 +66,23 @@ export default class S3Writer implements IDataWriter {
         };
 
         dataBody.on('pause', () => {
-            this._logger.silly(`Stream paused for ${fileNamePrefix}`);
+            this._logger.silly(`Read stream paused for ${fileNamePrefix}`);
         });
 
         dataBody.on('resume', () => {
-            this._logger.silly(`Stream resuming for ${fileNamePrefix}`);
+            this._logger.silly(`Read stream resuming for ${fileNamePrefix}`);
         });
 
         dataBody.on('close', () => {
-            this._logger.silly(`Stream closed for ${fileNamePrefix}`);
+            this._logger.silly(`Read stream closed for ${fileNamePrefix}`);
         });
 
         dataBody.on('error', () => {
-            this._logger.silly(`Stream errored for ${fileNamePrefix}`);
+            this._logger.silly(`Read stream errored for ${fileNamePrefix}`);
         });
 
         dataBody.on('end', () => {
-            this._logger.silly(`Stream ended for ${fileNamePrefix}`);
-        });
-
-        dataBody.on('data', (chunk) => {
-            this._logger.silly(`${chunk.length} bytes of data received for ${fileNamePrefix}`);
+            this._logger.silly(`Read stream ended for ${fileNamePrefix}`);
         });
 
         // Parallelize multi-part upload
@@ -93,8 +90,10 @@ export default class S3Writer implements IDataWriter {
         const managedUpload: S3.ManagedUpload = s3Obj.upload(params,
             { partSize: 1024 * 1024 * this.S3_PART_SIZE_MB, queueSize: this.S3_QUEUE_SIZE });
 
-        managedUpload.on('httpUploadProgress', (evt) => {
+        managedUpload.on('httpUploadProgress', async (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
+            await this._authManager.refreshCognitoCredentials();
+            config.credentials = await this._authManager.getIamCredentials();
         });
 
         await managedUpload.promise();

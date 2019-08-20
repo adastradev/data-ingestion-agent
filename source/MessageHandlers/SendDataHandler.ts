@@ -92,6 +92,9 @@ export default class SendDataHandler implements IMessageHandler {
     public async handle(message: SendDataMessage) {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
+        await this._authManager.refreshCognitoCredentials();
+        config.credentials = await this._authManager.getIamCredentials();
+
         const integrationType = IntegrationType[process.env.INTEGRATION_TYPE] || IntegrationType.Banner;
         const integrationConfig = await this._integrationConfigFactory.create(integrationType);
 
@@ -132,14 +135,16 @@ export default class SendDataHandler implements IMessageHandler {
                     let itemMetadata: Readable;
 
                     try {
+
+                        await this._authManager.refreshCognitoCredentials();
+                        config.credentials = await this._authManager.getIamCredentials();
+
                         const startTime = Date.now();
 
                         // Run query and get results from source DB
                         reader = this._container.get<IDataReader>(TYPES.DataReader);
                         const queryResult: IQueryResult = await reader.read(queryDefinition);
                         itemMetadata = queryResult.metadata;
-
-                        await this.refreshCreds();
 
                         // Ingest this query's results to S3 ingestion bucket
                         const uploaded = await this._writer.ingest(queryResult.result, folderPath, queryDefinition.name);
@@ -182,6 +187,9 @@ export default class SendDataHandler implements IMessageHandler {
                         await this._connectionPool.close();
                         reject(err);
                     } else {
+
+                        await this._authManager.refreshCognitoCredentials();
+                        config.credentials = await this._authManager.getIamCredentials();
 
                         // Ingest DDL
                         const ingested = await this.ingestDDL(validTables, folderPath);
@@ -266,13 +274,5 @@ export default class SendDataHandler implements IMessageHandler {
         compiledMetadataStream.push(null);
 
         return await this._writer.ingest(compiledMetadataStream, folderPath, 'metadata');
-    }
-
-    private refreshCreds = async () => {
-        if (this._authManager.needsRefresh()) {
-            await this._authManager.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
-            config.credentials = await this._authManager.getIamCredentials();
-            await this._authManager.refreshCognitoCredentials();
-        }
     }
 }

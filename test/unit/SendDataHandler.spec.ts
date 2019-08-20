@@ -18,6 +18,7 @@ import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
 import { AuthManager } from '@adastradev/user-management-sdk';
+import { CognitoIdentityCredentials } from 'aws-sdk';
 
 const expect = chai.expect;
 
@@ -29,6 +30,12 @@ describe('SendDataHandler', () => {
         const authStub: AuthManager = {
             needsRefresh: () => {
                 return false;
+            },
+            getIamCredentials: async () => {
+                return {} as CognitoIdentityCredentials;
+            },
+            refreshCognitoCredentials: async () => {
+                return true;
             }
         } as AuthManager;
 
