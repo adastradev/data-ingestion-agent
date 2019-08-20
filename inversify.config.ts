@@ -54,8 +54,8 @@ const region = process.env.AWS_REGION || 'us-east-1';
 const stage = process.env.DEFAULT_STAGE || 'prod';
 
 // AWS module configuration
-configureAwsProxy(AWSconfig);
-AWSconfig.region = region;
+configureAwsProxy(awsConfig);
+awsConfig.region = region;
 
 process.env.UV_THREADPOOL_SIZE = process.env.CONCURRENT_CONNECTIONS || '5';
 
@@ -153,7 +153,7 @@ const startup = async () => {
 
         logger.silly('authManager.getIamCredentials');
         try {
-            AWSconfig.credentials = await authManager.getIamCredentials();
+            awsConfig.credentials = await authManager.getIamCredentials();
         } catch (error) {
             logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
             throw error;
