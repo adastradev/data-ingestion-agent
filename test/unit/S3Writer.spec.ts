@@ -12,6 +12,7 @@ import TYPES from '../../ioc.types';
 import * as sinon from 'sinon';
 import IOutputEncoder, { IEncodeResult } from '../../source/DataAccess/IOutputEncoder';
 import { AuthManager } from '@adastradev/user-management-sdk';
+import { CognitoIdentityCredentials } from 'aws-sdk';
 
 const expect = chai.expect;
 
@@ -27,6 +28,11 @@ describe('S3Writer', () => {
         refreshCognitoCredentials: () => {
             return new Promise((res, rej) => {
                 res(false);
+            });
+        },
+        getIamCredentials: () => {
+            return new Promise((res, rej) => {
+                res({} as CognitoIdentityCredentials);
             });
         }
     } as AuthManager;
