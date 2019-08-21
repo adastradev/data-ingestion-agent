@@ -109,6 +109,7 @@ describe('Agent', () => {
             const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs);
             const logHeapSpaceStatsStub = sandbox.stub(agent as any, 'logHeapSpaceStats');
             const refreshCognitoStub = sandbox.stub(authManager, 'refreshCognitoCredentials');
+            const getIamCredentialsStub = sandbox.stub(authManager, 'getIamCredentials');
             const handleMessageStub = sandbox.stub(agent, 'handleMessage' as any);
             const handleAgentCmdsStub = sandbox.stub(agent, 'handleAgentCommands' as any);
 
@@ -119,6 +120,7 @@ describe('Agent', () => {
                 agent,
                 logHeapSpaceStatsStub,
                 refreshCognitoStub,
+                getIamCredentialsStub,
                 handleMessageStub,
                 handleAgentCmdsStub
             };
