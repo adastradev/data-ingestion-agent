@@ -9,6 +9,7 @@ import IOutputEncoder from '../IOutputEncoder';
 
 import { AuthManager } from '@adastradev/user-management-sdk';
 import { S3 } from 'aws-sdk';
+import { config } from 'aws-sdk/global';
 
 /**
  * Given a readable stream ingest data into an S3 bucket
@@ -84,6 +85,9 @@ export default class S3Writer implements IDataWriter {
             this._logger.silly(`Read stream ended for ${fileNamePrefix}`);
         });
 
+        await this._authManager.refreshCognitoCredentials();
+        config.credentials = await this._authManager.getIamCredentials();
+
         // Parallelize multi-part upload
         const s3Obj = new S3();
         const managedUpload: S3.ManagedUpload = s3Obj.upload(params,
@@ -91,7 +95,6 @@ export default class S3Writer implements IDataWriter {
 
         managedUpload.on('httpUploadProgress', async (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
-            await this._authManager.refreshCognitoCredentials();
         });
 
         await managedUpload.promise();

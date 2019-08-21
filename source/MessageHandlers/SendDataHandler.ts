@@ -93,6 +93,7 @@ export default class SendDataHandler implements IMessageHandler {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
         await this._authManager.refreshCognitoCredentials();
+        config.credentials = await this._authManager.getIamCredentials();
 
         const integrationType = IntegrationType[process.env.INTEGRATION_TYPE] || IntegrationType.Banner;
         const integrationConfig = await this._integrationConfigFactory.create(integrationType);
@@ -136,6 +137,7 @@ export default class SendDataHandler implements IMessageHandler {
                     try {
 
                         await this._authManager.refreshCognitoCredentials();
+                        config.credentials = await this._authManager.getIamCredentials();
 
                         const startTime = Date.now();
 
