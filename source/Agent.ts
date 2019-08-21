@@ -9,6 +9,7 @@ import IMessageHandler from './IMessageHandler';
 import MessageFactory from './MessageFactory';
 import ICommand from './Commands/ICommand';
 import { AuthManager } from '@adastradev/user-management-sdk';
+import { config } from 'aws-sdk/global';
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
 import { InvalidCommandException } from './InvalidCommandException';
@@ -45,6 +46,7 @@ export class Agent {
 
                 this.logger.silly('authManager.refreshCognitoCredentials');
                 await this.authManager.refreshCognitoCredentials();
+                config.credentials = await this.authManager.getIamCredentials();
 
                 const sqs = this.sqs || new SQS();
                 // For now fetch 1 message from the queue but in the future we could open this up
