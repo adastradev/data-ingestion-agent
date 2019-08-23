@@ -17,7 +17,7 @@ import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
-import { AuthManager } from '@adastradev/user-management-sdk';
+import { AuthManager } from '../../source/Auth';
 import { CognitoIdentityCredentials } from 'aws-sdk';
 
 const expect = chai.expect;

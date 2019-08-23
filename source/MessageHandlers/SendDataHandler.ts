@@ -21,7 +21,7 @@ import { TableNotFoundException } from '../TableNotFoundException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
 import * as stream from 'stream';
-import { AuthManager } from '@adastradev/user-management-sdk';
+import { AuthManager } from '../Auth';
 import { config } from 'aws-sdk/global';
 
 interface IManifest {

@@ -11,7 +11,7 @@ import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
 import * as sinon from 'sinon';
 import IOutputEncoder, { IEncodeResult } from '../../source/DataAccess/IOutputEncoder';
-import { AuthManager, CognitoUserPoolLocatorUserManagement } from '@adastradev/user-management-sdk';
+import { AuthManager, CognitoUserPoolLocatorUserManagement } from '../../source/Auth';
 import { CognitoIdentityCredentials } from 'aws-sdk';
 
 const expect = chai.expect;

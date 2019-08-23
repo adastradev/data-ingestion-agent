@@ -8,7 +8,7 @@ import IMessage from './IMessage';
 import IMessageHandler from './IMessageHandler';
 import MessageFactory from './MessageFactory';
 import ICommand from './Commands/ICommand';
-import { AuthManager } from '@adastradev/user-management-sdk';
+import { AuthManager } from './Auth';
 import { config } from 'aws-sdk/global';
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
@@ -43,9 +43,6 @@ export class Agent {
 
             do {
                 await sleep(1000);
-
-                this.logger.silly('authManager refresh()');
-                config.credentials = await this.authManager.refresh();
 
                 const sqs = this.sqs || new SQS();
                 // For now fetch 1 message from the queue but in the future we could open this up

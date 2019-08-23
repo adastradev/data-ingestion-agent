@@ -1,7 +1,7 @@
 import { Container, interfaces } from 'inversify';
 import TYPES from '../../ioc.types';
 import { stubInterface } from 'ts-sinon';
-import { AuthManager } from '@adastradev/user-management-sdk';
+import { AuthManager } from '../../source/Auth';
 
 // Handlers
 import IMessageHandler from '../../source/IMessageHandler';

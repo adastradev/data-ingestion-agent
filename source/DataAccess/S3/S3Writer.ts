@@ -7,7 +7,7 @@ import IDataWriter from '../IDataWriter';
 import { Logger } from 'winston';
 import IOutputEncoder from '../IOutputEncoder';
 
-import { AuthManager } from '@adastradev/user-management-sdk';
+import { AuthManager } from '../../Auth';
 import { S3 } from 'aws-sdk';
 import { config } from 'aws-sdk/global';
 
