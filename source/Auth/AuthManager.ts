@@ -40,6 +40,7 @@ export class AuthManager {
     ) {
         this.locator = locator;
         this.region = region;
+        this.lastRefresh = 0;
         // AWS module configuration
         configureAwsProxy(AWS.config);
         AWS.config.region = region;
