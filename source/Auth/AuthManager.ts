@@ -109,14 +109,14 @@ export class AuthManager {
     }
 
     public refresh = async () => {
-        this.lastRefresh = (new Date()).getTime();
         await this.refreshCognitoCredentials();
         return this.getIamCredentials();
     }
 
     public async refreshCognitoCredentials(): Promise<any> {
         return new Promise((res, rej) => {
-            if (this.needsRefresh()) {
+            if (this.needsRefresh() === true) {
+                this.lastRefresh = (new Date()).getTime();
                 const { refreshToken } = this.getTokens(this.cognitoUserSession);
                 this.cognitoUser.refreshSession(refreshToken, (err, session) => {
                     if (err) {
