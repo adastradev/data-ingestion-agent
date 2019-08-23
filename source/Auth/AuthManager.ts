@@ -10,6 +10,7 @@ import {
 import proxy = require('proxy-agent');
 import { GlobalConfigInstance } from 'aws-sdk/lib/config';
 import { CognitoIdentityCredentials } from 'aws-sdk/global';
+import sleep from '../Util/sleep';
 export function configureAwsProxy(awsConfig: GlobalConfigInstance) {
     if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
         // TODO: does AWS support multiple proxy protocols simultaneously (HTTP and HTTPS proxy)
@@ -23,6 +24,7 @@ export function configureAwsProxy(awsConfig: GlobalConfigInstance) {
         });
     }
 }
+
 export class AuthManager {
     private locator: ICognitoUserPoolLocator;
     private poolData: ICognitoUserPoolApiModel;
@@ -31,6 +33,7 @@ export class AuthManager {
     private cognitoUserSession: CognitoUserSession;
     private iamCredentials: AWS.CognitoIdentityCredentials;
     private authenticatorURI: string;
+    private concurrency: number;
 
     constructor(
         locator: ICognitoUserPoolLocator,
@@ -38,6 +41,7 @@ export class AuthManager {
     ) {
         this.locator = locator;
         this.region = region;
+        this.concurrency = 1;
         // AWS module configuration
         configureAwsProxy(AWS.config);
         AWS.config.region = region;
@@ -111,23 +115,27 @@ export class AuthManager {
     }
 
     public async refreshCognitoCredentials(): Promise<any> {
+        this.concurrency += 1;
         return new Promise((res, rej) => {
-            const { refreshToken } = this.getTokens(this.cognitoUserSession);
-            this.cognitoUser.refreshSession(refreshToken, (err, session) => {
-                if (err) {
-                    rej(err);
-                } else {
-                    const tokens = this.getTokens(session);
-                    this.iamCredentials = this.buildCognitoIdentityCredentials(tokens);
-                    this.iamCredentials.get((error) => {
-                        if (error) {
-                            rej(error);
-                        } else {
-                            console.log(`New expiry: ${this.iamCredentials.expireTime}`);
-                        }
-                        res();
-                    });
-                }
+            this.waitForConcurrencyUnlock().then(() => {
+                const { refreshToken } = this.getTokens(this.cognitoUserSession);
+                this.cognitoUser.refreshSession(refreshToken, (err, session) => {
+                    if (err) {
+                        rej(err);
+                    } else {
+                        const tokens = this.getTokens(session);
+                        this.iamCredentials = this.buildCognitoIdentityCredentials(tokens);
+                        this.iamCredentials.get((error) => {
+                            if (error) {
+                                rej(error);
+                            } else {
+                                console.log(`New expiry: ${this.iamCredentials.expireTime}`);
+                                this.concurrency -= 1;
+                            }
+                            res();
+                        });
+                    }
+                });
             });
         });
     }
@@ -143,6 +151,14 @@ export class AuthManager {
 
     public getIamCredentials = () => {
         return this.iamCredentials;
+    }
+
+    private waitForConcurrencyUnlock = async () => {
+        if (this.concurrency) {
+            const sleepTime = 10000 * (this.concurrency - 1);
+            console.log(`${this.concurrency - 1} concurrent refresh processes. Sleeping ${sleepTime / 1000} seconds`);
+            await sleep(sleepTime);
+        }
     }
 
     private getTokens = (session) => {
