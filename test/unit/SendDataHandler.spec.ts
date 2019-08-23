@@ -28,14 +28,10 @@ describe('SendDataHandler', () => {
         let sandbox: sinon.SinonSandbox;
 
         const authStub: AuthManager = {
-            needsRefresh: () => {
-                return false;
-            },
-            getIamCredentials: async () => {
-                return {} as CognitoIdentityCredentials;
-            },
-            refreshCognitoCredentials: async () => {
-                return true;
+            refresh: () => {
+                return new Promise((res, rej) => {
+                    res({} as CognitoIdentityCredentials);
+                });
             }
         } as AuthManager;
 

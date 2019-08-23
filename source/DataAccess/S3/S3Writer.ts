@@ -85,8 +85,7 @@ export default class S3Writer implements IDataWriter {
             this._logger.silly(`Read stream ended for ${fileNamePrefix}`);
         });
 
-        await this._authManager.refreshCognitoCredentials();
-        config.credentials = await this._authManager.getIamCredentials();
+        config.credentials = await this._authManager.refresh();
 
         // Parallelize multi-part upload
         const s3Obj = new S3();
@@ -95,6 +94,10 @@ export default class S3Writer implements IDataWriter {
 
         managedUpload.on('httpUploadProgress', async (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
+            this._logger.silly('Refreshing credentials on S3 instance and AWS config (if needed)...');
+            const creds = await this._authManager.refresh();
+            config.credentials = creds;
+            s3Obj.config.credentials = creds;
         });
 
         await managedUpload.promise();

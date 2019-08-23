@@ -92,8 +92,7 @@ export default class SendDataHandler implements IMessageHandler {
     public async handle(message: SendDataMessage) {
         this._logger.silly(`Handling message: ${message.receiptHandle}`);
 
-        await this._authManager.refreshCognitoCredentials();
-        config.credentials = await this._authManager.getIamCredentials();
+        config.credentials = await this._authManager.refresh();
 
         const integrationType = IntegrationType[process.env.INTEGRATION_TYPE] || IntegrationType.Banner;
         const integrationConfig = await this._integrationConfigFactory.create(integrationType);
@@ -136,8 +135,7 @@ export default class SendDataHandler implements IMessageHandler {
 
                     try {
 
-                        await this._authManager.refreshCognitoCredentials();
-                        config.credentials = await this._authManager.getIamCredentials();
+                        config.credentials = await this._authManager.refresh();
 
                         const startTime = Date.now();
 
@@ -188,7 +186,7 @@ export default class SendDataHandler implements IMessageHandler {
                         reject(err);
                     } else {
 
-                        await this._authManager.refreshCognitoCredentials();
+                        config.credentials = await this._authManager.refresh();
 
                         // Ingest DDL
                         const ingested = await this.ingestDDL(validTables, folderPath);

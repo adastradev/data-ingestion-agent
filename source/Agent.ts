@@ -44,9 +44,8 @@ export class Agent {
             do {
                 await sleep(1000);
 
-                this.logger.silly('authManager.refreshCognitoCredentials');
-                await this.authManager.refreshCognitoCredentials();
-                config.credentials = await this.authManager.getIamCredentials();
+                this.logger.silly('authManager refresh()');
+                config.credentials = await this.authManager.refresh();
 
                 const sqs = this.sqs || new SQS();
                 // For now fetch 1 message from the queue but in the future we could open this up
