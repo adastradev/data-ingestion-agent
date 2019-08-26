@@ -8,11 +8,12 @@ import IMessage from './IMessage';
 import IMessageHandler from './IMessageHandler';
 import MessageFactory from './MessageFactory';
 import ICommand from './Commands/ICommand';
-import { AuthManager } from './Auth';
+import {
+    CustomAuthManager
+} from './Auth/CustomAuthManager';
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
 import { InvalidCommandException } from './InvalidCommandException';
-import { config } from 'aws-sdk/global';
 
 export enum AgentMode { 'ShutdownRequested', 'Listening', 'Adhoc' }
 
@@ -24,7 +25,7 @@ export class Agent {
     constructor(
         @inject(TYPES.Logger) private readonly logger: Winston.Logger,
         @inject(TYPES.QueueUrl) private readonly queueUrl: string,
-        @inject(TYPES.AuthManager) private readonly authManager: AuthManager,
+        @inject(TYPES.AuthManager) private readonly authManager: CustomAuthManager,
         @inject(TYPES.Container) private readonly container: Container,
         @inject(TYPES.SQS) private readonly sqs: SQS
     ) { }
@@ -44,8 +45,8 @@ export class Agent {
             do {
                 await sleep(1000);
 
-                this.logger.silly('authManager.refresh()');
-                config.credentials = await this.authManager.refresh();
+                this.logger.silly('authManager.refreshCognitoCredentials()');
+                await this.authManager.refreshCognitoCredentials();
 
                 const sqs = this.sqs || new SQS();
                 // For now fetch 1 message from the queue but in the future we could open this up

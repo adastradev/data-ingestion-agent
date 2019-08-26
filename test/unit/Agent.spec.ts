@@ -13,7 +13,7 @@ import ICommand from '../../source/Commands/ICommand';
 import TYPES from '../../ioc.types';
 import { InvalidCommandException } from '../../source/InvalidCommandException';
 import winston = require('winston');
-import { AuthManager } from '../../source/Auth';
+import { CustomAuthManager } from '../../source/Auth/CustomAuthManager';
 import { SQS } from 'aws-sdk';
 import PreviewMessage from '../../source/Messages/PreviewMessage';
 import { create } from 'domain';
@@ -104,7 +104,7 @@ describe('Agent', () => {
 
         const createTestContext = () => {
             const logger = container.get<winston.Logger>(TYPES.Logger);
-            const authManager = container.get<AuthManager>(TYPES.AuthManager);
+            const authManager = container.get<CustomAuthManager>(TYPES.AuthManager);
             const sqs = new SQS();
             const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs);
             const logHeapSpaceStatsStub = sandbox.stub(agent as any, 'logHeapSpaceStats');
@@ -178,7 +178,7 @@ describe('Agent', () => {
 
         const createTestContext = () => {
             const logger = container.get<winston.Logger>(TYPES.Logger);
-            const authManager = container.get<AuthManager>(TYPES.AuthManager);
+            const authManager = container.get<CustomAuthManager>(TYPES.AuthManager);
             const sqs = new SQS();
             const deleteMessageStub = (sandbox.stub(sqs, 'deleteMessage') as sinon.SinonStub).returns({ promise: () => Promise.resolve()});
             const dummyHandler = new DummyHandler();

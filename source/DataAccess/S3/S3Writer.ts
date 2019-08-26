@@ -7,6 +7,7 @@ import IDataWriter from '../IDataWriter';
 import { Logger } from 'winston';
 import AWS = require('aws-sdk');
 import IOutputEncoder from '../IOutputEncoder';
+import { CustomAuthManager } from '../../Auth/CustomAuthManager';
 
 /**
  * Given a readable stream ingest data into an S3 bucket
@@ -23,7 +24,8 @@ export default class S3Writer implements IDataWriter {
     constructor(
         @inject(TYPES.Bucket) private _bucketPath: string,
         @inject(TYPES.OutputEncoder) private _outputEncoder: IOutputEncoder,
-        @inject(TYPES.Logger) private _logger: Logger) {
+        @inject(TYPES.Logger) private _logger: Logger,
+        @inject(TYPES.AuthManager) private _authManager: CustomAuthManager) {
 
         this.S3_PART_SIZE_MB = 10;
         if (process.env.S3_PART_SIZE_MB) {
@@ -59,6 +61,8 @@ export default class S3Writer implements IDataWriter {
             Key: `${fileNamePrefix}${fileSuffix}`
         };
 
+        this._authManager.refreshCognitoCredentialsSync();
+
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
         const managedUpload: AWS.S3.ManagedUpload = s3Obj.upload(params,
@@ -66,6 +70,7 @@ export default class S3Writer implements IDataWriter {
 
         managedUpload.on('httpUploadProgress', (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
+            this._authManager.refreshCognitoCredentialsSync();
         });
 
         await managedUpload.promise();

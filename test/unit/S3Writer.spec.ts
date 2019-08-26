@@ -11,8 +11,15 @@ import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
 import * as sinon from 'sinon';
 import IOutputEncoder, { IEncodeResult } from '../../source/DataAccess/IOutputEncoder';
+import { CustomAuthManager } from '../../source/Auth/CustomAuthManager';
 
 const expect = chai.expect;
+
+const stubAuthManager = {
+    refreshCognitoCredentialsSync: () => {
+        return true;
+    }
+} as CustomAuthManager;
 
 class DummyEncoder implements IOutputEncoder {
     public encode(inputStream: Readable): IEncodeResult {
@@ -54,7 +61,7 @@ describe('S3Writer', () => {
                 const logger: Logger = container.get<Logger>(TYPES.Logger);
                 const encoderStub = new DummyEncoder();
                 const encoderSpy = sandbox.spy(encoderStub, 'encode');
-                const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger);
+                const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger, stubAuthManager);
                 const result = {} as awssdk.S3.ManagedUpload.SendData;
 
                 const dummyPromise = (): Promise<awssdk.S3.ManagedUpload.SendData> => {
@@ -104,7 +111,7 @@ describe('S3Writer', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const encoderStub = new DummyEncoder();
             const encoderSpy = sandbox.spy(encoderStub, 'encode');
-            const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger);
+            const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger, stubAuthManager);
 
             const table = (s3Writer as any).isDataFile('ABCDEF');
             const metadata = (s3Writer as any).isDataFile('metadata');

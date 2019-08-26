@@ -1,6 +1,6 @@
-import { ICognitoUserPoolLocator } from './ICognitoUserPoolLocator';
+import { ICognitoUserPoolLocator } from '@adastradev/user-management-sdk';
 import * as AWS from 'aws-sdk/global';
-import { ICognitoUserPoolApiModel } from './ICognitoUserPoolApiModel';
+import { ICognitoUserPoolApiModel } from '@adastradev/user-management-sdk';
 import {
     AuthenticationDetails,
     CognitoUser,
@@ -24,7 +24,7 @@ export function configureAwsProxy(awsConfig: GlobalConfigInstance) {
     }
 }
 
-export class AuthManager {
+export class CustomAuthManager {
     private locator: ICognitoUserPoolLocator;
     private poolData: ICognitoUserPoolApiModel;
     private region: string;
@@ -32,6 +32,7 @@ export class AuthManager {
     private cognitoUserSession: CognitoUserSession;
     private authenticatorURI: string;
     private lastRefresh: number;
+    private iamCredentials;
 
     constructor(
         locator: ICognitoUserPoolLocator,
@@ -43,11 +44,6 @@ export class AuthManager {
         // AWS module configuration
         configureAwsProxy(AWS.config);
         AWS.config.region = region;
-    }
-
-    public refresh = async () => {
-        await this.refreshCognitoCredentials();
-        return this.getIamCredentials();
     }
 
     public signIn = (email: string, password: string, newPassword: string = ''): Promise<CognitoUserSession> => {
@@ -122,12 +118,16 @@ export class AuthManager {
                         rej(err);
                     } else {
                         const tokens = this.getTokens(session);
-                        AWS.config.credentials = this.buildCognitoIdentityCredentials(tokens);
-                        (AWS.config.credentials as CognitoIdentityCredentials).get((error) => {
+                        this.iamCredentials = this.buildCognitoIdentityCredentials(tokens);
+                        (this.iamCredentials as CognitoIdentityCredentials).get((error) => {
                             if (error) {
                                 rej(error);
                             } else {
-                                console.log(`New expiry: ${(AWS.config.credentials as CognitoIdentityCredentials).expireTime}`);
+                                console.log('Setting new environment credentials...');
+                                process.env.AWS_ACCESS_KEY_ID = this.iamCredentials.accessKeyId;
+                                process.env.AWS_SECRET_ACCESS_KEY = this.iamCredentials.secretAccessKey;
+                                process.env.AWS_SESSION_TOKEN = this.iamCredentials.sessionToken;
+                                console.log(`New expiry: ${(this.iamCredentials as CognitoIdentityCredentials).expireTime}`);
                             }
                             res();
                         });
@@ -137,6 +137,13 @@ export class AuthManager {
                 res();
             }
         });
+    }
+
+    public refreshCognitoCredentialsSync(): boolean {
+        this.refreshCognitoCredentials().then(() => {
+            return true;
+        });
+        return false;
     }
 
     public buildCognitoIdentityCredentials = (tokens): CognitoIdentityCredentials => {
@@ -149,12 +156,12 @@ export class AuthManager {
     }
 
     public getIamCredentials = () => {
-        return AWS.config.credentials;
+        return this.iamCredentials;
     }
 
     private needsRefresh = () => {
         const currentTime = (new Date()).getTime();
-        const minutes = 29;
+        const minutes = 30;
         if (currentTime - this.lastRefresh >= minutes * 60 * 1000) {
             return true;
         } else {

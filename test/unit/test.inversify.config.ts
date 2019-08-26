@@ -1,7 +1,7 @@
 import { Container, interfaces } from 'inversify';
 import TYPES from '../../ioc.types';
 import { stubInterface } from 'ts-sinon';
-import { AuthManager } from '../../source/Auth';
+import { CustomAuthManager } from '../../source/Auth/CustomAuthManager';
 
 // Handlers
 import IMessageHandler from '../../source/IMessageHandler';
@@ -64,9 +64,9 @@ container.bind<string>(TYPES.Bucket).toConstantValue('some-bucket/74c23bda-a496-
 container.bind<IDDLHelper>(TYPES.DDLHelper).to(OracleDDLHelper).whenTargetNamed(IntegrationSystemType.Oracle);
 
 // tslint:disable-next-line:only-arrow-functions
-container.bind<AuthManager>(TYPES.AuthManager)
+container.bind<CustomAuthManager>(TYPES.AuthManager)
     .toDynamicValue((context: interfaces.Context) => {
-        return new AuthManager(null, 'us-east-1');
+        return new CustomAuthManager(null, 'us-east-1');
     });
 container.bind<Container>(TYPES.Container).toConstantValue(container);
 
