@@ -12,6 +12,7 @@ import { AuthManager } from './Auth';
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
 import { InvalidCommandException } from './InvalidCommandException';
+import { config } from 'aws-sdk/global';
 
 export enum AgentMode { 'ShutdownRequested', 'Listening', 'Adhoc' }
 
@@ -43,8 +44,8 @@ export class Agent {
             do {
                 await sleep(1000);
 
-                this.logger.silly('authManager.refreshCognitoCredentials');
-                await this.authManager.refreshCognitoCredentials();
+                this.logger.silly('authManager.refresh()');
+                config.credentials = await this.authManager.refresh();
 
                 const sqs = this.sqs || new SQS();
                 // For now fetch 1 message from the queue but in the future we could open this up
