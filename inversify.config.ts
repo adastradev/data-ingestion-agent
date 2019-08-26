@@ -10,7 +10,7 @@ import {
     AuthManager,
     CognitoUserPoolLocatorUserManagement,
     configureAwsProxy
-} from '@adastradev/user-management-sdk';
+} from './source/Auth';
 import { DataIngestionApi } from '@adastradev/data-ingestion-sdk';
 import { QueryService } from './source/queryServiceAPI';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
@@ -45,7 +45,7 @@ import { IntegrationSystemType } from './source/IIntegrationConfig';
 
 import axios, { AxiosRequestConfig } from 'axios';
 import { Agent } from './source/Agent';
-import { SNS, SQS } from 'aws-sdk';
+import { SNS, SQS, CognitoIdentityCredentials } from 'aws-sdk';
 import IOutputEncoder from './source/DataAccess/IOutputEncoder';
 import GZipOutputEncoder from './source/DataAccess/GZipOutputEncoder';
 import { DefaultHttpClientProvider } from './source/Util/DefaultHttpClientProvider';
@@ -153,7 +153,16 @@ const startup = async () => {
 
         logger.silly('authManager.getIamCredentials');
         try {
-            AWS.config.credentials = await authManager.getIamCredentials();
+            AWS.config.credentials = await authManager.refresh();
+            CognitoIdentityCredentials.prototype.refresh = () => {
+                authManager.refresh()
+                .then((creds) => {
+                    return creds;
+                })
+                .catch((err) => {
+                    throw err;
+                });
+            };
         } catch (error) {
             logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
             throw error;

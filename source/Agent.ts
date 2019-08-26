@@ -8,7 +8,7 @@ import IMessage from './IMessage';
 import IMessageHandler from './IMessageHandler';
 import MessageFactory from './MessageFactory';
 import ICommand from './Commands/ICommand';
-import { AuthManager } from '@adastradev/user-management-sdk';
+import { AuthManager } from './Auth';
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
 import { InvalidCommandException } from './InvalidCommandException';
