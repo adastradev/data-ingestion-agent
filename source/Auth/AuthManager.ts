@@ -123,12 +123,12 @@ export class AuthManager {
                         rej(err);
                     } else {
                         const tokens = this.getTokens(session);
-                        this.iamCredentials = this.buildCognitoIdentityCredentials(tokens);
-                        this.iamCredentials.get((error) => {
+                        AWS.config.credentials = this.buildCognitoIdentityCredentials(tokens);
+                        (AWS.config.credentials as CognitoIdentityCredentials).get((error) => {
                             if (error) {
                                 rej(error);
                             } else {
-                                console.log(`New expiry: ${this.iamCredentials.expireTime}`);
+                                console.log(`New expiry: ${(AWS.config.credentials as CognitoIdentityCredentials).expireTime}`);
                             }
                             res();
                         });
@@ -150,7 +150,7 @@ export class AuthManager {
     }
 
     public getIamCredentials = () => {
-        return this.iamCredentials;
+        return AWS.config.credentials;
     }
 
     private needsRefresh = () => {
