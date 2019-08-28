@@ -32,6 +32,7 @@ export class CustomAuthManager {
     private cognitoUserSession: CognitoUserSession;
     private authenticatorURI: string;
     private lastRefresh: number;
+    private minutesBeforeAllowRefresh: number = 30;
     private iamCredentials;
 
     constructor(
@@ -161,8 +162,7 @@ export class CustomAuthManager {
 
     private needsRefresh = () => {
         const currentTime = (new Date()).getTime();
-        const minutes = 30;
-        if (currentTime - this.lastRefresh >= minutes * 60 * 1000) {
+        if (currentTime - this.lastRefresh >= this.minutesBeforeAllowRefresh * 60 * 1000) {
             return true;
         } else {
             return false;
