@@ -120,13 +120,6 @@ export class CustomAuthManager {
         });
     }
 
-    public refreshCognitoCredentialsSync(): boolean {
-        this.refreshCognitoCredentials().then(() => {
-            return true;
-        });
-        return false;
-    }
-
     public buildCognitoIdentityCredentials = (tokens): CognitoIdentityCredentials => {
         return new CognitoIdentityCredentials({
             IdentityPoolId: this.poolData.IdentityPoolId,

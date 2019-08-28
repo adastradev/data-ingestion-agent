@@ -61,7 +61,7 @@ export default class S3Writer implements IDataWriter {
             Key: `${fileNamePrefix}${fileSuffix}`
         };
 
-        this._authManager.refreshCognitoCredentialsSync();
+        await this._authManager.refreshCognitoCredentials();
 
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
@@ -70,7 +70,9 @@ export default class S3Writer implements IDataWriter {
 
         managedUpload.on('httpUploadProgress', (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
-            this._authManager.refreshCognitoCredentialsSync();
+            this._authManager.refreshCognitoCredentials().then(() => {
+                return true;
+            });
         });
 
         await managedUpload.promise();

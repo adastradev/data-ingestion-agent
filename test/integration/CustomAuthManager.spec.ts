@@ -58,4 +58,28 @@ describe('AuthManager', () => {
     expect((iamCredsTwo as CognitoIdentityCredentials).expireTime)
         .greaterThan((iamCredsOne as CognitoIdentityCredentials).expireTime);
   });
+
+  it('Should not refresh again before half an hour has passed', async () => {
+        (auth as any).minutesBeforeAllowRefresh = 60;
+        await auth.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
+        await auth.refreshCognitoCredentials();
+        const iamCredsOne = auth.getIamCredentials();
+        const envCredsOne = {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        };
+
+        await sleep(1000);
+
+        await auth.refreshCognitoCredentials();
+        const iamCredsTwo = auth.getIamCredentials();
+        const envCredsTwo = {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+        };
+        expect(iamCredsOne).deep.equal(iamCredsTwo);
+        expect(envCredsOne).deep.equal(envCredsTwo);
+        expect((iamCredsTwo as CognitoIdentityCredentials).expireTime)
+            .equal((iamCredsOne as CognitoIdentityCredentials).expireTime);
+    });
 });

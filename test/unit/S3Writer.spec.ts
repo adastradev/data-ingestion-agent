@@ -16,8 +16,10 @@ import { CustomAuthManager } from '../../source/Auth/CustomAuthManager';
 const expect = chai.expect;
 
 const stubAuthManager = {
-    refreshCognitoCredentialsSync: () => {
-        return true;
+    refreshCognitoCredentials: () => {
+        return new Promise((resolve) => {
+            resolve();
+        });
     }
 } as CustomAuthManager;
 
