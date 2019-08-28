@@ -47,32 +47,29 @@ export class CustomAuthManager {
         AWS.config.region = region;
     }
 
-    public signIn = (email: string, password: string, newPassword: string = ''): Promise<CognitoUserSession> => {
+    public signIn = (email: string, password: string): Promise<CognitoUserSession> => {
         return new Promise(async (resolve, reject) => {
-            // get the pool data from the response
             console.log(`Signing into AWS Cognito`);
+
+            // get the pool data from the response
             try {
                 this.poolData = await this.locator.getPoolForUsername(email);
                 this.authenticatorURI = `cognito-idp.${this.region}.amazonaws.com/${this.poolData.UserPoolId}`;
             } catch (error) {
                 return reject(error);
             }
+
             // construct a user pool object
             const userPool = new CognitoUserPool(this.poolData);
             // configure the authentication credentials
-            const authenticationData = {
-                Password: password,
-                Username: email
-            };
+            const authenticationData = { Password: password, Username: email };
             // create object with user/pool combined
-            const userData = {
-                Pool: userPool,
-                Username: email
-            };
+            const userData = { Pool: userPool, Username: email };
             // init Cognito auth details with auth data
             const authenticationDetails = new AuthenticationDetails(authenticationData);
             // authenticate user to in Cognito user pool
             this.cognitoUser = new CognitoUser(userData);
+
             const that = this;
             this.cognitoUser.authenticateUser(authenticationDetails, {
                 onSuccess(result) {
@@ -82,47 +79,30 @@ export class CustomAuthManager {
                 onFailure(err) {
                     return reject(err);
                 },
-                mfaRequired(codeDeliveryDetails) { // eslint-disable-line
+                mfaRequired(codeDeliveryDetails) {
                     return reject(Error('Multi-factor auth is not currently supported'));
                 },
-                newPasswordRequired(userAttributes, requiredAttributes) { // eslint-disable-line
-                    if (newPassword !== undefined && newPassword.length > 0) {
-                        // User was signed up by an admin and must provide new
-                        // password and required attributes
-                        // These attributes are not mutable and should be removed from map.
-                        delete userAttributes.email_verified;
-                        delete userAttributes['custom:tenant_id'];
-                        that.cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
-                            onFailure: (err) => {
-                                return reject(err);
-                            },
-                            onSuccess: (result) => {
-                                that.cognitoUserSession = result;
-                                return resolve(result);
-                            }
-                        });
-                    } else {
-                        return reject(Error('New password is required for the user'));
-                    }
+                newPasswordRequired(userAttributes, requiredAttributes) {
+                    return reject(Error('New password is required for the user'));
                 }
             });
         });
     }
 
     public async refreshCognitoCredentials(): Promise<any> {
-        return new Promise((res, rej) => {
+        return new Promise((resolve, reject) => {
             if (this.needsRefresh() === true) {
                 this.lastRefresh = (new Date()).getTime();
                 const { refreshToken } = this.getTokens(this.cognitoUserSession);
                 this.cognitoUser.refreshSession(refreshToken, (err, session) => {
                     if (err) {
-                        rej(err);
+                        reject(err);
                     } else {
                         const tokens = this.getTokens(session);
                         this.iamCredentials = this.buildCognitoIdentityCredentials(tokens);
                         (this.iamCredentials as CognitoIdentityCredentials).get((error) => {
                             if (error) {
-                                rej(error);
+                                reject(error);
                             } else {
                                 console.log('Setting new environment credentials...');
                                 process.env.AWS_ACCESS_KEY_ID = this.iamCredentials.accessKeyId;
@@ -130,12 +110,12 @@ export class CustomAuthManager {
                                 process.env.AWS_SESSION_TOKEN = this.iamCredentials.sessionToken;
                                 console.log(`New expiry: ${(this.iamCredentials as CognitoIdentityCredentials).expireTime}`);
                             }
-                            res();
+                            resolve();
                         });
                     }
                 });
             } else {
-                res();
+                resolve();
             }
         });
     }

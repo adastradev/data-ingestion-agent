@@ -35,7 +35,7 @@ describe('AuthManager', () => {
     sandbox.restore();
   });
 
-  it('Should successfully login and refresh credentials', async () => {
+  it('Should have ability to login and refresh multiple times successfully', async () => {
     (auth as any).minutesBeforeAllowRefresh = 0;
     await auth.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
     await auth.refreshCognitoCredentials();
