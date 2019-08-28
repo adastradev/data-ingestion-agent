@@ -12,7 +12,7 @@ import {
 import {
     CognitoUserPoolLocatorUserManagement,
     configureAwsProxy
-} from '@adastradev/user-management-sdk'
+} from '@adastradev/user-management-sdk';
 import { DataIngestionApi } from '@adastradev/data-ingestion-sdk';
 import { QueryService } from './source/queryServiceAPI';
 import { BearerTokenCredentials, DiscoverySdk } from '@adastradev/serverless-discovery-sdk';
