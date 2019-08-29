@@ -8,7 +8,9 @@ import IMessage from './IMessage';
 import IMessageHandler from './IMessageHandler';
 import MessageFactory from './MessageFactory';
 import ICommand from './Commands/ICommand';
-import { AuthManager } from '@adastradev/user-management-sdk';
+import {
+    CustomAuthManager
+} from './Auth/CustomAuthManager';
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
 import { InvalidCommandException } from './InvalidCommandException';
@@ -23,7 +25,7 @@ export class Agent {
     constructor(
         @inject(TYPES.Logger) private readonly logger: Winston.Logger,
         @inject(TYPES.QueueUrl) private readonly queueUrl: string,
-        @inject(TYPES.AuthManager) private readonly authManager: AuthManager,
+        @inject(TYPES.AuthManager) private readonly authManager: CustomAuthManager,
         @inject(TYPES.Container) private readonly container: Container,
         @inject(TYPES.SQS) private readonly sqs: SQS
     ) { }
@@ -43,7 +45,7 @@ export class Agent {
             do {
                 await sleep(1000);
 
-                this.logger.silly('authManager.refreshCognitoCredentials');
+                this.logger.silly('authManager.refreshCognitoCredentials()');
                 await this.authManager.refreshCognitoCredentials();
 
                 const sqs = this.sqs || new SQS();

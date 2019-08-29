@@ -7,7 +7,9 @@ import * as AWS from 'aws-sdk';
 import * as Winston from 'winston';
 import * as Transport from 'winston-transport';
 import {
-    AuthManager,
+    CustomAuthManager
+} from './source/Auth/CustomAuthManager';
+import {
     CognitoUserPoolLocatorUserManagement,
     configureAwsProxy
 } from '@adastradev/user-management-sdk';
@@ -82,7 +84,7 @@ const cloudDependenciesMap: Map<any, any> = getCloudDependencies();
 const sdk: DiscoverySdk = new DiscoverySdk(process.env.DISCOVERY_SERVICE, region, process.env.DEFAULT_STAGE, null, cloudDependenciesMap);
 
 const poolLocator = new CognitoUserPoolLocatorUserManagement(region);
-const authManager = new AuthManager(poolLocator, region);
+const authManager = new CustomAuthManager(poolLocator, region);
 
 const startup = async () => {
     try {
@@ -151,9 +153,9 @@ const startup = async () => {
             throw error;
         }
 
-        logger.silly('authManager.getIamCredentials');
+        logger.silly('authManager.refreshCognitoCredentials()');
         try {
-            AWS.config.credentials = await authManager.getIamCredentials();
+            await authManager.refreshCognitoCredentials();
         } catch (error) {
             logger.error('Failed to get authentication keys, please confirm the specified user exists and is in a valid state');
             throw error;
@@ -208,7 +210,7 @@ const startup = async () => {
         container.bind<SNS>(TYPES.SNS).toConstantValue(new SNS());
 
         // Config injection
-        container.bind<AuthManager>(TYPES.AuthManager).toConstantValue(authManager);
+        container.bind<CustomAuthManager>(TYPES.AuthManager).toConstantValue(authManager);
         container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
         container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
         container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snsTopicArn);
