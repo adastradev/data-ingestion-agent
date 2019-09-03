@@ -72,6 +72,7 @@ export class Agent {
 
     private async handleAgentCommands() {
         return new Promise(async (resolve, reject) => {
+            console.log('checking commands');
             const args = process.argv.splice(2);
             if (args.length > 0) {
                 let command: ICommand;
@@ -79,13 +80,17 @@ export class Agent {
 
                 const isKnownCommand = (TYPES[commandName]) ? this.container.isBound(TYPES[commandName]) : false;
                 if (isKnownCommand) {
+                    console.log('known command');
                     command = this.container.get<ICommand>(TYPES[commandName]);
                     await command.invoke(args.splice(1));
                 } else {
+                    console.log('unknown command');
                     reject(new InvalidCommandException(commandName, `Unknown command '${commandName}'`));
                 }
 
                 this.mode = AgentMode.Adhoc;
+            } else {
+                console.log('no args when handling commands');
             }
 
             resolve();

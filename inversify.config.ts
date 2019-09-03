@@ -35,6 +35,7 @@ import OracleReader from './source/DataAccess/Oracle/OracleReader';
 import ICommand from './source/Commands/ICommand';
 import AdHocIngestCommand from './source/Commands/AdHocIngestCommand';
 import AdHocPreviewCommand from './source/Commands/AdHocPreviewCommand';
+import GenerateCommand from './source/Commands/GenerateCommand';
 import IntegrationConfigFactory from './source/IntegrationConfigFactory';
 import IConnectionPool from './source/DataAccess/IConnectionPool';
 import OracleConnectionPoolProxy from './source/DataAccess/Oracle/OracleConnectionPoolProxy';
@@ -237,6 +238,7 @@ const startup = async () => {
         // Agent Commands
         container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);
         container.bind<ICommand>(TYPES.PREVIEW).to(AdHocPreviewCommand);
+        container.bind<ICommand>(TYPES.GENERATE).to(GenerateCommand);
 
         // TODO: Revisit, is this necessary?
         container.bind<Container>(TYPES.Container).toConstantValue(container);

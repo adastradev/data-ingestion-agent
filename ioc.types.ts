@@ -9,6 +9,7 @@ const TYPES = {
     DataWriter: Symbol('IngestionWriter'),
     DummyHandler: Symbol('DummyHandler'),
     DummyMessage: Symbol('DummyMessage'),
+    GENERATE: Symbol('Generate'),
     INGEST: Symbol('Ingest'),
     IntegrationConfigFactory: Symbol('IntegrationConfigFactory'),
     Logger: Symbol('Logger'),
