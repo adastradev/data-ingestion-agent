@@ -58,7 +58,7 @@ PROCESS_MAX_MEMORY_SIZE_MB=4096
 # Define a variable to hold your connection string
 CONNECTION_STRING=your_connection_string
 
-docker run -d -t \
+docker run -t \
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
