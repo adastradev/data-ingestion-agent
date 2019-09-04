@@ -19,7 +19,7 @@ export function configureAwsProxy(awsConfig: GlobalConfigInstance) {
             proxyUri = process.env.HTTPS_PROXY;
         }
         awsConfig.update({
-            httpOptions: { agent: proxy(proxyUri) }
+            httpOptions: { agent: proxy(proxyUri) as any }
         });
     }
 }
