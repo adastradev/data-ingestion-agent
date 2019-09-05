@@ -1,5 +1,6 @@
 import * as inquirer from 'inquirer';
 import { ICommandConfig } from './ICommandConfig';
+import { IntegrationType } from '../source/IIntegrationConfig';
 
 const validateMemoryValue = (input: number) => {
   if (input > 0) {
@@ -7,6 +8,13 @@ const validateMemoryValue = (input: number) => {
   } else {
     return 'Memory value must be greater than zero, please retry entering a valid value';
   }
+};
+
+const getIntegrationTypes = () => {
+  return Object.keys(IntegrationType)
+    .filter((k) => (k in [ IntegrationType.NotImplemented, IntegrationType.Unknown ]))
+    .map((k) => IntegrationType[k])
+    .map((t) => ({ name: t, value: t }));
 };
 
 export default {
@@ -18,9 +26,12 @@ export default {
         choices: [
           { name: 'Ingest Once', value: 'ingest', short: 0 },
           { name: 'Preview Ingest Queries', value: 'preview', short: 1 },
-          { name: 'Always Run in Background (Advanced)', value: '', short: 2 }
+          { name: 'Always Run in Background (Advanced)', value: 'background', short: 2 }
         ],
-        default: 'preview'
+        default: 'preview',
+        filter: (input) => {
+          return (input === 'background') ? '' : input;
+        }
       },
       {
         type: 'input',
@@ -41,6 +52,12 @@ export default {
       },
       {
         type: 'list',
+        name: 'agent.integrationType',
+        message: 'Which information system will the agent ingest data from?',
+        choices: getIntegrationTypes()
+      },
+      {
+        type: 'list',
         name: 'agent.database',
         message: 'What database technology does your student information system use?',
         choices: [
@@ -52,17 +69,21 @@ export default {
       {
         type: 'input',
         name: 'agent.dbEndpoint',
-        message: 'Enter the database connection string:'
+        message: 'Enter the database connection string:',
+        filter: (input) => `"${input}"`,
+        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview'
       },
       {
         type: 'input',
         name: 'agent.dbUser',
-        message: 'Enter database user:'
+        message: 'Enter database user:',
+        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview'
       },
       {
         type: 'password',
         name: 'agent.dbPassword',
-        message: 'Enter database users password:'
+        message: 'Enter database users password:',
+        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview'
       },
       {
         type: 'confirm',
@@ -134,22 +155,24 @@ export default {
     ],
 
   formatString: [
-    'docker run',
-    '${(this.agent.mode === "") ? "-d" : "-it"}',
-    '-m ${this.agent.maxMemory}M -e PROCESS_MAX_MEMORY_SIZE_MB=${this.agent.maxMemory}',
-    '-e ASTRA_CLOUD_USERNAME=${this.agent.astraUserName}',
-    '-e ASTRA_CLOUD_PASSWORD=${this.agent.astraUserPassword}',
-    '-e ${this.agent.database}_ENDPOINT="${this.agent.dbEndpoint}"',
-    '-e ${this.agent.database}_USER=${this.agent.dbUser}',
-    '-e ${this.agent.database}_PASSWORD=${this.agent.dbPassword}',
-    '${(this.agent.advancedMode === true) ? "-e LOG_LEVEL=" + this.agent.logLevel || "info" : null}',
-    '${(this.agent.advancedMode === true) ? "-e DISCOVERY_SERVICE=" + this.agent.discoverySvcUri : null}',
-    '${(this.agent.advancedMode === true) ? "-e DEFAULT_STAGE=" + this.agent.defaultStage : null}',
-    '${(this.agent.advancedMode === true) ? "-e AWS_REGION=" + this.agent.awsRegion : null}',
-    '--network=${this.agent.network || "bridge"}',
-    '${this.agent.image || "adastradev/data-ingestion-agent:latest"}',
+    'docker run ',
+    '${(this.agent.mode === "") ? "-d" : "-it"} ',
+    '-m ${this.agent.maxMemory}M ',
+    '-e INTEGRATION_TYPE=${this.agent.integrationType} ',
+    '-e PROCESS_MAX_MEMORY_SIZE_MB=${this.agent.maxMemory} ',
+    '-e ASTRA_CLOUD_USERNAME=${this.agent.astraUserName} ',
+    '-e ASTRA_CLOUD_PASSWORD=${this.agent.astraUserPassword} ',
+    '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_ENDPOINT=" + this.agent.dbEndpoint + " ") : ""}',
+    '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_USER=" + this.agent.dbUser + " ") : ""}',
+    '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_PASSWORD=" + this.agent.dbPassword + " ") : ""}',
+    '${(this.agent.advancedMode === true) ? "-e LOG_LEVEL=" + (this.agent.logLevel || "info") + " " : ""}',
+    '${(this.agent.advancedMode === true) ? "-e DISCOVERY_SERVICE=" + this.agent.discoverySvcUri + " " : ""}',
+    '${(this.agent.advancedMode === true) ? "-e DEFAULT_STAGE=" + this.agent.defaultStage + " " : ""}',
+    '${(this.agent.advancedMode === true) ? "-e AWS_REGION=" + this.agent.awsRegion + " " : ""}',
+    '--network=${(this.agent.network || "bridge")} ',
+    '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} ',
     '${this.agent.mode}'
   ]
-  .filter((s) => s.length > 0)
-  .join(' ')
+  // Adding a delimiter produces an ugly output when some format strings produce empty results
+  .join('')
 } as ICommandConfig;
