@@ -86,7 +86,6 @@
     "node-ssh": "^5.1.2",
     "oracledb": "^3.0.0",
     "proxy-agent": "^3.0.3",
-    "readline-promise": "^1.0.4",
     "shelljs": "^0.8.2",
     "through2": "^2.0.3",
     "ts-loader": "^5.2.1",

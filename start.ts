@@ -5,12 +5,12 @@ import * as shell from 'child_process';
 const args = process.argv.slice(2);
 
 if (!process.env.PROCESS_MAX_MEMORY_SIZE_MB) {
-    console.warn('PROCESS_MAX_MEMORY_SIZE_MB environment variable was not specified - using default process memory allocation which may be insufficient for this application');
+    throw Error('PROCESS_MAX_MEMORY_SIZE_MB environment variable is required but was not specified');
 }
 
 // allow space for the kernel
 const nodeProcessMaxSpaceSize: number = Math.round((process.env.PROCESS_MAX_MEMORY_SIZE_MB as any) * 0.75);
-const target = [`--max-old-space-size=${nodeProcessMaxSpaceSize || 1024}`, 'dist/index.js'].concat(args);
+const target = [`--max-old-space-size=${nodeProcessMaxSpaceSize}`, 'dist/index.js'].concat(args);
 let restartCounter = 0;
 let child;
 
