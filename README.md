@@ -58,7 +58,7 @@ PROCESS_MAX_MEMORY_SIZE_MB=4096
 # Define a variable to hold your connection string
 CONNECTION_STRING=your_connection_string
 
-docker run -d -t \
+docker run -t \
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
 -e ASTRA_CLOUD_USERNAME=<your_username> \
@@ -179,10 +179,12 @@ docker stats <container_name_or_id>
 ### View agent logs
 ```sh
 # View console output from container host
-docker logs dia
+docker logs <container_name_or_id>
 # Copy/export logs from the container to the host
-docker cp dia:/var/log/dia /tmp/log/dia
+# Create a destination path to store log files. After running the command the copied log file stored in your destination path should be renamed so files are not overwritten. 
+docker cp <container_name_or_id>:/var/log/dia/. <destination_path>
 ```
+See the [Docker cp command guide for help copying logs to a local file system](https://docs.docker.com/engine/reference/commandline/cp/)
 
 ## Development
 See the [Development guide for Data Ingestion Agent](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DevelopmentGuide.md)
