@@ -31,6 +31,7 @@ COPY package.json package-lock.json *.ts *config* ./
 COPY source ./source
 COPY test ./test
 COPY docs ./docs
+COPY cli ./cli
 
 RUN npm ci &&\
     npm run build &&\
