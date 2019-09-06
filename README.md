@@ -7,16 +7,10 @@ Ad Astra Docker agent code base for cloud integration without VPN tunnels
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
 [Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
+
 [Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
 
 #### Oracle
-When connecting to an Oracle database the specified database user must be given read/execute access to the following:
-
-- DBMS_METADATA.GET_DDL (function)
-- ALL_TABLES (view)
-- ALL_CONS_COLUMNS (view)
-- ALL_CONSTRAINTS (view)
-- All tables referenced by this agent (see 'Query Preview' section below)
 
 When specifying the 'ORACLE_ENDPOINT' value (a connection string) to your Oracle instance you may use one of the following formats:
 
@@ -30,10 +24,22 @@ CONNECTION_STRING="hostname:port/service_name"
 # TNS Style Connection String using SERVICE_NAME
 # CONNECTION_STRING="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=port))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_name)))"
 ```
+When connecting to an Oracle database the specified database user must be given read/execute access to the following:
+
+- DBMS_METADATA.GET_DDL (function)
+- ALL_TABLES (view)
+- ALL_CONS_COLUMNS (view)
+- ALL_CONSTRAINTS (view)
+- All tables referenced by this agent (see 'Query Preview' section below)
 
 ## Resource Requirements
 
+
 #### Docker Host
+
+Hardware:
+
+* Server grade systems are recommended for hosting docker and the data ingestion agent. Using consumer grade devices such as personal laptops and desktops as the main host for the DIA is strongly discouraged.
 
 Memory:
 
