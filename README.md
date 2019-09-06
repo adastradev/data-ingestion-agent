@@ -39,7 +39,7 @@ When connecting to an Oracle database the specified database user must be given 
 
 Hardware:
 
-* Server grade systems are recommended for hosting docker and the data ingestion agent. Consumer grade devices such as personal laptops and desktops should be avoided.
+* Server grade systems are recommended for hosting docker and the data ingestion agent. Using consumer grade devices such as personal laptops and desktops as the main host for the DIA is strongly discouraged.
 
 Memory:
 
