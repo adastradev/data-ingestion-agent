@@ -2,7 +2,7 @@ import * as inquirer from 'inquirer';
 import { ICommandConfig } from './ICommandConfig';
 import { IntegrationType } from '../source/IIntegrationConfig';
 
-const validateMemoryValue = (input: number) => {
+export const validateNonZero = (input: number): boolean | string => {
   if (input > 0) {
     return true;
   } else {
@@ -10,10 +10,18 @@ const validateMemoryValue = (input: number) => {
   }
 };
 
-const getIntegrationTypes = () => {
+export const validateNotEmptyString = (input: string): boolean | string => {
+  if (input.length > 0) {
+    return true;
+  } else {
+    return 'Please enter a value for this parameter';
+  }
+};
+
+export const getIntegrationTypes = () => {
+  const keys = Object.keys(IntegrationType);
   return Object.keys(IntegrationType)
-    .filter((k) => (k in [ IntegrationType.NotImplemented, IntegrationType.Unknown ]))
-    .map((k) => IntegrationType[k])
+    .filter((k) => [ 'NotImplemented', 'Unknown' ].indexOf(k) === -1)
     .map((t) => ({ name: t, value: t }));
 };
 
@@ -28,7 +36,7 @@ export default {
           { name: 'Preview Ingest Queries', value: 'preview', short: 1 },
           { name: 'Always Run in Background (Advanced)', value: 'background', short: 2 }
         ],
-        default: 'preview',
+        default: () => process.env.mode || 'preview',
         filter: (input) => {
           return (input === 'background') ? '' : input;
         }
@@ -36,25 +44,30 @@ export default {
       {
         type: 'input',
         name: 'agent.astraUserName',
-        message: 'Enter your Astra Cloud user name:'
+        message: 'Enter your Astra Cloud user name:',
+        default: () => process.env.astraUserName,
+        validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.astraUserPassword',
-        message: 'Enter your Astra Cloud password:'
+        message: 'Enter your Astra Cloud password:',
+        default: () => process.env.astraUserPassword,
+        validate: validateNotEmptyString
       },
       {
         type: 'number',
         name: 'agent.maxMemory',
         message: 'How much memory (in megabytes) should be allocated to the agent?',
-        default: '2048',
-        validate: validateMemoryValue
+        default: () => process.env.maxMemory || '2048',
+        validate: validateNonZero
       },
       {
         type: 'list',
         name: 'agent.integrationType',
         message: 'Which information system will the agent ingest data from?',
-        choices: getIntegrationTypes()
+        choices: getIntegrationTypes(),
+        default: () => process.env.integrationType
       },
       {
         type: 'list',
@@ -64,31 +77,38 @@ export default {
           { name: 'Oracle', value: 'ORACLE', short: 0 },
           { name: 'Microsoft SQL Server (not supported)', value: 'MSSQL', short: 1 }
         ],
-        default: 'ORACLE'
+        default: () => process.env.database || 'ORACLE'
       },
       {
         type: 'input',
         name: 'agent.dbEndpoint',
         message: 'Enter the database connection string:',
-        filter: (input) => `"${input}"`,
-        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview'
+        filter: (input) => (input.length > 0) ? `"${input}"` : '',
+        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
+        default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
+        validate: validateNotEmptyString
       },
       {
         type: 'input',
         name: 'agent.dbUser',
         message: 'Enter database user:',
-        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview'
+        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
+        default: () => process.env.dbUser,
+        validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.dbPassword',
         message: 'Enter database users password:',
-        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview'
+        when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
+        default: () => process.env.dbPassword,
+        validate: validateNotEmptyString
       },
       {
         type: 'confirm',
         name: 'agent.advancedMode',
-        message: 'Would you like to configure advanced run settings?'
+        message: 'Would you like to configure advanced run settings?',
+        default: () => process.env.advancedMode
       },
       {
         type: 'list',
@@ -102,18 +122,19 @@ export default {
           { name: 'Debug', value: 'debug', short: 4 },
           { name: 'All', value: 'silly', short: 3 }
         ],
-        default: 'info',
+        default: () => process.env.logLevel || 'info',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode
       },
       {
         type: 'input',
         name: 'agent.image',
         message: 'Enter an alternative docker image to use:',
-        default: 'adastradev/data-ingestion-agent:latest',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode
+        default: () => process.env.image || 'adastradev/data-ingestion-agent:latest',
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        validate: validateNotEmptyString
       },
       {
-        type: 'choice',
+        type: 'list',
         name: 'agent.network',
         message: 'Enter the docker network to use:',
         choices: [
@@ -121,36 +142,53 @@ export default {
           { name: 'host', value: 'host', short: 1 },
           { name: 'custom', value: 'custom', short:  2}
         ],
-        default: 'bridge',
+        default: () => process.env.network || 'bridge',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode
       },
       {
         type: 'input',
-        name: 'agent.network',
+        name: 'agent.networkCustom',
         message: 'Enter the custom docker network identifier:',
-        default: 'bridge',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode && answers.agent.network === 'custom'
+        default: () => process.env.networkCustom || 'bridge',
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode && answers.agent.network === 'custom',
+        validate: validateNotEmptyString
       },
       {
         type: 'input',
         name: 'agent.discoverySvcUri',
         message: 'Enter the alternative discovery service URI:',
-        default: process.env.DISCOVERY_SERVICE || '',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode
+        default: () => process.env.discoverySvcUri || process.env.DISCOVERY_SERVICE || '',
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        validate: validateNotEmptyString
       },
       {
         type: 'input',
         name: 'agent.defaultStage',
         message: 'Enter the alternative default stage:',
-        default: process.env.DEFAULT_STAGE || '',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode
+        default: () => process.env.defaultStage || process.env.DEFAULT_STAGE || '',
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        validate: validateNotEmptyString
       },
       {
         type: 'input',
         name: 'agent.awsRegion',
         message: 'Enter the alternative AWS region:',
-        default: process.env.AWS_REGION || 'us-east-1',
+        default: () => process.env.awsRegion || process.env.AWS_REGION || 'us-east-1',
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        validate: validateNotEmptyString
+      },
+      {
+        type: 'number',
+        name: 'agent.concurrentConnections',
+        message: 'Enter the maximum number of concurrent database connections allowed:',
+        validate: validateNonZero,
+        default: () => process.env.concurrentConnections || process.env.CONCURRENT_CONNECTIONS || 5,
         when: (answers: inquirer.Answers) => answers.agent.advancedMode
+      },
+      {
+        type: 'confirm',
+        name: 'agent.confirmedAccurate',
+        message: 'Are all of the entered values correct?'
       }
     ],
 
@@ -169,7 +207,8 @@ export default {
     '${(this.agent.advancedMode === true) ? "-e DISCOVERY_SERVICE=" + this.agent.discoverySvcUri + " " : ""}',
     '${(this.agent.advancedMode === true) ? "-e DEFAULT_STAGE=" + this.agent.defaultStage + " " : ""}',
     '${(this.agent.advancedMode === true) ? "-e AWS_REGION=" + this.agent.awsRegion + " " : ""}',
-    '--network=${(this.agent.network || "bridge")} ',
+    '${(this.agent.advancedMode === true) ? "-e CONCURRENT_CONNECTIONS=" + this.agent.concurrentConnections + " " : ""}',
+    '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} ',
     '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} ',
     '${this.agent.mode}'
   ]

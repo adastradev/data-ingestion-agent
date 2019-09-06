@@ -17,7 +17,7 @@ import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
-import Wizard from '../../cli/Wizard';
+import Wizard, { getIntegrationTypes } from '../../cli/Wizard';
 
 const expect = chai.expect;
 const fillTemplate = (template, inputs): string => {
@@ -25,6 +25,13 @@ const fillTemplate = (template, inputs): string => {
 };
 
 describe.only('Wizard', () => {
+
+    describe('getIntegrationTypes', () => {
+      it('should produce valid choice options for each integration type', () => {
+        const types = getIntegrationTypes();
+        expect(types).to.have.length.greaterThan(0);
+      });
+    });
 
     describe('formatString', () => {
         let sandbox: sinon.SinonSandbox;
@@ -114,12 +121,13 @@ describe.only('Wizard', () => {
               defaultStage: 'dev',
               awsRegion: 'us-east-2',
               network: 'my-first-network',
-              image: 'adastradev/data-ingestion-agent:0.9'
+              image: 'adastradev/data-ingestion-agent:0.9',
+              concurrentConnections: 5
             }
           };
 
           const result = fillTemplate(Wizard.formatString, args);
-          expect(result).to.equal('docker run -it -m 2048M -e INTEGRATION_TYPE=Banner -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e ASTRA_CLOUD_USERNAME=test -e ASTRA_CLOUD_PASSWORD=test -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=http://someuri -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 --network=my-first-network adastradev/data-ingestion-agent:0.9 preview');
+          expect(result).to.equal('docker run -it -m 2048M -e INTEGRATION_TYPE=Banner -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e ASTRA_CLOUD_USERNAME=test -e ASTRA_CLOUD_PASSWORD=test -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=http://someuri -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 preview');
         });
 
         it('should produce an advanced mode ingest command', async () => {
@@ -140,12 +148,13 @@ describe.only('Wizard', () => {
               defaultStage: 'dev',
               awsRegion: 'us-east-2',
               network: 'my-first-network',
-              image: 'adastradev/data-ingestion-agent:0.9'
+              image: 'adastradev/data-ingestion-agent:0.9',
+              concurrentConnections: 5
             }
           };
 
           const result = fillTemplate(Wizard.formatString, args);
-          expect(result).to.equal('docker run -it -m 2048M -e INTEGRATION_TYPE=Banner -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e ASTRA_CLOUD_USERNAME=test -e ASTRA_CLOUD_PASSWORD=test -e ORACLE_ENDPOINT=someendpoint -e ORACLE_USER=test -e ORACLE_PASSWORD=test -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=http://someuri -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 --network=my-first-network adastradev/data-ingestion-agent:0.9 ingest');
+          expect(result).to.equal('docker run -it -m 2048M -e INTEGRATION_TYPE=Banner -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e ASTRA_CLOUD_USERNAME=test -e ASTRA_CLOUD_PASSWORD=test -e ORACLE_ENDPOINT=someendpoint -e ORACLE_USER=test -e ORACLE_PASSWORD=test -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=http://someuri -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 ingest');
         });
 
         it('should produce an advanced mode background command', async () => {
@@ -166,12 +175,13 @@ describe.only('Wizard', () => {
               defaultStage: 'dev',
               awsRegion: 'us-east-2',
               network: 'my-first-network',
-              image: 'adastradev/data-ingestion-agent:0.9'
+              image: 'adastradev/data-ingestion-agent:0.9',
+              concurrentConnections: 5
             }
           };
 
           const result = fillTemplate(Wizard.formatString, args);
-          expect(result).to.equal('docker run -d -m 2048M -e INTEGRATION_TYPE=Banner -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e ASTRA_CLOUD_USERNAME=test -e ASTRA_CLOUD_PASSWORD=test -e ORACLE_ENDPOINT=someendpoint -e ORACLE_USER=test -e ORACLE_PASSWORD=test -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=http://someuri -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 --network=my-first-network adastradev/data-ingestion-agent:0.9 ');
+          expect(result).to.equal('docker run -d -m 2048M -e INTEGRATION_TYPE=Banner -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e ASTRA_CLOUD_USERNAME=test -e ASTRA_CLOUD_PASSWORD=test -e ORACLE_ENDPOINT=someendpoint -e ORACLE_USER=test -e ORACLE_PASSWORD=test -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=http://someuri -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 ');
         });
     });
 });

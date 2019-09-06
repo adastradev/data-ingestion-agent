@@ -16,7 +16,23 @@ const fillTemplate = (template, inputs): string => {
 export default async function (procArgs: string[]): Promise<boolean> {
   if (procArgs.length > 0 && commands[procArgs[0]]) {
     const commandConfig: ICommandConfig = commands[procArgs[0]];
-    const answers = await inquirer.prompt(commandConfig.prompts);
+    let confirmed: boolean;
+    let answers: any;
+    do {
+      answers = await inquirer.prompt(commandConfig.prompts);
+
+      // TODO: Pump answers into global cache?
+      // tslint:disable-next-line: no-string-literal
+      confirmed = answers['agent'].confirmedAccurate;
+
+      if (!confirmed) {
+        // Save answers for next attempt
+        for (const key of Object.keys(answers.agent)) {
+          process.env[key] = answers.agent[key];
+        }
+      }
+    } while (!confirmed);
+
     console.log('Copy and paste the following command to run the ingestion agent:');
     console.log('------');
     console.log(fillTemplate(commandConfig.formatString, answers));
