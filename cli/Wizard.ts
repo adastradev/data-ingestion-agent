@@ -25,6 +25,10 @@ export const getIntegrationTypes = () => {
 };
 
 export default {
+  successMessages: [
+    'Copy and paste the following command to run the ingestion agent:',
+    '----------------------------------------------------------------'
+  ],
   prompts: [
       {
         type: 'list',

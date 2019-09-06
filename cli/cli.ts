@@ -32,8 +32,9 @@ export default async function (procArgs: string[]): Promise<boolean> {
       }
     } while (!confirmed);
 
-    console.log('Copy and paste the following command to run the ingestion agent:');
-    console.log('------');
+    for (const msg of commandConfig.successMessages) {
+      console.log(msg);
+    }
     console.log(fillTemplate(commandConfig.formatString, answers));
 
     // We handled a command that should result in an immediate exit
