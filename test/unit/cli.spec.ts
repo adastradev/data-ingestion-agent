@@ -4,7 +4,6 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 import * as inquirer from 'inquirer';
-
 import * as sinon from 'sinon';
 import cli from '../../cli/cli';
 
@@ -12,11 +11,11 @@ const expect = chai.expect;
 
 describe('cli', () => {
   let sandbox: sinon.SinonSandbox;
-  let agentArgs: any;
+  let accurateArgs: any;
 
   before(() => {
     sandbox = sinon.createSandbox();
-    agentArgs = {
+    accurateArgs = {
       mode: 'preview',
       integrationType: 'Banner',
       astraUserName: 'test',
@@ -44,7 +43,7 @@ describe('cli', () => {
 
   it('prompt the user and loop once when the user did not need to edit their inputs', async () => {
     const promptStub = sandbox.stub(inquirer, 'prompt').returns({
-      agent: agentArgs
+      agent: accurateArgs
     } as any);
 
     const shouldContinue = await cli(['wizard']);
@@ -54,7 +53,7 @@ describe('cli', () => {
   });
 
   it('prompt the user and loop once when the user did not need to edit their inputs', async () => {
-    const inaccurateArgs = Object.assign({}, agentArgs);
+    const inaccurateArgs = Object.assign({}, accurateArgs);
     inaccurateArgs.confirmedAccurate = false;
     const promptStub = sandbox.stub(inquirer, 'prompt')
       .onFirstCall()
@@ -63,7 +62,7 @@ describe('cli', () => {
         } as any)
       .onSecondCall()
         .returns({
-          agent: agentArgs
+          agent: accurateArgs
         } as any);
 
     const shouldContinue = await cli(['wizard']);

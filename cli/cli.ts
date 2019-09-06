@@ -1,3 +1,4 @@
+// tslint:disable: no-string-literal
 import * as inquirer from 'inquirer';
 import commands from './commands';
 import { ICommandConfig } from './ICommandConfig';
@@ -21,8 +22,6 @@ export default async function (procArgs: string[]): Promise<boolean> {
     do {
       answers = await inquirer.prompt(commandConfig.prompts);
 
-      // TODO: Pump answers into global cache?
-      // tslint:disable-next-line: no-string-literal
       confirmed = answers['agent'].confirmedAccurate;
 
       if (!confirmed) {

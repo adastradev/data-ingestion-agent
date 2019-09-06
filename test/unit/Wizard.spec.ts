@@ -230,13 +230,17 @@ describe('Wizard', () => {
       expect(result).to.be.true;
       result = prompt.when({ agent: { advancedMode: false }});
       expect(result).to.be.false;
-    }
+    };
 
     const providesStandardDefault = (prompt, promptName) => {
       process.env[promptName] = 'somevalue';
       expect(prompt.default()).to.equal('somevalue');
       delete process.env[promptName];
       expect(prompt.default()).to.equal('');
+    };
+
+    const getAgentPromptName = (promptName) => {
+      return Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
     };
 
     describe('prompts.agent.mode', () => {
@@ -281,7 +285,7 @@ describe('Wizard', () => {
       const promptName = 'astraUserPassword';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -294,7 +298,7 @@ describe('Wizard', () => {
       const promptName = 'maxMemory';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -310,7 +314,7 @@ describe('Wizard', () => {
       const promptName = 'integrationType';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -324,7 +328,7 @@ describe('Wizard', () => {
       const promptName = 'database';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -340,7 +344,7 @@ describe('Wizard', () => {
       const promptName = 'dbEndpoint';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -367,7 +371,7 @@ describe('Wizard', () => {
       const promptName = 'dbUser';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -384,7 +388,7 @@ describe('Wizard', () => {
       const promptName = 'dbPassword';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -401,7 +405,7 @@ describe('Wizard', () => {
       const promptName = 'dbPassword';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -414,7 +418,7 @@ describe('Wizard', () => {
       const promptName = 'logLevel';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -434,7 +438,7 @@ describe('Wizard', () => {
       const promptName = 'image';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -454,7 +458,7 @@ describe('Wizard', () => {
       const promptName = 'network';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -474,7 +478,7 @@ describe('Wizard', () => {
       const promptName = 'networkCustom';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -499,7 +503,7 @@ describe('Wizard', () => {
       const promptName = 'discoverySvcUri';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -522,7 +526,7 @@ describe('Wizard', () => {
       const promptName = 'defaultStage';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -545,7 +549,7 @@ describe('Wizard', () => {
       const promptName = 'awsRegion';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
@@ -568,7 +572,7 @@ describe('Wizard', () => {
       const promptName = 'concurrentConnections';
 
       before(() => {
-        prompt = Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
+        prompt = getAgentPromptName(promptName);
       });
 
       it('provides a default', () => {
