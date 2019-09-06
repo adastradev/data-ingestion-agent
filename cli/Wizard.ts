@@ -11,7 +11,7 @@ export const validateNonZero = (input: number): boolean | string => {
 };
 
 export const validateNotEmptyString = (input: string): boolean | string => {
-  if (input.length > 0) {
+  if (input.trim().length > 0) {
     return true;
   } else {
     return 'Please enter a value for this parameter';
@@ -19,7 +19,6 @@ export const validateNotEmptyString = (input: string): boolean | string => {
 };
 
 export const getIntegrationTypes = () => {
-  const keys = Object.keys(IntegrationType);
   return Object.keys(IntegrationType)
     .filter((k) => [ 'NotImplemented', 'Unknown' ].indexOf(k) === -1)
     .map((t) => ({ name: t, value: t }));
@@ -45,14 +44,14 @@ export default {
         type: 'input',
         name: 'agent.astraUserName',
         message: 'Enter your Astra Cloud user name:',
-        default: () => process.env.astraUserName,
+        default: () => process.env.astraUserName || '',
         validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.astraUserPassword',
         message: 'Enter your Astra Cloud password:',
-        default: () => process.env.astraUserPassword,
+        default: () => process.env.astraUserPassword || '',
         validate: validateNotEmptyString
       },
       {
@@ -93,7 +92,7 @@ export default {
         name: 'agent.dbUser',
         message: 'Enter database user:',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbUser,
+        default: () => process.env.dbUser || '',
         validate: validateNotEmptyString
       },
       {
@@ -101,14 +100,13 @@ export default {
         name: 'agent.dbPassword',
         message: 'Enter database users password:',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbPassword,
+        default: () => process.env.dbPassword || '',
         validate: validateNotEmptyString
       },
       {
         type: 'confirm',
         name: 'agent.advancedMode',
         message: 'Would you like to configure advanced run settings?',
-        default: () => process.env.advancedMode
       },
       {
         type: 'list',
@@ -182,7 +180,7 @@ export default {
         name: 'agent.concurrentConnections',
         message: 'Enter the maximum number of concurrent database connections allowed:',
         validate: validateNonZero,
-        default: () => process.env.concurrentConnections || process.env.CONCURRENT_CONNECTIONS || 5,
+        default: () => process.env.concurrentConnections || process.env.CONCURRENT_CONNECTIONS || '5',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode
       },
       {
