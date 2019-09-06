@@ -4,19 +4,7 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 
-import container from './test.inversify.config';
-import TYPES from '../../ioc.types';
-
-import IMessage from '../../source/IMessage';
-import SendDataMessage from '../../source/Messages/SendDataMessage';
-import SendDataHandler from '../../source/MessageHandlers/SendDataHandler';
-import IDataWriter from '../../source/DataAccess/IDataWriter';
 import * as sinon from 'sinon';
-import { Logger } from 'winston';
-import IntegrationConfigFactory from '../../source/IntegrationConfigFactory';
-import IConnectionPool from '../../source/DataAccess/IConnectionPool';
-import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
-import { TableNotFoundException } from '../../source/TableNotFoundException';
 import Wizard, { getIntegrationTypes } from '../../cli/Wizard';
 
 const expect = chai.expect;
@@ -24,14 +12,14 @@ const fillTemplate = (template, inputs): string => {
   return new Function('return `' + template + '`;').call(inputs);
 };
 
-describe.only('Wizard', () => {
+describe('Wizard', () => {
 
-    describe('getIntegrationTypes', () => {
-      it('should produce valid choice options for each integration type', () => {
-        const types = getIntegrationTypes();
-        expect(types).to.have.length.greaterThan(0);
-      });
-    });
+    // describe('getIntegrationTypes', () => {
+    //   it('should produce valid choice options for each integration type', () => {
+    //     const types = getIntegrationTypes();
+    //     expect(types).to.have.length.greaterThan(0);
+    //   });
+    // });
 
     describe('formatString', () => {
         let sandbox: sinon.SinonSandbox;
