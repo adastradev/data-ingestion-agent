@@ -1,6 +1,6 @@
 {
   "name": "@adastradev/data-ingestion-agent",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Ad Astra Docker agent code base for cloud integration without VPN tunnels",
   "main": "dist/index.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "test:coverage-check": "nyc check-coverage",
     "test:coverage-report": "nyc report --reporter=\"text-summary\"",
     "test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 300000 \"test/{unit,integration}/**/*.spec.ts\"",
-    "unit-test": "nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
+    "unit-test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
     "integration-test": "nyc --require ts-node/register mocha --timeout 120000 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
@@ -79,6 +79,7 @@
     "dependency-graph": "^0.7.2",
     "express": "^4.16.3",
     "fetch-with-proxy": "^1.1.0",
+    "inquirer": "^7.0.0",
     "inversify": "^4.13.0",
     "isomorphic-fetch": "^2.2.1",
     "moment": "^2.22.2",
@@ -94,6 +95,7 @@
     "winston": "^3.1.0"
   },
   "devDependencies": {
+    "@types/inquirer": "^6.5.0",
     "@types/oracledb": "^1.11.34",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
