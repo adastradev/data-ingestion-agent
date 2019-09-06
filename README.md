@@ -6,6 +6,9 @@ Ad Astra Docker agent code base for cloud integration without VPN tunnels
 ## Pre-requisites
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
+[Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
+[Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
+
 #### Oracle
 When connecting to an Oracle database the specified database user must be given read/execute access to the following:
 
@@ -73,28 +76,49 @@ PROCESS_MAX_MEMORY_SIZE_MB=4096
 # Define a variable to hold your connection string
 CONNECTION_STRING=your_connection_string
 
+For Windows:
+
+docker pull adastradev/data-ingestion-agent:latest && ^
+docker run -t ^
+-m $PROCESS_MAX_MEMORY_SIZE_MB'M' ^
+-e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB ^
+-e ASTRA_CLOUD_USERNAME=<ASTRA_USERNAME> ^
+-e ASTRA_CLOUD_PASSWORD=<ASTRA_PASSWORD> ^
+-e ORACLE_ENDPOINT=$CONNECTION_STRING ^
+-e ORACLE_USER=<ORACLE_USER> ^
+-e ORACLE_PASSWORD=<ORACLE_PASSWORD> ^
+-e INTEGRATION_TYPE=<SIS Type> ^
+-e DEFAULT_STAGE=dev ^
+--network=bridge ^
+adastradev/data-ingestion-agent:latest ^
+ingest
+
+For Mac & Linux:
+
+docker pull adastradev/data-ingestion-agent:latest && \
 docker run -t \
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
--e ASTRA_CLOUD_USERNAME=<your_username> \
--e ASTRA_CLOUD_PASSWORD=<your_password> \
+-e ASTRA_CLOUD_USERNAME=<ASTRA_USERNAME> \
+-e ASTRA_CLOUD_PASSWORD=<ASTRA_PASSWORD> \
 -e ORACLE_ENDPOINT=$CONNECTION_STRING \
--e ORACLE_USER=user \
--e ORACLE_PASSWORD=password \
+-e ORACLE_USER=<ORACLE_USER> \
+-e ORACLE_PASSWORD=<ORACLE_PASSWORD> \
+-e INTEGRATION_TYPE=<SIS Type> \
 --network=bridge \
-adastradev/data-ingestion-agent:<tag>
+adastradev/data-ingestion-agent:latest
+
+# <SIS Type> [Demo, Banner, PeopleSoft, Colleague]
 ```
 
 To see a demo of the agent without connecting it to any data source, omit the ORACLE_* environment variables. In demo mode, the agent can verify connectivity to the Astra Cloud and push a mock dataset into S3.
 
 The docker agent also supports the following optional arguments:
 ```sh
-# [Demo, Banner, PeopleSoft, Colleague]
--e INTEGRATION_TYPE=Banner \
 # [dev, prod]
--e DEFAULT_STAGE=prod \
--e AWS_REGION=us-east-1 \
--e CONCURRENT_CONNECTIONS=5 \
+-e DEFAULT_STAGE=prod 
+-e AWS_REGION=us-east-1 
+-e CONCURRENT_CONNECTIONS=5 
 # [error, warn, info, verbose, debug, silly]
 -e LOG_LEVEL=info
 ```
