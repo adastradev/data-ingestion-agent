@@ -57,7 +57,7 @@ To get started you can use the built-in interactive wizard to build a properly f
 * Your Astra Cloud user credentials
 * Your Student Information System database credentials for an administrative user if you choose to ingest data into the Astra cloud
 
-Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can deline to enter them at this time.
+Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can decline to enter them at this time.
 
 Execute the following to get started:
 
