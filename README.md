@@ -34,7 +34,12 @@ When connecting to an Oracle database the specified database user must be given 
 
 ## Resource Requirements
 
+
 #### Docker Host
+
+Hardware:
+
+* Server grade systems are recommended for hosting docker and the data ingestion agent. Consumer grade devices such as personal laptops and desktops should not be avoided.
 
 Memory:
 
