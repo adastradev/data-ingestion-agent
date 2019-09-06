@@ -47,6 +47,21 @@ Memory:
 docker pull adastradev/data-ingestion-agent:latest
 ```
 
+## Quick Start
+
+To get started you can use the built-in interactive wizard to build a properly formatted run command for the data ingestion agent. You should be prepared to collect the following information before using this wizard:
+
+* Your Astra Cloud user credentials
+* Your Student Information System database credentials for an administrative user if you choose to ingest data into the Astra cloud
+
+Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can deline to enter them at this time.
+
+Execute the following to get started:
+
+```sh
+docker run -it adastradev/data-ingestion-agent:latest wizard
+```
+
 ## Run
 
 For all possible Oracle connection string options, see the [Oracle section](####Oracle) at the top of this document
