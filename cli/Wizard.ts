@@ -122,7 +122,7 @@ export default {
           { name: 'Informational, Warnings, Errors', value: 'info', short: 2 },
           { name: 'Verbose', value: 'verbose', short: 3 },
           { name: 'Debug', value: 'debug', short: 4 },
-          { name: 'All', value: 'silly', short: 3 }
+          { name: 'All', value: 'silly', short: 5 }
         ],
         default: () => process.env.logLevel || 'info',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode
