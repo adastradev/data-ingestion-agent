@@ -34,7 +34,7 @@ To get started you can use the built-in interactive wizard to build a properly f
 * Your Student Information System database credentials for an administrative user if you choose to ingest data into the Astra cloud
   * For all possible Oracle connection string options, see the [Oracle section](#oracle)
 
-> Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can deline to enter them at this time.
+> Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can decline to enter them at this time.
 
 Execute the following to get started:
 
@@ -84,7 +84,7 @@ When connecting to an Oracle database the specified database user must be given 
 
 ## Running the Agent
 
-> The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data from. To see a full list of possible integration types you can specify see the [Quick Start](#quick-start) section at the top  of this guide.
+> The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
 
 ### Ingest Mode
 
