@@ -1,7 +1,8 @@
-# Data Ingestion Agent
 [![Coverage Status](https://coveralls.io/repos/github/adastradev/data-ingestion-agent/badge.svg?branch=master)](https://coveralls.io/github/adastradev/data-ingestion-agent?branch=master)
 
-Ad Astra Docker agent code base for cloud integration without VPN tunnels
+# What is Data Ingestion Agent?
+
+The Data Ingestion Agent enables the fast and secure delivery of data into the Ad Astra cloud without the need for VPN connections.
 
 ## Pre-requisites
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
@@ -21,9 +22,9 @@ To get started you can use the built-in interactive wizard to build a properly f
 
 * Your Astra Cloud user credentials
 * Your Student Information System database credentials for an administrative user if you choose to ingest data into the Astra cloud
-  * For all possible Oracle connection string options, see the [Oracle section](####Oracle)
+  * For all possible Oracle connection string options, see the [Oracle section](#oracle)
 
-Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can deline to enter them at this time.
+> Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can deline to enter them at this time.
 
 Execute the following to get started:
 
@@ -60,14 +61,10 @@ CONNECTION_STRING="hostname:port/service_name"
 # TNS Style Connection String using SID
 CONNECTION_STRING="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=port))(CONNECT_DATA=(SERVER=DEDICATED)(SID=sid)))"
 
-<<<<<<< Updated upstream
-Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can decline to enter them at this time.
-=======
 # TNS Style Connection String using SERVICE_NAME
 CONNECTION_STRING="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=port))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=service_name)))"
 ```
 When connecting to an Oracle database the specified database user must be given read/execute access to the following:
->>>>>>> Stashed changes
 
 - DBMS_METADATA.GET_DDL (function)
 - ALL_TABLES (view)
@@ -77,7 +74,7 @@ When connecting to an Oracle database the specified database user must be given 
 
 ## Running the Agent
 
-The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data from. To see a full list of possible integration types you can specify see the [Quick Start](##Quick-Start) section at the top  of this guide.
+> The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data from. To see a full list of possible integration types you can specify see the [Quick Start](##Quick-Start) section at the top  of this guide.
 
 ### Ingest Mode
 
