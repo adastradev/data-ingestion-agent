@@ -4,6 +4,16 @@
 
 The Data Ingestion Agent enables the fast and secure delivery of data into the Ad Astra cloud without the need for VPN connections.
 
+# Table of Contents
+
+1. [Pre-requisites](#pre-requisites)
+2. [Install](#install)
+3. [Quick Start](#quick-start)
+4. [Running the Agent](#running-the-agent)
+5. [Uninstall](#uninstall)
+6. [Administration](#administration)
+7. [Development](#development)
+
 ## Pre-requisites
 Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
@@ -52,7 +62,7 @@ Memory:
 
 #### Oracle
 
-When specifying the 'ORACLE_ENDPOINT' value (a connection string) to your Oracle instance you may use one of the following formats:
+When specifying the `ORACLE_ENDPOINT` value (a connection string) to your Oracle instance you may use one of the following formats:
 
 ```sh
 # Easy Connect Connection String
@@ -66,15 +76,15 @@ CONNECTION_STRING="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=port
 ```
 When connecting to an Oracle database the specified database user must be given read/execute access to the following:
 
-- DBMS_METADATA.GET_DDL (function)
-- ALL_TABLES (view)
-- ALL_CONS_COLUMNS (view)
-- ALL_CONSTRAINTS (view)
-- All tables referenced by this agent (see 'Query Preview' section below)
+- `DBMS_METADATA.GET_DDL` (function)
+- `ALL_TABLES` (view)
+- `ALL_CONS_COLUMNS` (view)
+- `ALL_CONSTRAINTS` (view)
+- All tables referenced by this agent (see [Query Preview Mode](#query-preview-mode) section below)
 
 ## Running the Agent
 
-> The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data from. To see a full list of possible integration types you can specify see the [Quick Start](##Quick-Start) section at the top  of this guide.
+> The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data from. To see a full list of possible integration types you can specify see the [Quick Start](#quick-start) section at the top  of this guide.
 
 ### Ingest Mode
 
@@ -118,11 +128,9 @@ docker run -t \
 -e INTEGRATION_TYPE=<SIS Type> \
 --network=bridge \
 adastradev/data-ingestion-agent:latest
-
-# <SIS Type> [Demo, Banner, PeopleSoft, Colleague]
 ```
 
-To see a demo of the agent without connecting it to any data source, omit the ORACLE_* environment variables. In demo mode, the agent can verify connectivity to the Astra Cloud and push a mock dataset into S3.
+To see a demo of the agent without connecting it to any data source, omit the `ORACLE_*` environment variables. In demo mode, the agent can verify connectivity to the Astra Cloud and push a mock dataset into S3.
 
 The docker agent also supports the following optional arguments:
 ```sh
