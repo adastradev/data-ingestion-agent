@@ -187,7 +187,7 @@ docker rmi <image>:<tag>
 <details><summary>Windows</summary>
 <p>
 
-```sh
+```
 Open notepad or notepad++ 
 
 Copy and paste:
