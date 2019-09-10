@@ -183,8 +183,13 @@ docker rmi <image>:<tag>
 ## Administration
 
 ### Automation
-Windows:
 
+<details><summary>Windows</summary>
+<p>
+
+#### yes, even hidden code blocks!
+
+```sh
 Open notepad or notepad++ 
 
 Copy and paste:
@@ -203,6 +208,10 @@ Open Windows Task Scheduler > 'Create Task' > Name your Task
 -Actions > 'New' > Action is 'Start A Program' > Browse to the .bat file you just created > select that file > 'Ok'
 
 To test right click the task in Task Scheduler and hit run. A Command Prompt should appear, your docker pull command will run first followed by your ingest command. 
+```
+
+</p>
+</details>
 
 ### Configure Network Access
 The Data Ingestion Agent requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
