@@ -2,7 +2,7 @@
 
 # What is the Data Ingestion Agent?
 
-The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into the Ad Astra cloud without the need for VPN connections.
+The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into the Ad Astra cloud without the need for Virtual Private Network (VPN) connections.
 
 # Table of Contents
 
@@ -48,7 +48,7 @@ docker run -it adastradev/data-ingestion-agent:latest wizard
 
 Hardware:
 
-* Server grade systems are recommended for hosting docker and the DIA. Using consumer grade devices such as personal laptops and desktops as the main host for the DIA is strongly discouraged.
+* Server grade systems are recommended for hosting Docker and the DIA. Using consumer grade devices such as personal laptops and desktops as the main host for the DIA is strongly discouraged.
 
 Memory:
 
@@ -144,7 +144,7 @@ The docker agent also supports the following optional arguments:
 
 ### Query Preview Mode
 
-Prior to sending any data, you can run the following docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command, the container will cease to run.
+Prior to sending any data, you can run the following Docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command, the container will cease to run.
 
 ```sh
 docker run -i \
@@ -197,8 +197,6 @@ docker pull adastradev/data-ingestion-agent:latest
 docker run ....<your data ingestion run cmd>
 ```
 
-Fill the parameters for the ingest command and add any additional docker arguments
-
 Save As > NameYourFile.bat
 
 Open Windows Task Scheduler > 'Create Task' > Name your Task
@@ -206,7 +204,7 @@ Open Windows Task Scheduler > 'Create Task' > Name your Task
 -Triggers > 'New' > Select desired ingest schedule > 'Ok'
 -Actions > 'New' > Action is 'Start A Program' > Browse to the .bat file you just created > select that file > 'Ok'
 
-To test right click the task in Task Scheduler and hit run. A Command Prompt should appear, your docker pull command will run first followed by your ingest command. 
+To test, right click the task in Task Scheduler and hit run. A Command Prompt should appear, your docker pull command will run first followed by your ingest command. 
 
 
 </p>
@@ -215,20 +213,20 @@ To test right click the task in Task Scheduler and hit run. A Command Prompt sho
 <details><summary>Mac/Linux</summary>
 <p>
 
-Create a shell script to contain the your DIA run command. For example, the following commands will create a script in your home directory.
+Create a shell script to contain your DIA run command. For example, the following commands will create a script in your home directory.
 
 ```sh
 $ echo "docker pull adastradev/data-ingestion-agent:latest && docker run ....<your data ingestion run cmd>" > run_ingestion_agent.sh
 $ chmod +x run_ingestion_agent.sh
 ```
 
-Open up the cron job configuration file
+Open up the cron job configuration file.
 
 ```sh
 crontab -e
 ```
 
-Call your script as a job to be executed on a schedule - in this case, once a day and append to a log file each time
+Call your script as a job to be executed on a schedule. In this case, once a day and append to a log file each time.
 
 ```sh
 0 0 * * * sh /home/run_ingestion_agent.sh >> /home/agent.log
@@ -256,7 +254,7 @@ docker exec -it <container_id_or_name> /bin/bash
 ```
 
 ### Container Health Monitoring
-The DIA periodically informs docker of its current health. Using `docker inspect` you can get a general idea of the applications state.
+The DIA periodically informs Docker of its current health. Using `docker inspect` you can get a general idea of the applications state.
 
 ```sh
 docker inspect --format='{{json .State.Health.Status}}' <container_name_or_id>
