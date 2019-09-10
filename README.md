@@ -187,8 +187,6 @@ docker rmi <image>:<tag>
 <details><summary>Windows</summary>
 <p>
 
-#### yes, even hidden code blocks!
-
 ```sh
 Open notepad or notepad++ 
 
