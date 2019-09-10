@@ -187,14 +187,15 @@ docker rmi <image>:<tag>
 <details><summary>Windows</summary>
 <p>
 
-```
 Open notepad or notepad++ 
 
 Copy and paste:
- 
+
+```
 docker pull adastradev/data-ingestion-agent:latest
 
-docker run -t -m 4096M -e PROCESS_MAX_MEMORY_SIZE_MB=4096 -e ASTRA_CLOUD_USERNAME=<INSERT ASTRA_CLOUD_USERNAME> -e ASTRA_CLOUD_PASSWORD=<INSERT ASTRA_CLOUD_PASSWORD> -e ORACLE_ENDPOINT=<INSERT ORACLE_ENDPOINT> -e ORACLE_USER=<INSERT ORACLE_USER> -e ORACLE_PASSWORD=<INSERT ORACLE_PASSWORD> -e INTEGRATION_TYPE=<INSERT SIS TYPE> --network=bridge adastradev/data-ingestion-agent:latest ingest 
+docker run ....<your data ingestion run cmd>
+```
 
 Fill the parameters for the ingest command and add any additional docker arguments
 
@@ -206,10 +207,36 @@ Open Windows Task Scheduler > 'Create Task' > Name your Task
 -Actions > 'New' > Action is 'Start A Program' > Browse to the .bat file you just created > select that file > 'Ok'
 
 To test right click the task in Task Scheduler and hit run. A Command Prompt should appear, your docker pull command will run first followed by your ingest command. 
+
+
+</p>
+</details>
+
+<details><summary>Mac/Linux</summary>
+<p>
+
+Create a shell script to contain the your data ingestion agent run command. For example, the following commands will create a script in your home directory.
+
+```sh
+$ echo "docker pull adastradev/data-ingestion-agent:latest && docker run ....<your data ingestion run cmd>" > run_ingestion_agent.sh
+$ chmod +x run_ingestion_agent.sh
+```
+
+Open up the cron job configuration file
+
+```sh
+crontab -e
+```
+
+Call your script as a job to be executed on a schedule - in this case, once a day and append to a log file each time
+
+```sh
+0 0 * * * sh /home/run_ingestion_agent.sh >> /home/agent.log
 ```
 
 </p>
 </details>
+
 
 ### Configure Network Access
 The Data Ingestion Agent requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
