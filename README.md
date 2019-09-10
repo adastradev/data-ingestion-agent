@@ -1,8 +1,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/adastradev/data-ingestion-agent/badge.svg?branch=master)](https://coveralls.io/github/adastradev/data-ingestion-agent?branch=master)
 
-# What is Data Ingestion Agent?
+# What is the Data Ingestion Agent?
 
-The Data Ingestion Agent enables the fast and secure delivery of data into the Ad Astra cloud without the need for VPN connections.
+The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into the Ad Astra cloud without the need for VPN connections.
 
 # Table of Contents
 
@@ -28,13 +28,13 @@ docker pull adastradev/data-ingestion-agent:latest
 
 ## Quick Start
 
-To get started you can use the built-in interactive wizard to build a properly formatted run command for the data ingestion agent. You should be prepared to collect the following information before using this wizard:
+To get started, you can use the built-in interactive wizard to build a properly formatted run command for the DIA. You should be prepared to collect the following information before using this wizard:
 
 * Your Astra Cloud user credentials
-* Your Student Information System database credentials for an administrative user if you choose to ingest data into the Astra cloud
+* Your Student Information System database credentials for an administrative user, if you choose to ingest data into the Astra cloud
   * For all possible Oracle connection string options, see the [Oracle section](#oracle)
 
-> Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings you can decline to enter them at this time.
+Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings, you can decline to enter them at this time.
 
 Execute the following to get started:
 
@@ -48,7 +48,7 @@ docker run -it adastradev/data-ingestion-agent:latest wizard
 
 Hardware:
 
-* Server grade systems are recommended for hosting docker and the data ingestion agent. Using consumer grade devices such as personal laptops and desktops as the main host for the DIA is strongly discouraged.
+* Server grade systems are recommended for hosting docker and the DIA. Using consumer grade devices such as personal laptops and desktops as the main host for the DIA is strongly discouraged.
 
 Memory:
 
@@ -84,11 +84,11 @@ When connecting to an Oracle database the specified database user must be given 
 
 ## Running the Agent
 
-The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
+The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types, use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
 
 ### Ingest Mode
 
-This mode will immediately ingest data into the Ad Astra cloud environment. Upon completion of an ingest of data the container will cease to run.
+This mode will immediately ingest data into the Ad Astra cloud environment. Upon completion of an ingest of data, the container will cease to run.
 
 ```sh
 # See Host System Requirements above for agent resource requirements
@@ -144,7 +144,7 @@ The docker agent also supports the following optional arguments:
 
 ### Query Preview Mode
 
-Prior to sending any data you can run the following docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command the container will cease to run.
+Prior to sending any data, you can run the following docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command, the container will cease to run.
 
 ```sh
 docker run -i \
@@ -170,9 +170,9 @@ The following links display the default set of queries that run for each of the 
 
 ## Uninstall
 
-The data ingestion agent is a long running process that may be performing work when an uninstall occurs. To reduce negative side effects of immediately stopping the agent it is advised to always stop the container with a grace period as shown below. Outright usage of `docker kill` is discouraged.
+The DIA is a long running process that may be performing work when an uninstall occurs. To reduce negative side effects of immediately stopping the agent, it is advised to always stop the container with a grace period as shown below. Outright usage of `docker kill` is discouraged.
 
-If multiple versions of the ingestion agent exist be sure to specify the optional tag when removing an image.
+If multiple versions of the ingestion agent exist, be sure to specify the optional tag when removing an image.
 
 ```sh
 docker stop --time 10 <container_name_or_id>
@@ -215,7 +215,7 @@ To test right click the task in Task Scheduler and hit run. A Command Prompt sho
 <details><summary>Mac/Linux</summary>
 <p>
 
-Create a shell script to contain the your data ingestion agent run command. For example, the following commands will create a script in your home directory.
+Create a shell script to contain the your DIA run command. For example, the following commands will create a script in your home directory.
 
 ```sh
 $ echo "docker pull adastradev/data-ingestion-agent:latest && docker run ....<your data ingestion run cmd>" > run_ingestion_agent.sh
@@ -239,24 +239,24 @@ Call your script as a job to be executed on a schedule - in this case, once a da
 
 
 ### Configure Network Access
-The Data Ingestion Agent requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
+The DIA requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
 
 No *inbound* access to the agent is required.
 
 See [Getting started with HTTPS proxies](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/HttpsProxy.md) for more information.
 
 ### Authentication
-The Data Ingestion Agent utilizes JWT/AWS IAM token authentication for all request authentication. The DIA does not currently use AWS Key Management, the JWT/IAM tokens are only valid for short periods (possibly an hour) at which point the DIA must re-authenticate. 
+The DIA utilizes JWT/AWS IAM token authentication for all request authentication. The DIA does not currently use AWS Key Management. The JWT/IAM tokens are only valid for short periods (possibly an hour), at which point the DIA must re-authenticate. 
 
 ### Root Access to a running agent container
-After starting the agent and confirming a healthy status you can use the containers name or ID to access the virtual machine via command line (bash) as follows:
+After starting the agent and confirming a healthy status, you can use the containers name or ID to access the virtual machine via command line (bash) as follows:
 
 ```sh
 docker exec -it <container_id_or_name> /bin/bash
 ```
 
 ### Container Health Monitoring
-The data ingestion agent periodically informs docker of its current health. Using `docker inspect` you can get a general idea of the applications state.
+The DIA periodically informs docker of its current health. Using `docker inspect` you can get a general idea of the applications state.
 
 ```sh
 docker inspect --format='{{json .State.Health.Status}}' <container_name_or_id>
@@ -278,4 +278,4 @@ docker cp <container_name_or_id>:/var/log/dia/. <destination_path>
 See the [Docker cp command guide for help copying logs to a local file system](https://docs.docker.com/engine/reference/commandline/cp/)
 
 ## Development
-See the [Development guide for Data Ingestion Agent](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DevelopmentGuide.md)
+See the [Development guide for the Data Ingestion Agent](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DevelopmentGuide.md)
