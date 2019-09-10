@@ -84,7 +84,7 @@ When connecting to an Oracle database the specified database user must be given 
 
 ## Running the Agent
 
-> The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
+The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
 
 ### Ingest Mode
 
@@ -181,6 +181,62 @@ docker rmi <image>:<tag>
 ```
 
 ## Administration
+
+### Automation
+
+<details><summary>Windows</summary>
+<p>
+
+Open notepad or notepad++ 
+
+Copy and paste:
+
+```
+docker pull adastradev/data-ingestion-agent:latest
+
+docker run ....<your data ingestion run cmd>
+```
+
+Fill the parameters for the ingest command and add any additional docker arguments
+
+Save As > NameYourFile.bat
+
+Open Windows Task Scheduler > 'Create Task' > Name your Task
+-General > Check 'Run with highest privileges' > Select additional desired criteria
+-Triggers > 'New' > Select desired ingest schedule > 'Ok'
+-Actions > 'New' > Action is 'Start A Program' > Browse to the .bat file you just created > select that file > 'Ok'
+
+To test right click the task in Task Scheduler and hit run. A Command Prompt should appear, your docker pull command will run first followed by your ingest command. 
+
+
+</p>
+</details>
+
+<details><summary>Mac/Linux</summary>
+<p>
+
+Create a shell script to contain the your data ingestion agent run command. For example, the following commands will create a script in your home directory.
+
+```sh
+$ echo "docker pull adastradev/data-ingestion-agent:latest && docker run ....<your data ingestion run cmd>" > run_ingestion_agent.sh
+$ chmod +x run_ingestion_agent.sh
+```
+
+Open up the cron job configuration file
+
+```sh
+crontab -e
+```
+
+Call your script as a job to be executed on a schedule - in this case, once a day and append to a log file each time
+
+```sh
+0 0 * * * sh /home/run_ingestion_agent.sh >> /home/agent.log
+```
+
+</p>
+</details>
+
 
 ### Configure Network Access
 The Data Ingestion Agent requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
