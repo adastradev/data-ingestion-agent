@@ -34,7 +34,9 @@ To get started, you can use the built-in interactive wizard to build a properly 
 * Your Student Information System database credentials for an administrative user, if you choose to ingest data into the Astra cloud
   * For all possible Oracle connection string options, see the [Oracle section](#oracle)
 
-Some settings provide helpful defaults which you may wish to use for your first run. Unless you are comfortable with specifying the advanced run settings, you can decline to enter them at this time.
+Some settings provide helpful defaults which you may wish to use for your first run. Hitting `enter` will use the default value (in parentheses).
+
+**NOTE:** Unless you are comfortable with specifying the advanced run settings, we recommend responding "no" to the prompt "would you like to configure advanced run settings?" in the wizard.
 
 Execute the following to get started:
 
