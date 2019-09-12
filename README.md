@@ -111,7 +111,6 @@ docker run -t ^
 -e ORACLE_USER=<ORACLE_USER> ^
 -e ORACLE_PASSWORD=<ORACLE_PASSWORD> ^
 -e INTEGRATION_TYPE=<SIS Type> ^
--e DEFAULT_STAGE=dev ^
 --network=bridge ^
 adastradev/data-ingestion-agent:latest ^
 ingest
@@ -130,6 +129,7 @@ docker run -t \
 -e INTEGRATION_TYPE=<SIS Type> \
 --network=bridge \
 adastradev/data-ingestion-agent:latest
+ingest
 ```
 
 To see a demo of the agent without connecting it to any data source, omit the `ORACLE_*` environment variables. In demo mode, the agent can verify connectivity to the Astra Cloud and push a mock dataset into S3.
