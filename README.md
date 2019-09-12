@@ -128,7 +128,7 @@ docker run -t \
 -e ORACLE_PASSWORD=<ORACLE_PASSWORD> \
 -e INTEGRATION_TYPE=<SIS Type> \
 --network=bridge \
-adastradev/data-ingestion-agent:latest
+adastradev/data-ingestion-agent:latest \
 ingest
 ```
 
