@@ -239,13 +239,6 @@ describe('Wizard', () => {
       expect(prompt.default()).to.equal('');
     };
 
-    const providesStandardDefaultWithQuotes = (prompt, promptName) => {
-      process.env[promptName] = 'somevalue';
-      expect(prompt.default()).to.equal('"somevalue"');
-      delete process.env[promptName];
-      expect(prompt.default()).to.equal('');
-    };
-
     const getAgentPromptName = (promptName) => {
       return Wizard.prompts.filter((p) => p.name === `agent.${promptName}`)[0];
     };
@@ -283,7 +276,7 @@ describe('Wizard', () => {
       });
 
       it('provides a default', () => {
-        providesStandardDefaultWithQuotes(prompt, promptName);
+        providesStandardDefault(prompt, promptName);
       });
     });
 
@@ -296,7 +289,7 @@ describe('Wizard', () => {
       });
 
       it('provides a default', () => {
-        providesStandardDefaultWithQuotes(prompt, promptName);
+        providesStandardDefault(prompt, promptName);
       });
     });
 
@@ -382,7 +375,7 @@ describe('Wizard', () => {
       });
 
       it('provides a default', () => {
-        providesStandardDefaultWithQuotes(prompt, promptName);
+        providesStandardDefault(prompt, promptName);
       });
 
       it('is only active in non-preview mode', () => {
@@ -399,7 +392,7 @@ describe('Wizard', () => {
       });
 
       it('provides a default', () => {
-        providesStandardDefaultWithQuotes(prompt, promptName);
+        providesStandardDefault(prompt, promptName);
       });
 
       it('is only active in non-preview mode', () => {
@@ -416,7 +409,7 @@ describe('Wizard', () => {
       });
 
       it('provides a default', () => {
-        providesStandardDefaultWithQuotes(prompt, promptName);
+        providesStandardDefault(prompt, promptName);
       });
     });
 

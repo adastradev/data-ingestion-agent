@@ -48,14 +48,16 @@ export default {
         type: 'input',
         name: 'agent.astraUserName',
         message: 'Enter your Astra Cloud user name:',
-        default: () => process.env.astraUserName ? `\"${process.env.astraUserName}\"` : '',
+        filter: (input) => (input.length > 0) ? `"${input}"` : '',
+        default: () => process.env.astraUserName ? `${process.env.astraUserName}` : '',
         validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.astraUserPassword',
         message: 'Enter your Astra Cloud password:',
-        default: () => process.env.astraUserPassword ? `\"${process.env.astraUserPassword}\"` : '',
+        filter: (input) => (input.length > 0) ? `"${input}"` : '',
+        default: () => process.env.astraUserPassword ? `${process.env.astraUserPassword}` : '',
         validate: validateNotEmptyString
       },
       {
@@ -86,7 +88,7 @@ export default {
         type: 'input',
         name: 'agent.dbEndpoint',
         message: 'Enter the database connection string:',
-        filter: (input) => (input.length > 0) ? `\"${input}\"` : '',
+        filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
         validate: validateNotEmptyString
@@ -95,16 +97,18 @@ export default {
         type: 'input',
         name: 'agent.dbUser',
         message: 'Enter database user:',
+        filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbUser ? `\"${process.env.dbUser}\"` : '',
+        default: () => process.env.dbUser ? `${process.env.dbUser}` : '',
         validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.dbPassword',
         message: 'Enter database users password:',
+        filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbPassword ? `\"${process.env.dbPassword}\"` : '',
+        default: () => process.env.dbPassword ? `${process.env.dbPassword}` : '',
         validate: validateNotEmptyString
       },
       {
