@@ -49,7 +49,7 @@ export default {
         name: 'agent.astraUserName',
         message: 'Enter your Astra Cloud user name:',
         filter: (input) => (input.length > 0) ? `"${input}"` : '',
-        default: () => process.env.astraUserName ? `${process.env.astraUserName}` : '',
+        default: () => process.env.astraUserName ? `${process.env.astraUserName}`.replace(/"/g, '') : '',
         validate: validateNotEmptyString
       },
       {
@@ -57,7 +57,7 @@ export default {
         name: 'agent.astraUserPassword',
         message: 'Enter your Astra Cloud password:',
         filter: (input) => (input.length > 0) ? `"${input}"` : '',
-        default: () => process.env.astraUserPassword ? `${process.env.astraUserPassword}` : '',
+        default: () => process.env.astraUserPassword ? `${process.env.astraUserPassword}`.replace(/"/g, '') : '',
         validate: validateNotEmptyString
       },
       {
@@ -99,7 +99,7 @@ export default {
         message: 'Enter database user:',
         filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbUser ? `${process.env.dbUser}` : '',
+        default: () => process.env.dbUser ? `${process.env.dbUser}`.replace(/"/g, '') : '',
         validate: validateNotEmptyString
       },
       {
@@ -108,7 +108,7 @@ export default {
         message: 'Enter database users password:',
         filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbPassword ? `${process.env.dbPassword}` : '',
+        default: () => process.env.dbPassword ? `${process.env.dbPassword}`.replace(/"/g, '') : '',
         validate: validateNotEmptyString
       },
       {
