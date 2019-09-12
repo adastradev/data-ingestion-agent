@@ -66,6 +66,26 @@ describe('OracleDDLHelper', () => {
             expect(query).to.contain('SELECT 1 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table2\'');
             expect(query).to.contain('SELECT 2 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table1\'');
         });
+
+        it('should return a properly formatted query for multiple related and unrelated tables where a child table is not known to the agent', async () => {
+            const ctx = createTestContext([['table1', 'tableX']]);
+            const helper = new OracleDDLHelper(ctx.pool);
+            const query = await helper.getDDLQuery(['table3', 'table1', 'table2']);
+
+            expect(query).to.contain('SELECT 0 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table3\'');
+            expect(query).to.contain('SELECT 2 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table2\'');
+            expect(query).to.contain('SELECT 1 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table1\'');
+        });
+
+        it('should return a properly formatted query for multiple related and unrelated tables where a parent table is not known to the agent', async () => {
+            const ctx = createTestContext([['tableX', 'table2']]);
+            const helper = new OracleDDLHelper(ctx.pool);
+            const query = await helper.getDDLQuery(['table3', 'table1', 'table2']);
+
+            expect(query).to.contain('SELECT 0 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table3\'');
+            expect(query).to.contain('SELECT 1 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table1\'');
+            expect(query).to.contain('SELECT 2 as "priority", TABLE_NAME, DBMS_METADATA.GET_DDL(\'TABLE\', TABLE_NAME, OWNER) as ddl FROM ALL_TABLES WHERE TABLE_NAME = \'table2\'');
+        });
     });
 
     describe('prioritizeObjects', () => {
@@ -83,6 +103,17 @@ describe('OracleDDLHelper', () => {
 
         it('should return a properly sorted list of objects to create when an independent circular dependency exists', async () => {
             const tableAssociations: Array<[string, string]> = [['a', 'b'], ['b', 'c'], ['e', 'e']];
+            const ctx = createTestContext(tableAssociations);
+
+            const helper = new OracleDDLHelper(ctx.pool);
+            const prioritizedObjects = await (helper as any).prioritizeTables(['a', 'b', 'c', 'd', 'e']);
+
+            expect(prioritizedObjects).to.have.lengthOf(5);
+            expect(prioritizedObjects).to.deep.equal(['c', 'b', 'a', 'd', 'e']);
+        });
+
+        it('should return a properly sorted list of objects to create when an unknown table exists in the associations', async () => {
+            const tableAssociations: Array<[string, string]> = [['a', 'b'], ['b', 'c'], ['e', 'e'], ['e', 'x']];
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);

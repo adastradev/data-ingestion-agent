@@ -22,7 +22,7 @@ export default class OracleDDLHelper implements IDDLHelper {
         return validTableNames
             .filter((name) => {
                 // The expected # of tables is not expected to reach a point where this would be
-                // noticeably ineffficient
+                // noticeably inefficient
                 return validTableNames.indexOf(name) > -1;
             })
             .map((name) => {
@@ -53,10 +53,7 @@ export default class OracleDDLHelper implements IDDLHelper {
     private async prioritizeTables(validTableNames: string[]): Promise<string[]> {
         const connection: oracledb.IConnection = await this._connectionPool.getConnection();
 
-        const tableInClause = validTableNames.map((tableOrViewName) => {
-            return `'${tableOrViewName}'`;
-        })
-        .join(',');
+        const tableInClause = validTableNames.map((objName) => `'${objName}'`).join(',');
 
         const tableConstraintQueries = `SELECT
                 cons.TABLE_NAME as child_table,
@@ -71,15 +68,19 @@ export default class OracleDDLHelper implements IDDLHelper {
         const records = await connection.execute(tableConstraintQueries);
 
         const tableGraph = new DepGraph<string>();
-        validTableNames.forEach((tableOrView, idx, array) => tableGraph.addNode(tableOrView));
+        validTableNames.forEach((tableOrView) => tableGraph.addNode(tableOrView));
 
         // Use a simple 2-tuple to represent an association of two database objects
         let row: [string, string];
         for (row of records.rows) {
+            const childTable = row[0];
+            const parentTable = row[1];
             // We don't care about self referencing tables so only worry about
-            // inter-table dependencies
-            if (row[0] !== row[1]) {
-                tableGraph.addDependency(row[0], row[1]);
+            // dependencies where both tables are known to the agent
+            if (childTable !== parentTable &&
+                tableGraph.hasNode(childTable) &&
+                tableGraph.hasNode(parentTable)) {
+                tableGraph.addDependency(childTable, parentTable);
             }
         }
 
