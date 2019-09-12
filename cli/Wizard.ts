@@ -48,14 +48,14 @@ export default {
         type: 'input',
         name: 'agent.astraUserName',
         message: 'Enter your Astra Cloud user name:',
-        default: () => process.env.astraUserName || '',
+        default: () => `"${process.env.astraUserName}"` || '',
         validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.astraUserPassword',
         message: 'Enter your Astra Cloud password:',
-        default: () => process.env.astraUserPassword || '',
+        default: () => `"${process.env.astraUserPassword}"` || '',
         validate: validateNotEmptyString
       },
       {
@@ -96,7 +96,7 @@ export default {
         name: 'agent.dbUser',
         message: 'Enter database user:',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbUser || '',
+        default: () => `"${process.env.dbUser}"` || '',
         validate: validateNotEmptyString
       },
       {
@@ -104,7 +104,7 @@ export default {
         name: 'agent.dbPassword',
         message: 'Enter database users password:',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbPassword || '',
+        default: () => `"${process.env.dbPassword}"` || '',
         validate: validateNotEmptyString
       },
       {
