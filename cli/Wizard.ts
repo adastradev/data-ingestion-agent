@@ -1,5 +1,6 @@
 import * as inquirer from 'inquirer';
-import { ICommandConfig } from './ICommandConfig';
+import { orderBy } from 'lodash';
+import { ICommandConfig, IWizardQuestion } from './ICommandConfig';
 import { IntegrationType } from '../source/IIntegrationConfig';
 
 export const validateNonZero = (input: number): boolean | string => {
@@ -24,6 +25,10 @@ export const getIntegrationTypes = () => {
     .map((t) => ({ name: t, value: t }));
 };
 
+export const fillTemplate = (template, inputs): string => {
+  return new Function('return `' + template + '`;').call(inputs);
+};
+
 export default {
   successMessages: [
     'Copy and paste the following command to run the ingestion agent:',
@@ -42,37 +47,45 @@ export default {
         default: () => process.env.mode || 'preview',
         filter: (input) => {
           return (input === 'background') ? '' : input;
-        }
+        },
+        formatOrder: 0,
+        formatString: '${(this.agent.mode === "") ? "-d" : "-it"} '
       },
       {
         type: 'input',
         name: 'agent.astraUserName',
         message: 'Enter your Astra Cloud user name:',
-        filter: (input) => (input.length > 0) ? `"${input}"` : '',
-        default: () => process.env.astraUserName ? `${process.env.astraUserName}`.replace(/"/g, '') : '',
-        validate: validateNotEmptyString
+        default: () => process.env.astraUserName || '',
+        validate: validateNotEmptyString,
+        formatOrder: 0,
+        formatString: '-e ASTRA_CLOUD_USERNAME=${this.agent.astraUserName} '
       },
       {
         type: 'password',
         name: 'agent.astraUserPassword',
         message: 'Enter your Astra Cloud password:',
-        filter: (input) => (input.length > 0) ? `"${input}"` : '',
-        default: () => process.env.astraUserPassword ? `${process.env.astraUserPassword}`.replace(/"/g, '') : '',
-        validate: validateNotEmptyString
+        default: () => process.env.astraUserPassword || '',
+        validate: validateNotEmptyString,
+        formatOrder: 0,
+        formatString: '-e ASTRA_CLOUD_PASSWORD=${this.agent.astraUserPassword} '
       },
       {
         type: 'number',
         name: 'agent.maxMemory',
         message: 'How much memory (in megabytes) should be allocated to the agent?',
         default: () => process.env.maxMemory || '2048',
-        validate: validateNonZero
+        validate: validateNonZero,
+        formatOrder: 1,
+        formatString: '-m ${this.agent.maxMemory}M -e PROCESS_MAX_MEMORY_SIZE_MB=${this.agent.maxMemory} '
       },
       {
         type: 'list',
         name: 'agent.integrationType',
         message: 'Which information system will the agent ingest data from?',
         choices: getIntegrationTypes(),
-        default: () => process.env.integrationType
+        default: () => process.env.integrationType,
+        formatOrder: 2,
+        formatString: '-e INTEGRATION_TYPE=${this.agent.integrationType} '
       },
       {
         type: 'list',
@@ -91,24 +104,24 @@ export default {
         filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 3,
+        formatString: '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_ENDPOINT=" + this.agent.dbEndpoint + " ") : ""}'
       },
       {
         type: 'input',
         name: 'agent.dbUser',
         message: 'Enter database user:',
-        filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbUser ? `${process.env.dbUser}`.replace(/"/g, '') : '',
+        default: () => process.env.dbUser || '',
         validate: validateNotEmptyString
       },
       {
         type: 'password',
         name: 'agent.dbPassword',
         message: 'Enter database users password:',
-        filter: (input) => (input.length > 0) ? `"${input}"` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
-        default: () => process.env.dbPassword ? `${process.env.dbPassword}`.replace(/"/g, '') : '',
+        default: () => process.env.dbPassword || '',
         validate: validateNotEmptyString
       },
       {
@@ -129,7 +142,9 @@ export default {
           { name: 'All', value: 'silly', short: 5 }
         ],
         default: () => process.env.logLevel || 'info',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        formatOrder: 4,
+        formatString: '${(this.agent.advancedMode === true) ? "-e LOG_LEVEL=" + (this.agent.logLevel || "info") + " " : ""}'
       },
       {
         type: 'input',
@@ -137,7 +152,9 @@ export default {
         message: 'Enter an alternative docker image to use:',
         default: () => process.env.image || 'adastradev/data-ingestion-agent:latest',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 10,
+        formatString: '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} '
       },
       {
         type: 'list',
@@ -149,7 +166,9 @@ export default {
           { name: 'custom', value: 'custom', short:  2}
         ],
         default: () => process.env.network || 'bridge',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        formatOrder: 9,
+        formatString: '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} '
       },
       {
         type: 'input',
@@ -165,7 +184,9 @@ export default {
         message: 'Enter the alternative discovery service URI:',
         default: () => process.env.discoverySvcUri || process.env.DISCOVERY_SERVICE || '',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 5,
+        formatString: '${(this.agent.advancedMode === true) ? "-e DISCOVERY_SERVICE=" + this.agent.discoverySvcUri + " " : ""}'
       },
       {
         type: 'input',
@@ -173,7 +194,9 @@ export default {
         message: 'Enter the alternative default stage:',
         default: () => process.env.defaultStage || process.env.DEFAULT_STAGE || '',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 6,
+        formatString: '${(this.agent.advancedMode === true) ? "-e DEFAULT_STAGE=" + this.agent.defaultStage + " " : ""}'
       },
       {
         type: 'input',
@@ -181,7 +204,9 @@ export default {
         message: 'Enter the alternative AWS region:',
         default: () => process.env.awsRegion || process.env.AWS_REGION || 'us-east-1',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 7,
+        formatString: '${(this.agent.advancedMode === true) ? "-e AWS_REGION=" + this.agent.awsRegion + " " : ""}'
       },
       {
         type: 'number',
@@ -189,35 +214,31 @@ export default {
         message: 'Enter the maximum number of concurrent database connections allowed:',
         validate: validateNonZero,
         default: () => process.env.concurrentConnections || process.env.CONCURRENT_CONNECTIONS || '5',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
+        formatOrder: 8,
+        formatString: '${(this.agent.advancedMode === true) ? "-e CONCURRENT_CONNECTIONS=" + this.agent.concurrentConnections + " " : ""}'
       },
       {
         type: 'confirm',
         name: 'agent.confirmedAccurate',
-        message: 'Are all of the entered values correct?'
+        message: 'Are all of the entered values correct?',
+        formatOrder: 11,
+        formatString: '${this.agent.mode}'
       }
     ],
 
-  formatString: [
-    'docker run ',
-    '${(this.agent.mode === "") ? "-d" : "-it"} ',
-    '-m ${this.agent.maxMemory}M ',
-    '-e INTEGRATION_TYPE=${this.agent.integrationType} ',
-    '-e PROCESS_MAX_MEMORY_SIZE_MB=${this.agent.maxMemory} ',
-    '-e ASTRA_CLOUD_USERNAME=${this.agent.astraUserName} ',
-    '-e ASTRA_CLOUD_PASSWORD=${this.agent.astraUserPassword} ',
-    '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_ENDPOINT=" + this.agent.dbEndpoint + " ") : ""}',
-    '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_USER=" + this.agent.dbUser + " ") : ""}',
-    '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_PASSWORD=" + this.agent.dbPassword + " ") : ""}',
-    '${(this.agent.advancedMode === true) ? "-e LOG_LEVEL=" + (this.agent.logLevel || "info") + " " : ""}',
-    '${(this.agent.advancedMode === true) ? "-e DISCOVERY_SERVICE=" + this.agent.discoverySvcUri + " " : ""}',
-    '${(this.agent.advancedMode === true) ? "-e DEFAULT_STAGE=" + this.agent.defaultStage + " " : ""}',
-    '${(this.agent.advancedMode === true) ? "-e AWS_REGION=" + this.agent.awsRegion + " " : ""}',
-    '${(this.agent.advancedMode === true) ? "-e CONCURRENT_CONNECTIONS=" + this.agent.concurrentConnections + " " : ""}',
-    '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} ',
-    '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} ',
-    '${this.agent.mode}'
-  ]
-  // Adding a delimiter produces an ugly output when some format strings produce empty results
-  .join('')
+  apply: (prompts: IWizardQuestion[], answers: inquirer.Answers): boolean => {
+
+    let argString = '';
+    const promptsWithFormats = prompts.filter((p) => p.formatOrder && p.formatString);
+    for (const q of orderBy(promptsWithFormats, ['formatOrder'], ['asc'])) {
+      if (q.when.valueOf() === true) {
+        argString += fillTemplate(q.formatString, answers);
+      }
+    }
+
+    console.log(`docker run ${argString}`);
+
+    return true;
+  }
 } as ICommandConfig;
