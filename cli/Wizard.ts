@@ -134,7 +134,7 @@ export default {
         message: 'Enter an agent docker image tag to use (use default for production):',
         default: () => process.env.image || 'adastradev/data-ingestion-agent:latest',
         validate: validateNotEmptyString,
-        formatOrder: 14,
+        formatOrder: 15,
         formatString: '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} '
       },
       {
@@ -147,7 +147,7 @@ export default {
           { name: 'custom', value: 'custom', short:  2}
         ],
         default: () => process.env.network || 'bridge',
-        formatOrder: 10,
+        formatOrder: 14,
         formatString: '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} '
       },
       {
@@ -187,8 +187,8 @@ export default {
         default: () => process.env.discoverySvcUri || process.env.DISCOVERY_SERVICE || '',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         validate: validateNotEmptyString,
-        formatOrder: 9,
-        formatString: '-e DISCOVERY_SERVICE=\'${this.agent.discoverySvcUri}\''
+        formatOrder: 10,
+        formatString: '-e DISCOVERY_SERVICE=\'${this.agent.discoverySvcUri}\' '
       },
       {
         type: 'input',
