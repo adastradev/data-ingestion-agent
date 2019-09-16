@@ -18,6 +18,7 @@ const args = process.argv.slice(2);
             const nodeProcessMaxSpaceSize: number = Math.round((process.env.PROCESS_MAX_MEMORY_SIZE_MB as any) * 0.75);
             const target = [`--max-old-space-size=${nodeProcessMaxSpaceSize}`, 'dist/index.js'].concat(args);
             let restartCounter = 0;
+            let agentHadNonzeroExit = false;
             let child;
 
             const onExitHandler = (code, signal) => {
@@ -25,11 +26,16 @@ const args = process.argv.slice(2);
 
                 console.log(`Agent Process exited with code ${code}; signal: ${signal}`);
 
+                if (code !== 0) {
+                    agentHadNonzeroExit = true;
+                }
+
                 if (restartCounter < 5 && !args[0]) {
                     child = spawnAgent();
                 } else {
                     if (!args[0]) {
                         console.log(`Retry max encountered, exiting.`);
+                        process.exit(agentHadNonzeroExit ? 1 : 0);
                     }
                     childState.status = 'exited';
                 }
@@ -37,6 +43,9 @@ const args = process.argv.slice(2);
                 if (args[0]) {
                     if (server) {
                         server.close();
+                    }
+                    if (agentHadNonzeroExit) {
+                        process.exit(1);
                     }
                 }
             };
