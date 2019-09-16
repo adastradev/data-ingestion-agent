@@ -1,6 +1,6 @@
 import * as inquirer from 'inquirer';
 import { orderBy } from 'lodash';
-import { ICommandConfig, IWizardQuestion } from './ICommandConfig';
+import { ICommandConfig } from './ICommandConfig';
 import { IntegrationType } from '../source/IIntegrationConfig';
 
 export const validateNonZero = (input: number): boolean | string => {
@@ -48,7 +48,7 @@ export default {
         filter: (input) => {
           return (input === 'background') ? '' : input;
         },
-        formatOrder: 0,
+        formatOrder: 1,
         formatString: '${(this.agent.mode === "") ? "-d" : "-it"} '
       },
       {
@@ -57,8 +57,8 @@ export default {
         message: 'Enter your Astra Cloud user name:',
         default: () => process.env.astraUserName || '',
         validate: validateNotEmptyString,
-        formatOrder: 0,
-        formatString: '-e ASTRA_CLOUD_USERNAME=${this.agent.astraUserName} '
+        formatOrder: 4,
+        formatString: '-e ASTRA_CLOUD_USERNAME=\'${this.agent.astraUserName}\' '
       },
       {
         type: 'password',
@@ -66,8 +66,8 @@ export default {
         message: 'Enter your Astra Cloud password:',
         default: () => process.env.astraUserPassword || '',
         validate: validateNotEmptyString,
-        formatOrder: 0,
-        formatString: '-e ASTRA_CLOUD_PASSWORD=${this.agent.astraUserPassword} '
+        formatOrder: 5,
+        formatString: '-e ASTRA_CLOUD_PASSWORD=\'${this.agent.astraUserPassword}\' '
       },
       {
         type: 'number',
@@ -75,7 +75,7 @@ export default {
         message: 'How much memory (in megabytes) should be allocated to the agent?',
         default: () => process.env.maxMemory || '2048',
         validate: validateNonZero,
-        formatOrder: 1,
+        formatOrder: 2,
         formatString: '-m ${this.agent.maxMemory}M -e PROCESS_MAX_MEMORY_SIZE_MB=${this.agent.maxMemory} '
       },
       {
@@ -84,7 +84,7 @@ export default {
         message: 'Which information system will the agent ingest data from?',
         choices: getIntegrationTypes(),
         default: () => process.env.integrationType,
-        formatOrder: 2,
+        formatOrder: 3,
         formatString: '-e INTEGRATION_TYPE=${this.agent.integrationType} '
       },
       {
@@ -105,8 +105,8 @@ export default {
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
         validate: validateNotEmptyString,
-        formatOrder: 3,
-        formatString: '${(this.agent.mode !== "preview") ? ("-e " + this.agent.database + "_ENDPOINT=" + this.agent.dbEndpoint + " ") : ""}'
+        formatOrder: 6,
+        formatString: '${"-e " + this.agent.database + "_ENDPOINT=\'" + this.agent.dbEndpoint + "\' "}'
       },
       {
         type: 'input',
@@ -114,7 +114,9 @@ export default {
         message: 'Enter database user:',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => process.env.dbUser || '',
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 7,
+        formatString: '${"-e " + this.agent.database + "_USER=\'" + this.agent.dbUser + "\' "}'
       },
       {
         type: 'password',
@@ -122,12 +124,36 @@ export default {
         message: 'Enter database users password:',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => process.env.dbPassword || '',
-        validate: validateNotEmptyString
+        validate: validateNotEmptyString,
+        formatOrder: 8,
+        formatString: '${"-e " + this.agent.database + "_PASSWORD=\'" + this.agent.dbPassword + "\' "}'
+      },
+      {
+        type: 'input',
+        name: 'agent.image',
+        message: 'Enter an agent docker image tag to use (use default for production):',
+        default: () => process.env.image || 'adastradev/data-ingestion-agent:latest',
+        validate: validateNotEmptyString,
+        formatOrder: 14,
+        formatString: '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} '
+      },
+      {
+        type: 'list',
+        name: 'agent.network',
+        message: 'Enter the docker network to use (bridge works in most cases):',
+        choices: [
+          { name: 'bridge', value: 'bridge', short: 0 },
+          { name: 'host', value: 'host', short: 1 },
+          { name: 'custom', value: 'custom', short:  2}
+        ],
+        default: () => process.env.network || 'bridge',
+        formatOrder: 10,
+        formatString: '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} '
       },
       {
         type: 'confirm',
         name: 'agent.advancedMode',
-        message: 'Would you like to configure advanced run settings?',
+        message: 'Would you like to configure advanced run settings?'
       },
       {
         type: 'list',
@@ -143,32 +169,8 @@ export default {
         ],
         default: () => process.env.logLevel || 'info',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        formatOrder: 4,
-        formatString: '${(this.agent.advancedMode === true) ? "-e LOG_LEVEL=" + (this.agent.logLevel || "info") + " " : ""}'
-      },
-      {
-        type: 'input',
-        name: 'agent.image',
-        message: 'Enter an alternative docker image to use:',
-        default: () => process.env.image || 'adastradev/data-ingestion-agent:latest',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        validate: validateNotEmptyString,
-        formatOrder: 10,
-        formatString: '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} '
-      },
-      {
-        type: 'list',
-        name: 'agent.network',
-        message: 'Enter the docker network to use:',
-        choices: [
-          { name: 'bridge', value: 'bridge', short: 0 },
-          { name: 'host', value: 'host', short: 1 },
-          { name: 'custom', value: 'custom', short:  2}
-        ],
-        default: () => process.env.network || 'bridge',
-        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         formatOrder: 9,
-        formatString: '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} '
+        formatString: '-e LOG_LEVEL=${this.agent.logLevel || "info"} '
       },
       {
         type: 'input',
@@ -185,8 +187,8 @@ export default {
         default: () => process.env.discoverySvcUri || process.env.DISCOVERY_SERVICE || '',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         validate: validateNotEmptyString,
-        formatOrder: 5,
-        formatString: '${(this.agent.advancedMode === true) ? "-e DISCOVERY_SERVICE=" + this.agent.discoverySvcUri + " " : ""}'
+        formatOrder: 9,
+        formatString: '-e DISCOVERY_SERVICE=\'${this.agent.discoverySvcUri}\''
       },
       {
         type: 'input',
@@ -195,8 +197,8 @@ export default {
         default: () => process.env.defaultStage || process.env.DEFAULT_STAGE || '',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         validate: validateNotEmptyString,
-        formatOrder: 6,
-        formatString: '${(this.agent.advancedMode === true) ? "-e DEFAULT_STAGE=" + this.agent.defaultStage + " " : ""}'
+        formatOrder: 11,
+        formatString: '-e DEFAULT_STAGE=${this.agent.defaultStage} '
       },
       {
         type: 'input',
@@ -205,8 +207,8 @@ export default {
         default: () => process.env.awsRegion || process.env.AWS_REGION || 'us-east-1',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         validate: validateNotEmptyString,
-        formatOrder: 7,
-        formatString: '${(this.agent.advancedMode === true) ? "-e AWS_REGION=" + this.agent.awsRegion + " " : ""}'
+        formatOrder: 12,
+        formatString: '-e AWS_REGION=${this.agent.awsRegion} '
       },
       {
         type: 'number',
@@ -215,30 +217,35 @@ export default {
         validate: validateNonZero,
         default: () => process.env.concurrentConnections || process.env.CONCURRENT_CONNECTIONS || '5',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
-        formatOrder: 8,
-        formatString: '${(this.agent.advancedMode === true) ? "-e CONCURRENT_CONNECTIONS=" + this.agent.concurrentConnections + " " : ""}'
+        formatOrder: 13,
+        formatString: '-e CONCURRENT_CONNECTIONS=${this.agent.concurrentConnections} '
       },
       {
         type: 'confirm',
         name: 'agent.confirmedAccurate',
         message: 'Are all of the entered values correct?',
-        formatOrder: 11,
+        formatOrder: 16,
         formatString: '${this.agent.mode}'
       }
     ],
 
-  apply: (prompts: IWizardQuestion[], answers: inquirer.Answers): boolean => {
-
-    let argString = '';
+  apply: async (prompts: inquirer.Question[], answers: inquirer.Answers): Promise<boolean> => {
     const promptsWithFormats = prompts.filter((p) => p.formatOrder && p.formatString);
+    const elements = [];
     for (const q of orderBy(promptsWithFormats, ['formatOrder'], ['asc'])) {
-      if (q.when.valueOf() === true) {
-        argString += fillTemplate(q.formatString, answers);
+      if (q.when) {
+        // tslint:disable-next-line: ban-types
+        const shouldDisplay: boolean = (q.when.valueOf() as Function)(answers);
+        if (shouldDisplay) {
+          elements.push(fillTemplate(q.formatString, answers));
+        }
+      } else {
+        elements.push(fillTemplate(q.formatString, answers));
       }
     }
 
-    console.log(`docker run ${argString}`);
+    console.log(`docker run ${elements.join('')}`);
 
-    return true;
+    return false;
   }
 } as ICommandConfig;

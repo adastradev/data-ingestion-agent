@@ -1,12 +1,15 @@
-import inquirer = require("inquirer");
+import inquirer = require('inquirer');
 
 export interface ICommandConfig {
   successMessages: string[];
-  prompts: inquirer.QuestionCollection[] | IWizardQuestion[];
-  apply(prompts: Array<inquirer.QuestionCollection<inquirer.Answers>> | IWizardQuestion[], answers: inquirer.Answers): boolean | Promise<boolean>;
+  prompts: inquirer.Question[];
+  apply(prompts: inquirer.Question[], answers: inquirer.Answers): Promise<boolean>;
 }
 
-export interface IWizardQuestion extends inquirer.Question {
-  formatString?: string;
-  formatOrder?: number;
+declare module 'inquirer' {
+  // tslint:disable-next-line: interface-name
+  interface Question {
+    formatString?: string;
+    formatOrder?: number;
+  }
 }

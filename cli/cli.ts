@@ -1,9 +1,7 @@
 // tslint:disable: no-string-literal
 import * as inquirer from 'inquirer';
 import commands from './commands';
-import { ICommandConfig, IWizardQuestion } from './ICommandConfig';
-
-
+import { ICommandConfig } from './ICommandConfig';
 
 /**
  * Handles any configuration commands that have been specified
@@ -34,20 +32,10 @@ export default async function (procArgs: string[]): Promise<boolean> {
       console.log(msg);
     }
 
-    commandConfig.apply(commandConfig.prompts, answers);
-
-    // // Build string
-    // const orderedAnswers = new Array<string>(commandConfig.prompts.length);
-    // for (const q of commandConfig.prompts) {
-    //   const wq = q as IWizardQuestion;
-    //   orderedAnswers[wq.formatOrder] = fillTemplate(wq.formatString, answers);
-    // }
-
-    // console.log(orderedAnswers.join());
-    // console.log(fillTemplate(commandConfig.template, answers));
+    const contd = await commandConfig.apply(commandConfig.prompts, answers);
 
     // We handled a command that should result in an immediate exit
-    return false;
+    return contd;
   } else {
      // No commands were found to be handled by this function, so continue starting up the agent
     return true;
