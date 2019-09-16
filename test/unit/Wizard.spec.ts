@@ -103,7 +103,7 @@ describe('Wizard', () => {
 
             const result = await Wizard.apply(Wizard.prompts, args);
             expect(result).to.be.false;
-            expect(logSpy.lastCall.args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest ingest');
+            expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest ingest');
         });
 
         it('should produce a non-advanced mode preview command', async () => {
@@ -125,7 +125,7 @@ describe('Wizard', () => {
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.lastCall.args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest preview');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest preview');
         });
 
         // it('should produce a non-advanced mode background command', async () => {
@@ -176,7 +176,7 @@ describe('Wizard', () => {
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.lastCall.args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 preview');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 preview');
         });
 
         it('should produce an advanced mode ingest command', async () => {
@@ -205,7 +205,7 @@ describe('Wizard', () => {
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.lastCall.args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 ingest');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 ingest');
         });
 
         // it('should produce an advanced mode background command', async () => {

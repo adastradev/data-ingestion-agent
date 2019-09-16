@@ -29,10 +29,26 @@ export const fillTemplate = (template, inputs): string => {
   return new Function('return `' + template + '`;').call(inputs);
 };
 
+export const logCommand = (desc: string, cmd: string) => {
+  const title = `# ${desc} #`;
+  const hr = '*'.repeat(title.length);
+  console.log(hr);
+  console.log(title);
+  console.log(hr);
+  console.log();
+  console.log(cmd);
+  console.log();
+};
+
 export default {
   successMessages: [
-    'Copy and paste the following command to run the ingestion agent:',
-    '----------------------------------------------------------------'
+    '',
+    '----------------------------------------------------------------------',
+    'Use one of the following commands applicable to your shell environment',
+    'to run the data ingestion agent. Some values may need to be modified',
+    'to work with your configuration.',
+    '----------------------------------------------------------------------',
+    ''
   ],
   prompts: [
       {
@@ -246,8 +262,10 @@ export default {
       }
     }
 
-    console.log(`docker run ${elements.join('')}`);
-
+    const cmd = `docker run ${elements.join('')}`;
+    logCommand('(Windows) Command Prompt', cmd);
+    logCommand('(Windows) Powershell', cmd.replace(/\'/g, '"'));
+    logCommand('(Linux/Mac) bash', cmd);
     return false;
   }
 } as ICommandConfig;
