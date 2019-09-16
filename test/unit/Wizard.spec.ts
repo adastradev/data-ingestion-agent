@@ -10,7 +10,7 @@ import { IntegrationType } from '../../source/IIntegrationConfig';
 
 const expect = chai.expect;
 
-describe.only('Wizard', () => {
+describe('Wizard', () => {
 
     describe('getIntegrationTypes', () => {
       it('should produce valid choice options for each integration type', () => {
