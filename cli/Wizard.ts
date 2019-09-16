@@ -263,8 +263,8 @@ export default {
     }
 
     const cmd = `docker run ${elements.join('')}`;
-    logCommand('(Windows) Command Prompt', cmd);
-    logCommand('(Windows) Powershell', cmd.replace(/\'/g, '"'));
+    logCommand('(Windows) Command Prompt', cmd.replace(/\'/g, '"'));
+    logCommand('(Windows) Powershell', cmd);
     logCommand('(Linux/Mac) bash', cmd);
     return false;
   }
