@@ -101,12 +101,12 @@ export default {
         type: 'input',
         name: 'agent.dbEndpoint',
         message: 'Enter the database connection string:',
-        filter: (input) => (input.length > 0) ? `"${input}"` : '',
+        filter: (input) => (input.length > 0) ? `'${input}'` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
         validate: validateNotEmptyString,
         formatOrder: 6,
-        formatString: '${"-e " + this.agent.database + "_ENDPOINT=\'" + this.agent.dbEndpoint + "\' "}'
+        formatString: '${"-e " + this.agent.database + "_ENDPOINT=" + this.agent.dbEndpoint + " "}'
       },
       {
         type: 'input',
