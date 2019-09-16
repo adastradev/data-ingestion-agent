@@ -41,15 +41,17 @@ export default {
         message: 'In what mode would you like the agent to run?',
         choices: [
           { name: 'Ingest Once', value: 'ingest', short: 0 },
-          { name: 'Preview Ingest Queries', value: 'preview', short: 1 },
-          { name: 'Always Run in Background (Advanced)', value: 'background', short: 2 }
+          { name: 'Preview Ingest Queries', value: 'preview', short: 1 }
+          // { name: 'Always Run in Background (Advanced)', value: 'background', short: 2 }
         ],
         default: () => process.env.mode || 'preview',
-        filter: (input) => {
-          return (input === 'background') ? '' : input;
-        },
+        // Leaving for future use when enabling background mode
+        // filter: (input) => {
+        //   return (input === 'background') ? '' : input;
+        // },
+        // formatString: '${(this.agent.mode === "") ? "-d" : "-it"} '
         formatOrder: 1,
-        formatString: '${(this.agent.mode === "") ? "-d" : "-it"} '
+        formatString: '-it '
       },
       {
         type: 'input',
