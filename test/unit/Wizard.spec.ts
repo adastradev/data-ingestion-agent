@@ -99,7 +99,7 @@ describe('Wizard', () => {
                 astraUserPassword: 'test',
                 maxMemory: 2048,
                 database: 'ORACLE',
-                dbEndpoint: '\'someendpoint\'',
+                dbEndpoint: 'someendpoint',
                 dbUser: 'test',
                 dbPassword: 'test',
                 advancedMode: false,
@@ -121,7 +121,7 @@ describe('Wizard', () => {
               astraUserPassword: 'test',
               maxMemory: 2048,
               database: 'ORACLE',
-              dbEndpoint: '\'someendpoint\'',
+              dbEndpoint: 'someendpoint',
               dbUser: 'test',
               dbPassword: 'test',
               advancedMode: false,
@@ -143,7 +143,7 @@ describe('Wizard', () => {
         //       astraUserPassword: 'test',
         //       maxMemory: 2048,
         //       database: 'ORACLE',
-        //       dbEndpoint: '\'someendpoint\'',
+        //       dbEndpoint: 'someendpoint',
         //       dbUser: 'test',
         //       dbPassword: 'test',
         //       advancedMode: false,
@@ -165,7 +165,7 @@ describe('Wizard', () => {
               astraUserPassword: 'test',
               maxMemory: 2048,
               database: 'ORACLE',
-              dbEndpoint: '\'someendpoint\'',
+              dbEndpoint: 'someendpoint',
               dbUser: 'test',
               dbPassword: 'test',
               advancedMode: true,
@@ -194,7 +194,7 @@ describe('Wizard', () => {
               astraUserPassword: 'test',
               maxMemory: 2048,
               database: 'ORACLE',
-              dbEndpoint: '\'someendpoint\'',
+              dbEndpoint: 'someendpoint',
               dbUser: 'test',
               dbPassword: 'test',
               advancedMode: true,
@@ -223,7 +223,7 @@ describe('Wizard', () => {
         //       astraUserPassword: 'test',
         //       maxMemory: 2048,
         //       database: 'ORACLE',
-        //       dbEndpoint: '\'someendpoint\'',
+        //       dbEndpoint: 'someendpoint',
         //       dbUser: 'test',
         //       dbPassword: 'test',
         //       advancedMode: true,
@@ -422,7 +422,7 @@ describe('Wizard', () => {
       let prompt;
       const promptName = 'dbEndpoint';
       const formats: IFormatTestCase[] = [
-        { cfg: { database: 'ORACLE', dbEndpoint: '\'someone@host:port/orcl\'' }, val: '-e ORACLE_ENDPOINT=\'someone@host:port/orcl\' ', desc: 'database connection string'}
+        { cfg: { database: 'ORACLE', dbEndpoint: 'someone@host:port/orcl' }, val: '-e ORACLE_ENDPOINT=\'someone@host:port/orcl\' ', desc: 'database connection string'}
       ];
 
       before(() => {

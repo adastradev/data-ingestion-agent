@@ -131,7 +131,7 @@ export default {
         default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
         validate: validateNotEmptyString,
         formatOrder: 6,
-        formatString: '${"-e " + this.agent.database + "_ENDPOINT=" + this.agent.dbEndpoint + " "}'
+        formatString: '${"-e " + this.agent.database + "_ENDPOINT=\'" + this.agent.dbEndpoint + "\' "}'
       },
       {
         type: 'input',
