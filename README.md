@@ -228,7 +228,7 @@ The docker agent also supports the following optional arguments:
 
 Prior to sending any data, you can run the following Docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command, the container will cease to run.
 
-To run the agent expand and execute one of the following commands.
+**To run the agent expand and execute one of the following commands.**
 
 <details><summary>(Windows) Command Prompt</summary>
 
