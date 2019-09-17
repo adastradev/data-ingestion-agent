@@ -406,8 +406,8 @@ See the [Docker cp command guide for help copying logs to a local file system](h
 ## Security
 
 * Encryption:
-  * Ingested data is always encrypted in transit and at rest.
-  * 
+  * Data is ingested over HTTPS
+  * Data at rest is encrypted in a private AWS S3 bucket using AES-256 bit encryption
 
 *** 
 

@@ -5,7 +5,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 
 import * as sinon from 'sinon';
-import Wizard, { fillTemplate, getIntegrationTypes, validateNonZero, validateNotEmptyString } from '../../cli/Wizard';
+import Wizard, { fillTemplate, getIntegrationTypes, validateNotEmptyString, validateNumberAndNonZero } from '../../cli/Wizard';
 import { IntegrationType } from '../../source/IIntegrationConfig';
 import inquirer = require('inquirer');
 
@@ -29,19 +29,25 @@ describe('Wizard', () => {
       });
     });
 
-    describe('validateNonZero', () => {
+    describe('validateNumberAndNonZero', () => {
       it('should validate that a positive value is valid', () => {
-        const result = validateNonZero(10);
+        const result = validateNumberAndNonZero('10');
         expect(typeof result).to.equal('boolean');
+        expect(result).to.be.true;
       });
 
       it('should validate that a negative value is invalid', () => {
-        const result = validateNonZero(-10);
+        const result = validateNumberAndNonZero('-10');
         expect(typeof result).to.equal('string');
       });
 
       it('should validate that a zero value is invalid', () => {
-        const result = validateNonZero(0);
+        const result = validateNumberAndNonZero('0');
+        expect(typeof result).to.equal('string');
+      });
+
+      it('should validate that a non-integer value is invalid', () => {
+        const result = validateNumberAndNonZero('something');
         expect(typeof result).to.equal('string');
       });
     });
@@ -436,11 +442,6 @@ describe('Wizard', () => {
         validatePromptActiveInNonPreviewMode(prompt);
       });
 
-      it('filters the input when a value is specified', () => {
-        expect(prompt.filter('someendpoint')).to.equal('\'someendpoint\'');
-        expect(prompt.filter('')).to.equal('');
-      });
-
       for (const exp of formats) {
         it(`formats ${exp.desc}`, () => {
           validateFormat(prompt, exp);
@@ -671,7 +672,7 @@ describe('Wizard', () => {
         delete process.env[promptName];
         expect(prompt.default()).to.equal('userspecified');
         delete process.env.DEFAULT_STAGE;
-        expect(prompt.default()).to.equal('');
+        expect(prompt.default()).to.equal('prod');
       });
 
       it('is only active in advanced mode', () => {

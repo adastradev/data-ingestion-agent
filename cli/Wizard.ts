@@ -3,13 +3,21 @@ import { orderBy } from 'lodash';
 import { ICommandConfig } from './ICommandConfig';
 import { IntegrationType } from '../source/IIntegrationConfig';
 
-export const validateNonZero = (input: number): boolean | string => {
-  if (input > 0) {
+export const validateNumberAndNonZero = (input: string): boolean | string => {
+  if (tryParseInt(input, 0) > 0) {
     return true;
   } else {
-    return 'Memory value must be greater than zero, please retry entering a valid value';
+    return 'Memory value must be an integer that is greater than zero, please retry entering a valid value';
   }
 };
+
+const tryParseInt = (str, defaultValue) => {
+  let retValue = defaultValue;
+  if (str !== null && str.length > 0 && !isNaN(str)) {
+    retValue = parseInt(str, 0);
+  }
+  return retValue;
+}
 
 export const validateNotEmptyString = (input: string): boolean | string => {
   if (input.trim().length > 0) {
@@ -92,7 +100,7 @@ export default {
         name: 'agent.maxMemory',
         message: 'How much memory (in megabytes) should be allocated to the agent?',
         default: () => process.env.maxMemory || '2048',
-        validate: validateNonZero,
+        validate: validateNumberAndNonZero,
         formatOrder: 2,
         formatString: '-m ${this.agent.maxMemory}M -e PROCESS_MAX_MEMORY_SIZE_MB=${this.agent.maxMemory} '
       },
@@ -119,7 +127,6 @@ export default {
         type: 'input',
         name: 'agent.dbEndpoint',
         message: 'Enter the database connection string:',
-        filter: (input) => (input.length > 0) ? `'${input}'` : '',
         when: (answers: inquirer.Answers) => answers.agent.mode !== 'preview',
         default: () => (process.env.dbEndpoint || '').replace(/"/g, ''),
         validate: validateNotEmptyString,
@@ -212,7 +219,7 @@ export default {
         type: 'input',
         name: 'agent.defaultStage',
         message: 'Enter the alternative default stage:',
-        default: () => process.env.defaultStage || process.env.DEFAULT_STAGE || '',
+        default: () => process.env.defaultStage || process.env.DEFAULT_STAGE || 'prod',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         validate: validateNotEmptyString,
         formatOrder: 11,
@@ -232,7 +239,7 @@ export default {
         type: 'number',
         name: 'agent.concurrentConnections',
         message: 'Enter the maximum number of concurrent database connections allowed:',
-        validate: validateNonZero,
+        validate: validateNumberAndNonZero,
         default: () => process.env.concurrentConnections || process.env.CONCURRENT_CONNECTIONS || '5',
         when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         formatOrder: 13,
