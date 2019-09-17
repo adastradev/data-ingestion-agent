@@ -96,7 +96,7 @@ export default {
         formatString: '-e ASTRA_CLOUD_PASSWORD=\'${this.agent.astraUserPassword}\' '
       },
       {
-        type: 'number',
+        type: 'input',
         name: 'agent.maxMemory',
         message: 'How much memory (in megabytes) should be allocated to the agent?',
         default: () => process.env.maxMemory || '2048',

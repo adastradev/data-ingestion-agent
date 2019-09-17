@@ -46,7 +46,7 @@ Some settings provide helpful defaults which you may wish to use for your first 
 
 **NOTE:** Unless you are comfortable with specifying the advanced run settings, we recommend responding "no" to the prompt "would you like to configure advanced run settings?" in the wizard.
 
-**WARNING:** If you're installing Docker in a nested VM scenario using Hyper-V, see [this guide](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization)
+**WARNING:** If you're installing Docker in a nested VM scenario using Hyper-V, see [this guide](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization).
 
 Execute one of the following to install the latest version of the agent and start the wizard:
 
