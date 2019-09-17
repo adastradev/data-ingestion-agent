@@ -41,6 +41,8 @@ To get started, you can use the built-in interactive wizard to build a properly 
 * Your Astra Cloud user credentials
 * Your Student Information System database credentials for an administrative user, if you choose to ingest data into the Astra cloud
   * For all possible Oracle connection string options, see the [Oracle section](#oracle)
+* Familiarize yourself with the different modes that the agent can run in before using the wizard.
+  * See the [Running the Agent](#running-the-agent) section and corresponding descriptions to get a high level overview of the available agent modes
 
 Some settings provide helpful defaults which you may wish to use for your first run. Hitting `enter` will use the default value (in parentheses).
 
@@ -48,7 +50,7 @@ Some settings provide helpful defaults which you may wish to use for your first 
 
 **WARNING:** If you're installing Docker in a nested VM scenario using Hyper-V, see [this guide](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization).
 
-Execute one of the following to install the latest version of the agent and start the wizard:
+**Expand and execute one of the following to install the latest version of the agent and start the wizard:**
 
 <details><summary>(Windows) Command Prompt</summary>
 <p>
@@ -130,6 +132,8 @@ The agent supports different 'modes' in which it can run. Each mode performs a s
 ### Ingest Mode
 
 This mode will immediately ingest data into the Ad Astra cloud environment. Upon completion of an ingest of data, the container will cease to run.
+
+**To run the agent expand and execute one of the following commands.**
 
 <details><summary>(Windows) Command Prompt</summary>
 <p>
@@ -223,6 +227,8 @@ The docker agent also supports the following optional arguments:
 ### Query Preview Mode
 
 Prior to sending any data, you can run the following Docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command, the container will cease to run.
+
+To run the agent expand and execute one of the following commands.
 
 <details><summary>(Windows) Command Prompt</summary>
 
