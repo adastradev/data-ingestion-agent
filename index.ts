@@ -12,6 +12,7 @@ global['fetch'] = fetch;
         container = await startup();
     } catch (error) {
         console.log(error);
+        process.exit(1);
     }
 
     return container;
