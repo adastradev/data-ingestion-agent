@@ -53,7 +53,7 @@ Execute one of the following to install the latest version of the agent and star
 <details><summary>(Windows) Command Prompt</summary>
 <p>
 
-```sh
+```bat
 docker pull adastradev/data-ingestion-agent:latest && ^
 docker run -it adastradev/data-ingestion-agent:latest wizard
 ```
@@ -135,10 +135,10 @@ This mode will immediately ingest data into the Ad Astra cloud environment. Upon
 <p>
 
 ```bat
-# See Host System Requirements above for agent resource requirements
+REM See Host System Requirements above for agent resource requirements
 SET PROCESS_MAX_MEMORY_SIZE_MB=4096
 
-# Define a variable to hold your connection string
+REM Define a variable to hold your connection string
 SET CONNECTION_STRING=your_connection_string
 
 docker pull adastradev/data-ingestion-agent:latest && ^
@@ -227,7 +227,7 @@ Prior to sending any data, you can run the following Docker command to examine e
 <details><summary>(Windows) Command Prompt</summary>
 
 ```bat
-# See Host System Requirements above for agent resource requirements
+REM See Host System Requirements above for agent resource requirements
 SET PROCESS_MAX_MEMORY_SIZE_MB=4096
 
 docker pull adastradev/data-ingestion-agent:latest && ^
