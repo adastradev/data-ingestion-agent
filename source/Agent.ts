@@ -60,7 +60,7 @@ export class Agent {
 
                         if (msg.Body) {
                             const message: IMessage = JSON.parse(msg.Body);
-                            this.logger.info(`'${message.type} completed`);
+                            this.logger.info(`'${message.type}' completed`);
                         }
                     }
                 }
