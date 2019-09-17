@@ -17,17 +17,19 @@ The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into
 ***
 ## Pre-requisites
 
-Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
+* Ad Astra Cloud credentials
 
-[Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
+* Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
-[Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
+  * [Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
 
-[Docker download for Linux (Ubuntu)](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+  * [Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
 
-[Docker download for Linux (Debian)](https://docs.docker.com/install/linux/docker-ce/debian/)
+  * [Docker download for Linux (Ubuntu)](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
-[Docker download for Linux (CentOS)](https://docs.docker.com/install/linux/docker-ce/centos/)
+  * [Docker download for Linux (Debian)](https://docs.docker.com/install/linux/docker-ce/debian/)
+
+  * [Docker download for Linux (CentOS)](https://docs.docker.com/install/linux/docker-ce/centos/)
 
 ***
 
@@ -45,7 +47,7 @@ Some settings provide helpful defaults which you may wish to use for your first 
 
 **WARNING:** If you're installing Docker in a nested VM scenario using Hyper-V, see [this guide](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization)
 
-Execute the following to get the latest version of the agent and start the wizard:
+Execute one of the following to install the latest version of the agent and start the wizard:
 
 <details><summary>(Windows) Command Prompt</summary>
 <p>
@@ -60,7 +62,7 @@ docker run -it adastradev/data-ingestion-agent:latest wizard
 <p>
 
 ```powershell
-docker pull adastradev/data-ingestion-agent:latest -and `
+docker pull adastradev/data-ingestion-agent:latest; `
 docker run -it adastradev/data-ingestion-agent:latest wizard
 ```
 </p></details>
@@ -122,6 +124,8 @@ When connecting to an Oracle database the specified database user must be given 
 
 The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types, use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
 
+The agent supports different 'modes' in which it can run. Each mode performs a specific action (see below) and then exits after the action is complete.
+
 ### Ingest Mode
 
 This mode will immediately ingest data into the Ad Astra cloud environment. Upon completion of an ingest of data, the container will cease to run.
@@ -162,7 +166,7 @@ $PROCESS_MAX_MEMORY_SIZE_MB = 4096
 # Define a variable to hold your connection string
 $CONNECTION_STRING = your_connection_string
 
-docker pull adastradev/data-ingestion-agent:latest -and `
+docker pull adastradev/data-ingestion-agent:latest; `
 docker run -t `
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' `
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB `
@@ -245,7 +249,7 @@ preview
 # See Host System Requirements above for agent resource requirements
 $PROCESS_MAX_MEMORY_SIZE_MB = 4096
 
-docker pull adastradev/data-ingestion-agent:latest -and `
+docker pull adastradev/data-ingestion-agent:latest; `
 docker run -i `
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' `
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB `
