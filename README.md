@@ -12,7 +12,8 @@ The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into
 4. [Running the Agent](#running-the-agent)
 5. [Uninstall](#uninstall)
 6. [Administration](#administration)
-7. [Development](#development)
+7. [Security](#security)
+8. [Development](#development)
 
 ***
 ## Pre-requisites
