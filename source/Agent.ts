@@ -118,6 +118,7 @@ export class Agent {
                 await sqs.deleteMessage({ QueueUrl: this.queueUrl, ReceiptHandle: message.receiptHandle }).promise();
             }
             this.logger.error(error.message);
+            throw error;
         }
     }
 

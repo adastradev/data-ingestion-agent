@@ -243,35 +243,8 @@ describe('Agent', () => {
             };
 
             // Can't parse the message so we can't delete a message we have no receipt handle for
-            await (agent as any).handleMessage(message, ctx.sqs, ctx.messageHandlerFactory, ctx.messageFactory);
+            expect((agent as any).handleMessage(message, ctx.sqs, ctx.messageHandlerFactory, ctx.messageFactory)).to.eventually.be.rejectedWith(Error);
 
-            expect(createFromJsonStub.calledOnce).to.be.true;
-            expect(ctx.deleteMessageStub.notCalled).to.be.true;
-            expect(ctx.getHandlerStub.notCalled).to.be.true;
-            expect(ctx.handleMessageSpy.notCalled).to.be.true;
-        });
-
-        it('should attempt to delete a message if after parsing it fails', async () => {
-            const ctx = createTestContext();
-            (ctx.deleteMessageStub as sinon.SinonStub)
-                .onFirstCall()
-                    .returns({ promise: () => Promise.reject(Error)})
-                .onSecondCall()
-                    .returns({ promise: () => Promise.resolve()});
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
-
-            const message = {
-                Body: JSON.stringify(new DummyMessage()),
-                ReceiptHandle: 'abc123'
-            };
-
-            // Can't parse the message so we can't delete a message we have no receipt handle for
-            await (agent as any).handleMessage(message, ctx.sqs, ctx.messageHandlerFactory, ctx.messageFactory);
-
-            expect(ctx.createFromJsonStub.calledOnce).to.be.true;
-            expect(ctx.deleteMessageStub.calledTwice).to.be.true;
-            expect(ctx.getHandlerStub.notCalled).to.be.true;
-            expect(ctx.handleMessageSpy.notCalled).to.be.true;
         });
 
     });
