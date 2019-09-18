@@ -46,7 +46,7 @@ const args = process.argv.slice(2);
                     }
                     if (agentHadNonzeroExit) {
                         try {
-                            console.log('Something went wrong with the agent. Attempting to send error to Ad Astra...')
+                            console.log('Something went wrong with the agent. Attempting to send error to Ad Astra...');
                             // TODO: ADD LOGIC TO PUBLISH FAILED SNS EVENT HERE
                         } catch (err) {
                             console.log(`We ran into a problem sending the error to Ad Astra: ${err.message}`);
