@@ -215,7 +215,7 @@ const startup = async () => {
         container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
         container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
         container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snapshotReceievedSnsTopicArn);
-        container.bind<string>(TYPES.IngestFailedTopicArn).toConstantValue(ingestFailedTopicArn);
+        container.bind<string>(TYPES.IngestFailedTopicArn).toConstantValue(ingestFailedSnsTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
         container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
