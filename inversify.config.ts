@@ -197,7 +197,8 @@ const startup = async () => {
         } catch (error) {
             logger.error('Could not find ingestion settings');
         }
-        const snsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
+        const snapshotReceievedSnsTopicArn = globalConfigResponse.data.snapshotReceivedTopicArn;
+        const ingestFailedSnsTopicArn = globalConfigResponse.data.ingestFailedTopicArn;
 
         // App
         container.bind<Agent>(TYPES.Agent).to(Agent).inSingletonScope();
@@ -213,7 +214,8 @@ const startup = async () => {
         container.bind<CustomAuthManager>(TYPES.AuthManager).toConstantValue(authManager);
         container.bind<Winston.Logger>(TYPES.Logger).toConstantValue(logger);
         container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
-        container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snsTopicArn);
+        container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snapshotReceievedSnsTopicArn);
+        container.bind<string>(TYPES.IngestFailedTopicArn).toConstantValue(ingestFailedTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
         container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)

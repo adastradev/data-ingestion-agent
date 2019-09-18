@@ -22,6 +22,7 @@ const TYPES = {
     SendDataHandler: Symbol('SendDataHandler'),
     SendDataMessage: Symbol('SendDataMessage'),
     SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
+    IngestFailedTopicArn: Symbol('IngestFailedTopicArn'),
     SNS: Symbol('SNS'),
     SQS: Symbol('SQS'),
     TenantName: Symbol('TenantName'),
