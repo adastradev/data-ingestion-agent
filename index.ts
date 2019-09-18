@@ -12,6 +12,7 @@ global['fetch'] = fetch;
         container = await startup();
     } catch (error) {
         console.log(error);
+        process.exit(1);
     }
 
     return container;
@@ -19,6 +20,11 @@ global['fetch'] = fetch;
 .then(async (container) => {
     if (container) {
         const agent: Agent = container.get<Agent>(TYPES.Agent);
-        await agent.main();
+        try {
+            await agent.main();
+        } catch (error) {
+            console.log(error);
+            process.exit(1);
+        }
     }
 });

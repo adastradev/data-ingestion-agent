@@ -176,40 +176,43 @@ export default class SendDataHandler implements IMessageHandler {
                         reject(err);
                     } else {
 
-                        // Ingest DDL
-                        const ingested = await this.ingestDDL(validTables, folderPath);
+                        try {
+                            // Ingest DDL
+                            const ingested = await this.ingestDDL(validTables, folderPath);
 
-                        // Add to manifest file
-                        manifest.files.push(ingested.fileName);
+                            // Add to manifest file
+                            manifest.files.push(ingested.fileName);
 
-                        await this._connectionPool.close();
+                            await this._connectionPool.close();
 
-                        results.forEach((queryResult) => {
-                            if (queryResult.data) {
-                                aggregateMetadata.push(queryResult);
-                            }
-                        });
+                            results.forEach((queryResult) => {
+                                if (queryResult.data) {
+                                    aggregateMetadata.push(queryResult);
+                                }
+                            });
 
-                        // Ingest metadata
-                        const uploaded = await this.ingestMetadata(aggregateMetadata, folderPath);
+                            // Ingest metadata
+                            const uploaded = await this.ingestMetadata(aggregateMetadata, folderPath);
 
-                        manifest.files.push(uploaded.fileName);
+                            manifest.files.push(uploaded.fileName);
 
-                        // Calculate overall duration in milliseconds and write to manifest
-                        const ingestFinishTime = moment();
-                        const duration = ingestFinishTime.diff(ingestStartTime).toString();
+                            // Calculate overall duration in milliseconds and write to manifest
+                            const ingestFinishTime = moment();
+                            const duration = ingestFinishTime.diff(ingestStartTime).toString();
 
-                        manifest.ingestDuration = duration;
-                        manifest.ingestEndTime = ingestFinishTime.toISOString();
+                            manifest.ingestDuration = duration;
+                            manifest.ingestEndTime = ingestFinishTime.toISOString();
 
-                        const rs = new stream.Readable();
-                        rs.push(JSON.stringify(manifest));
-                        rs.push(null);
+                            const rs = new stream.Readable();
+                            rs.push(JSON.stringify(manifest));
+                            rs.push(null);
 
-                        // Finally, ingest manifest file
-                        await this._writer.ingest(rs, folderPath, 'manifest.json');
-                        await this.raiseSnapshotCompletionEvent(integrationType as IntegrationType, completionDescription, this._bucketPath + '/' + folderPath);
-
+                            // Finally, ingest manifest file
+                            await this._writer.ingest(rs, folderPath, 'manifest.json');
+                            await this.raiseSnapshotCompletionEvent(integrationType as IntegrationType, completionDescription, this._bucketPath + '/' + folderPath);
+                        } catch (err) {
+                            reject(err);
+                        }
                         resolve();
                     }
                 }
