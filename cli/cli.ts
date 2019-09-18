@@ -3,10 +3,6 @@ import * as inquirer from 'inquirer';
 import commands from './commands';
 import { ICommandConfig } from './ICommandConfig';
 
-const fillTemplate = (template, inputs): string => {
-  return new Function('return `' + template + '`;').call(inputs);
-};
-
 /**
  * Handles any configuration commands that have been specified
  *
@@ -18,11 +14,11 @@ export default async function (procArgs: string[]): Promise<boolean> {
   if (procArgs.length > 0 && commands[procArgs[0]]) {
     const commandConfig: ICommandConfig = commands[procArgs[0]];
     let confirmed: boolean;
-    let answers: any;
+    let answers: inquirer.Answers;
     do {
       answers = await inquirer.prompt(commandConfig.prompts);
 
-      confirmed = answers['agent'].confirmedAccurate;
+      confirmed = answers.agent.confirmedAccurate;
 
       if (!confirmed) {
         // Save answers for next attempt
@@ -35,10 +31,11 @@ export default async function (procArgs: string[]): Promise<boolean> {
     for (const msg of commandConfig.successMessages) {
       console.log(msg);
     }
-    console.log(fillTemplate(commandConfig.formatString, answers));
+
+    const contd = await commandConfig.apply(commandConfig.prompts, answers);
 
     // We handled a command that should result in an immediate exit
-    return false;
+    return contd;
   } else {
      // No commands were found to be handled by this function, so continue starting up the agent
     return true;

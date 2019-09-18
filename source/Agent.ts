@@ -57,6 +57,11 @@ export class Agent {
                 if (result.Messages && result.Messages.length > 0) {
                     for (const msg of result.Messages) {
                         await this.handleMessage(msg, sqs, handlerFactory, messageFactory);
+
+                        if (msg.Body) {
+                            const message: IMessage = JSON.parse(msg.Body);
+                            this.logger.info(`'${message.type}' process completed!`);
+                        }
                     }
                 }
             } while (this.mode === AgentMode.Listening);

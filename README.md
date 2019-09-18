@@ -12,19 +12,27 @@ The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into
 4. [Running the Agent](#running-the-agent)
 5. [Uninstall](#uninstall)
 6. [Administration](#administration)
-7. [Development](#development)
+7. [Security](#security)
+8. [Development](#development)
 
+***
 ## Pre-requisites
-Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
-[Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
+* Ad Astra Cloud credentials
 
-[Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
+* Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
 
-## Install
-```sh
-docker pull adastradev/data-ingestion-agent:latest
-```
+  * [Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
+
+  * [Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
+
+  * [Docker download for Linux (Ubuntu)](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+
+  * [Docker download for Linux (Debian)](https://docs.docker.com/install/linux/docker-ce/debian/)
+
+  * [Docker download for Linux (CentOS)](https://docs.docker.com/install/linux/docker-ce/centos/)
+
+***
 
 ## Quick Start
 
@@ -33,16 +41,45 @@ To get started, you can use the built-in interactive wizard to build a properly 
 * Your Astra Cloud user credentials
 * Your Student Information System database credentials for an administrative user, if you choose to ingest data into the Astra cloud
   * For all possible Oracle connection string options, see the [Oracle section](#oracle)
+* Familiarize yourself with the different modes that the agent can run in before using the wizard.
+  * See the [Running the Agent](#running-the-agent) section and corresponding descriptions to get a high level overview of the available agent modes
 
 Some settings provide helpful defaults which you may wish to use for your first run. Hitting `enter` will use the default value (in parentheses).
 
 **NOTE:** Unless you are comfortable with specifying the advanced run settings, we recommend responding "no" to the prompt "would you like to configure advanced run settings?" in the wizard.
 
-Execute the following to get started:
+**WARNING:** If you're installing Docker in a nested VM scenario using Hyper-V, see [this guide](https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-guide/nested-virtualization).
 
-```sh
+**Expand and execute one of the following to install the latest version of the agent and start the wizard:**
+
+<details><summary>(Windows) Command Prompt</summary>
+<p>
+
+```bat
+docker pull adastradev/data-ingestion-agent:latest && ^
 docker run -it adastradev/data-ingestion-agent:latest wizard
 ```
+</p></details>
+
+<details><summary>(Windows) Powershell</summary>
+<p>
+
+```powershell
+docker pull adastradev/data-ingestion-agent:latest; `
+docker run -it adastradev/data-ingestion-agent:latest wizard
+```
+</p></details>
+
+<details><summary>(Linux/Mac) bash</summary>
+<p>
+
+```bash
+docker pull adastradev/data-ingestion-agent:latest && \
+docker run -it adastradev/data-ingestion-agent:latest wizard
+```
+</p></details>
+
+***
 
 ## Resource Requirements
 
@@ -84,38 +121,80 @@ When connecting to an Oracle database the specified database user must be given 
 - `ALL_CONSTRAINTS` (view)
 - All tables referenced by this agent (see [Query Preview Mode](#query-preview-mode) section below)
 
+***
+
 ## Running the Agent
 
 The agent is highly dependent on the integration type you specify as part of your commands. Integration types are a simple identifier for the system from which you intend to ingest data. To see a full list of possible integration types, use the wizard as noted in the [Quick Start](#quick-start) section at the top of this guide.
+
+The agent supports different 'modes' in which it can run. Each mode performs a specific action (see below) and then exits after the action is complete.
 
 ### Ingest Mode
 
 This mode will immediately ingest data into the Ad Astra cloud environment. Upon completion of an ingest of data, the container will cease to run.
 
-```sh
-# See Host System Requirements above for agent resource requirements
-PROCESS_MAX_MEMORY_SIZE_MB=4096
+**To run the agent expand and execute one of the following commands.**
 
-# Define a variable to hold your connection string
-CONNECTION_STRING=your_connection_string
+<details><summary>(Windows) Command Prompt</summary>
+<p>
 
-For Windows:
+```bat
+REM See Host System Requirements above for agent resource requirements
+SET PROCESS_MAX_MEMORY_SIZE_MB=4096
+
+REM Define a variable to hold your connection string
+SET CONNECTION_STRING=your_connection_string
 
 docker pull adastradev/data-ingestion-agent:latest && ^
 docker run -t ^
--m $PROCESS_MAX_MEMORY_SIZE_MB'M' ^
--e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB ^
+-m %PROCESS_MAX_MEMORY_SIZE_MB%'M' ^
+-e PROCESS_MAX_MEMORY_SIZE_MB=%PROCESS_MAX_MEMORY_SIZE_MB% ^
 -e ASTRA_CLOUD_USERNAME=<ASTRA_USERNAME> ^
 -e ASTRA_CLOUD_PASSWORD=<ASTRA_PASSWORD> ^
--e ORACLE_ENDPOINT=$CONNECTION_STRING ^
+-e ORACLE_ENDPOINT=%CONNECTION_STRING% ^
 -e ORACLE_USER=<ORACLE_USER> ^
 -e ORACLE_PASSWORD=<ORACLE_PASSWORD> ^
 -e INTEGRATION_TYPE=<SIS Type> ^
 --network=bridge ^
 adastradev/data-ingestion-agent:latest ^
 ingest
+```
+</p></details>
 
-For Mac & Linux:
+<details><summary>(Windows) Powershell</summary>
+
+```powershell
+# See Host System Requirements above for agent resource requirements
+$PROCESS_MAX_MEMORY_SIZE_MB = 4096
+
+# Define a variable to hold your connection string
+$CONNECTION_STRING = your_connection_string
+
+docker pull adastradev/data-ingestion-agent:latest; `
+docker run -t `
+-m $PROCESS_MAX_MEMORY_SIZE_MB'M' `
+-e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB `
+-e ASTRA_CLOUD_USERNAME=<ASTRA_USERNAME> `
+-e ASTRA_CLOUD_PASSWORD=<ASTRA_PASSWORD> `
+-e ORACLE_ENDPOINT=$CONNECTION_STRING `
+-e ORACLE_USER=<ORACLE_USER> `
+-e ORACLE_PASSWORD=<ORACLE_PASSWORD> `
+-e INTEGRATION_TYPE=<SIS Type> `
+-e DEFAULT_STAGE=dev `
+--network=bridge `
+adastradev/data-ingestion-agent:latest `
+ingest
+```
+</p></details>
+
+<details><summary>(Linux/Mac) bash</summary>
+
+```bash
+# See Host System Requirements above for agent resource requirements
+PROCESS_MAX_MEMORY_SIZE_MB = 4096
+
+# Define a variable to hold your connection string
+CONNECTION_STRING = your_connection_string
 
 docker pull adastradev/data-ingestion-agent:latest && \
 docker run -t \
@@ -131,6 +210,7 @@ docker run -t \
 adastradev/data-ingestion-agent:latest \
 ingest
 ```
+</p></details>
 
 To see a demo of the agent without connecting it to any data source, omit the `ORACLE_*` environment variables. In demo mode, the agent can verify connectivity to the Astra Cloud and push a mock dataset into S3.
 
@@ -148,7 +228,56 @@ The docker agent also supports the following optional arguments:
 
 Prior to sending any data, you can run the following Docker command to examine each query for the specified integration type. No data is sent to the destination using this command. Upon completion of a preview command, the container will cease to run.
 
-```sh
+**To run the agent expand and execute one of the following commands.**
+
+<details><summary>(Windows) Command Prompt</summary>
+
+```bat
+REM See Host System Requirements above for agent resource requirements
+SET PROCESS_MAX_MEMORY_SIZE_MB=4096
+
+docker pull adastradev/data-ingestion-agent:latest && ^
+docker run -i ^
+-m %PROCESS_MAX_MEMORY_SIZE_MB%'M' ^
+-e PROCESS_MAX_MEMORY_SIZE_MB=%PROCESS_MAX_MEMORY_SIZE_MB% ^
+-e ASTRA_CLOUD_USERNAME=<your_username> ^
+-e ASTRA_CLOUD_PASSWORD=<your_password> ^
+-e INTEGRATION_TYPE=<SIS Type> ^
+--network=bridge ^
+adastradev/data-ingestion-agent:latest ^
+preview
+```
+
+</p></details>
+
+<details><summary>(Windows) Powershell</summary>
+
+```powershell
+# See Host System Requirements above for agent resource requirements
+$PROCESS_MAX_MEMORY_SIZE_MB = 4096
+
+docker pull adastradev/data-ingestion-agent:latest; `
+docker run -i `
+-m $PROCESS_MAX_MEMORY_SIZE_MB'M' `
+-e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB `
+-e ASTRA_CLOUD_USERNAME=<your_username> `
+-e ASTRA_CLOUD_PASSWORD=<your_password> `
+-e INTEGRATION_TYPE=<SIS Type> `
+--network=bridge `
+adastradev/data-ingestion-agent:latest `
+preview
+```
+
+</p></details>
+
+
+<details><summary>(Linux/Mac) bash</summary>
+
+```bash
+# See Host System Requirements above for agent resource requirements
+PROCESS_MAX_MEMORY_SIZE_MB = 4096
+
+docker pull adastradev/data-ingestion-agent:latest && \
 docker run -i \
 -m $PROCESS_MAX_MEMORY_SIZE_MB'M' \
 -e PROCESS_MAX_MEMORY_SIZE_MB=$PROCESS_MAX_MEMORY_SIZE_MB \
@@ -160,6 +289,9 @@ adastradev/data-ingestion-agent:latest \
 preview
 ```
 
+</p></details>
+
+
 The following links display the default set of queries that run for each of the respective SIS integrations:
 
 [Banner Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=Banner)
@@ -169,6 +301,8 @@ The following links display the default set of queries that run for each of the 
 [DegreeWorks Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=DegreeWorks)
 
 [Colleague SQL Queries](https://2089dnykgd.execute-api.us-east-1.amazonaws.com/1-0-0/queries?integrationstage=Ingestion&formatted=true&integrationtype=Colleague)
+
+***
 
 ## Uninstall
 
@@ -181,6 +315,7 @@ docker stop --time 10 <container_name_or_id>
 docker rm <container_name_or_id>
 docker rmi <image>:<tag>
 ```
+***
 
 ## Administration
 
@@ -212,7 +347,7 @@ To test, right click the task in Task Scheduler and hit run. A Command Prompt sh
 </p>
 </details>
 
-<details><summary>Mac/Linux</summary>
+<details><summary>Linux/Mac</summary>
 <p>
 
 Create a shell script to contain your DIA run command. For example, the following commands will create a script in your home directory.
@@ -276,6 +411,16 @@ docker logs <container_name_or_id>
 docker cp <container_name_or_id>:/var/log/dia/. <destination_path>
 ```
 See the [Docker cp command guide for help copying logs to a local file system](https://docs.docker.com/engine/reference/commandline/cp/)
+
+***
+
+## Security
+
+* Encryption:
+  * Data is ingested over HTTPS
+  * Data at rest is encrypted in a private AWS S3 bucket using AES-256 bit encryption
+
+*** 
 
 ## Development
 See the [Development guide for the Data Ingestion Agent](https://github.com/adastradev/data-ingestion-agent/blob/master/docs/DevelopmentGuide.md)
