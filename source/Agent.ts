@@ -139,7 +139,7 @@ export class Agent {
                     MessageStructure: 'json'
                 }).promise();
             } catch (err) {
-                this.logger.warn(`We ran into a problem sending the error to Ad Astra: ${err.message}`);
+                this.logger.warn(`There was a problem sending the error to Ad Astra: ${err.message}`);
             }
 
             throw error;
