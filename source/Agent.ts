@@ -1,4 +1,4 @@
-import { SQS } from 'aws-sdk';
+import { SQS, SNS } from 'aws-sdk';
 import * as Winston from 'winston';
 import { Container, inject, injectable } from 'inversify';
 
@@ -21,14 +21,20 @@ export enum AgentMode { 'ShutdownRequested', 'Listening', 'Adhoc' }
 export class Agent {
 
     private mode: AgentMode = AgentMode.Listening;
+    private tenantID: string;
 
     constructor(
         @inject(TYPES.Logger) private readonly logger: Winston.Logger,
         @inject(TYPES.QueueUrl) private readonly queueUrl: string,
         @inject(TYPES.AuthManager) private readonly authManager: CustomAuthManager,
         @inject(TYPES.Container) private readonly container: Container,
-        @inject(TYPES.SQS) private readonly sqs: SQS
-    ) { }
+        @inject(TYPES.SQS) private readonly sqs: SQS,
+        @inject(TYPES.SNS) private readonly sns: SNS,
+        @inject(TYPES.IngestFailedTopicArn) private readonly ingestFailedTopic: string,
+        @inject(TYPES.Bucket) private readonly bucketPath: string
+    ) {
+        this.tenantID = this.bucketPath.split('/')[1];
+    }
 
     public async main() {
         process.on('SIGTERM', () => {
@@ -121,7 +127,17 @@ export class Agent {
 
             try {
                 this.logger.warn('Something went wrong with the agent. Attempting to send error to Ad Astra...');
-                // TODO: ADD LOGIC TO PUBLISH FAILED SNS EVENT HERE
+
+                const event = {
+                    tenantID: this.tenantID,
+                    error: error.message
+                }
+
+                await this.sns.publish({
+                    Message: JSON.stringify(event),
+                    TopicArn: this.ingestFailedTopic,
+                    MessageStructure: 'json'
+                }).promise();
             } catch (err) {
                 this.logger.warn(`We ran into a problem sending the error to Ad Astra: ${err.message}`);
             }

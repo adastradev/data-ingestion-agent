@@ -14,7 +14,7 @@ import TYPES from '../../ioc.types';
 import { InvalidCommandException } from '../../source/InvalidCommandException';
 import winston = require('winston');
 import { CustomAuthManager } from '../../source/Auth/CustomAuthManager';
-import { SQS } from 'aws-sdk';
+import { SQS, SNS } from 'aws-sdk';
 import PreviewMessage from '../../source/Messages/PreviewMessage';
 import { create } from 'domain';
 import DummyMessage from '../../source/Messages/DummyMessage';
@@ -52,7 +52,7 @@ describe('Agent', () => {
 
             const invokeSpy = sandbox.spy(dummyCommand, 'invoke');
 
-            const agent = new Agent(null, 'somequeueurl', null, container, null);
+            const agent = new Agent(null, 'somequeueurl', null, container, null, sinon.stub({}) as SNS, 'blah', 'blah');
             await (agent as any).handleAgentCommands();
 
             expect(invokeSpy.calledOnce).to.be.true;
@@ -66,7 +66,7 @@ describe('Agent', () => {
 
             const invokeSpy = sandbox.spy(dummyCommand, 'invoke');
 
-            const agent = new Agent(null, 'somequeueurl', null, container, null);
+            const agent = new Agent(null, 'somequeueurl', null, container, null, sinon.stub({}) as SNS, 'blah', 'blah');
 
             expect((agent as any).handleAgentCommands()).to.eventually.be.rejectedWith(InvalidCommandException);
         });
@@ -87,7 +87,7 @@ describe('Agent', () => {
             const getHeapStatsSpy = sinon.spy(v8, 'getHeapStatistics');
             const getHeapSpaceStatsSpy = sinon.spy(v8, 'getHeapSpaceStatistics');
             const logger = container.get<winston.Logger>(TYPES.Logger);
-            const agent = new Agent(logger, 'somequeueurl', null, container, null);
+            const agent = new Agent(logger, 'somequeueurl', null, container, null, sinon.stub({}) as SNS, 'blah', 'blah');
 
             const loggerSpy = sandbox.spy(logger, 'debug');
 
@@ -106,7 +106,7 @@ describe('Agent', () => {
             const logger = container.get<winston.Logger>(TYPES.Logger);
             const authManager = container.get<CustomAuthManager>(TYPES.AuthManager);
             const sqs = new SQS();
-            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs);
+            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs, sinon.stub({}) as SNS, 'blah', 'blah');
             const logHeapSpaceStatsStub = sandbox.stub(agent as any, 'logHeapSpaceStats');
             const refreshCognitoStub = sandbox.stub(authManager, 'refreshCognitoCredentials');
             const handleMessageStub = sandbox.stub(agent, 'handleMessage' as any);
@@ -215,7 +215,7 @@ describe('Agent', () => {
         it('should call a handler and ackwnowledge the message', async () => {
             const ctx = createTestContext();
 
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, sinon.stub({}) as SNS, 'blah', 'blah');
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),
@@ -235,7 +235,7 @@ describe('Agent', () => {
             (ctx.messageFactory.createFromJson as any).restore();
             const createFromJsonStub = sandbox.stub(ctx.messageFactory, 'createFromJson').throws(new Error('Some failure'));
 
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, sinon.stub({}) as SNS, 'blah', 'blah');
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),
