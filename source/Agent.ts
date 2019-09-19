@@ -118,6 +118,14 @@ export class Agent {
                 await sqs.deleteMessage({ QueueUrl: this.queueUrl, ReceiptHandle: message.receiptHandle }).promise();
             }
             this.logger.error(error.message);
+
+            try {
+                this.logger.warn('Something went wrong with the agent. Attempting to send error to Ad Astra...');
+                // TODO: ADD LOGIC TO PUBLISH FAILED SNS EVENT HERE
+            } catch (err) {
+                this.logger.warn(`We ran into a problem sending the error to Ad Astra: ${err.message}`);
+            }
+
             throw error;
         }
     }
