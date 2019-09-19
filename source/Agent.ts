@@ -78,14 +78,11 @@ export class Agent {
                 this.logger.debug('Axios response data: ' + JSON.stringify(error.response.data));
             }
 
-            const eventPayload = {
-                tenantName: this.tenantName,
-                tenantID: this.tenantId,
-                error: `A failure occurred when ingesting data for \'${this.tenantName}\'. ${error}`
-            };
-
             try {
-                await (this.ingestionApi as any).notifyFailure(eventPayload);
+                await this.ingestionApi.notifyFailure(
+                    this.tenantName,
+                    this.tenantId,
+                    `A failure occurred when ingesting data for \'${this.tenantName}\'. ${error}`);
             } catch (err) {
                 this.logger.error(`Unable to send ingestion failure notification`);
             }

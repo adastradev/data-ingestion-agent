@@ -16,11 +16,11 @@ import winston = require('winston');
 import { CustomAuthManager } from '../../source/Auth/CustomAuthManager';
 import { SQS } from 'aws-sdk';
 import PreviewMessage from '../../source/Messages/PreviewMessage';
-import { create } from 'domain';
 import DummyMessage from '../../source/Messages/DummyMessage';
 import MessageHandlerFactory from '../../source/MessageHandlerFactory';
 import MessageFactory from '../../source/MessageFactory';
 import DummyHandler from '../../source/MessageHandlers/DummyHandler';
+import { DataIngestionApi } from '@adastradev/data-ingestion-sdk';
 
 const expect = chai.expect;
 
@@ -52,7 +52,7 @@ describe('Agent', () => {
 
             const invokeSpy = sandbox.spy(dummyCommand, 'invoke');
 
-            const agent = new Agent(null, 'somequeueurl', null, container, null);
+            const agent = new Agent(null, 'somequeueurl', null, container, null, null, null, null);
             await (agent as any).handleAgentCommands();
 
             expect(invokeSpy.calledOnce).to.be.true;
@@ -66,7 +66,7 @@ describe('Agent', () => {
 
             const invokeSpy = sandbox.spy(dummyCommand, 'invoke');
 
-            const agent = new Agent(null, 'somequeueurl', null, container, null);
+            const agent = new Agent(null, 'somequeueurl', null, container, null, null, null, null);
 
             expect((agent as any).handleAgentCommands()).to.eventually.be.rejectedWith(InvalidCommandException);
         });
@@ -87,7 +87,7 @@ describe('Agent', () => {
             const getHeapStatsSpy = sinon.spy(v8, 'getHeapStatistics');
             const getHeapSpaceStatsSpy = sinon.spy(v8, 'getHeapSpaceStatistics');
             const logger = container.get<winston.Logger>(TYPES.Logger);
-            const agent = new Agent(logger, 'somequeueurl', null, container, null);
+            const agent = new Agent(logger, 'somequeueurl', null, container, null, null, null, null);
 
             const loggerSpy = sandbox.spy(logger, 'debug');
 
@@ -99,14 +99,16 @@ describe('Agent', () => {
         });
     });
 
-    describe('main', () => {
+    describe.only('main', () => {
         let sandbox: sinon.SinonSandbox;
 
         const createTestContext = () => {
             const logger = container.get<winston.Logger>(TYPES.Logger);
             const authManager = container.get<CustomAuthManager>(TYPES.AuthManager);
             const sqs = new SQS();
-            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs);
+            const mockIngestionApi = sandbox.createStubInstance(DataIngestionApi);
+            const notifyFailureStub = mockIngestionApi.notifyFailure.resolves({});
+            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs, mockIngestionApi as any, 'someid', 'somename');
             const logHeapSpaceStatsStub = sandbox.stub(agent as any, 'logHeapSpaceStats');
             const refreshCognitoStub = sandbox.stub(authManager, 'refreshCognitoCredentials');
             const handleMessageStub = sandbox.stub(agent, 'handleMessage' as any);
@@ -120,7 +122,8 @@ describe('Agent', () => {
                 logHeapSpaceStatsStub,
                 refreshCognitoStub,
                 handleMessageStub,
-                handleAgentCmdsStub
+                handleAgentCmdsStub,
+                notifyFailureStub
             };
         };
 
@@ -149,6 +152,7 @@ describe('Agent', () => {
             expect(ctx.handleAgentCmdsStub.calledOnce).to.be.true;
             expect(sqsReceiveMsgStub.calledOnce).to.be.true;
             expect(ctx.handleMessageStub.firstCall.args[0]).to.deep.equal(dummyPreviewMsg.Messages[0]);
+            expect(ctx.notifyFailureStub.notCalled).to.be.true;
         });
 
         it('should attempt to authenticate and then handle a message before exiting when a shutdown is requested via SIGTERM', async () => {
@@ -170,6 +174,29 @@ describe('Agent', () => {
             expect(ctx.handleAgentCmdsStub.calledOnce).to.be.true;
             expect(sqsReceiveMsgStub.calledOnce).to.be.true;
             expect(ctx.handleMessageStub.firstCall.args[0]).to.deep.equal(dummyPreviewMsg.Messages[0]);
+            expect(ctx.notifyFailureStub.notCalled).to.be.true;
+        });
+
+        it('should attempt notify of ingestion failure when an error is encountered', async () => {
+            const ctx = createTestContext();
+            const dummyPreviewMsg = {
+                Messages: [ new PreviewMessage() ]
+            };
+
+            const sqsReceiveMsgStub = (sandbox.stub(ctx.sqs, 'receiveMessage') as sinon.SinonStub).returns({ promise: () => Promise.resolve(dummyPreviewMsg)});
+
+            ctx.handleMessageStub.rejects(new Error('Failure'));
+
+            try {
+                await ctx.agent.main();
+            } catch (error) {
+                expect(error).to.exist;
+            }
+
+            expect(ctx.notifyFailureStub.calledOnce).to.be.true;
+            expect(ctx.notifyFailureStub.getCall(0).args[0]).to.equal('somename');
+            expect(ctx.notifyFailureStub.getCall(0).args[1]).to.equal('someid');
+            expect(ctx.notifyFailureStub.getCall(0).args[2]).to.contain('Error: Failure');
         });
     });
 
@@ -215,7 +242,7 @@ describe('Agent', () => {
         it('should call a handler and ackwnowledge the message', async () => {
             const ctx = createTestContext();
 
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, null, null, null);
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),
@@ -235,7 +262,7 @@ describe('Agent', () => {
             (ctx.messageFactory.createFromJson as any).restore();
             const createFromJsonStub = sandbox.stub(ctx.messageFactory, 'createFromJson').throws(new Error('Some failure'));
 
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, null, null, null);
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),
