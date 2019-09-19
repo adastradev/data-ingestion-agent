@@ -5,6 +5,7 @@ const TYPES = {
     ConnectionPool: Symbol('ConnectionPool'),
     Container: Symbol('Container'),
     DDLHelper: Symbol('DDLHelper'),
+    DataIngestionApi: Symbol('DataIngestionApi'),
     DataReader: Symbol('IngestionReader'),
     DataWriter: Symbol('IngestionWriter'),
     DummyHandler: Symbol('DummyHandler'),
@@ -24,6 +25,7 @@ const TYPES = {
     SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
     SNS: Symbol('SNS'),
     SQS: Symbol('SQS'),
+    TenantId: Symbol('TenantId'),
     TenantName: Symbol('TenantName'),
     QueryService: Symbol('QueryService')
 };
