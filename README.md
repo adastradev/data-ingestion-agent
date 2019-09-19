@@ -18,18 +18,16 @@ The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into
 ## Pre-requisites
 
 * Ad Astra Cloud credentials
+* Review the docker [CLI documentation](https://docs.docker.com/engine/reference/commandline/cli/); familiarize yourself with the common commands noted in the [docker](#docker)
 
 * Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
-
   * [Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
-
   * [Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
-
   * [Docker download for Linux (Ubuntu)](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-
   * [Docker download for Linux (Debian)](https://docs.docker.com/install/linux/docker-ce/debian/)
-
   * [Docker download for Linux (CentOS)](https://docs.docker.com/install/linux/docker-ce/centos/)
+  * [Docker (Enterprise Edition) download for Linux (RHEL)](https://docs.docker.com/install/linux/docker-ee/rhel/)
+    * Installing Docker Community Edition on Red Hat Enterprise Linux (RHEL) will likely require the use of the CentOS guide to be successful
 
 ***
 
@@ -318,6 +316,19 @@ docker rmi <image>:<tag>
 
 ## Administration
 
+### Common Command Reference
+
+#### Docker
+
+* [docker run](https://docs.docker.com/engine/reference/commandline/run/) - Start a docker container
+* [docker ps](https://docs.docker.com/engine/reference/commandline/ps/) - Observe the status of containers
+* [docker stats](https://docs.docker.com/engine/reference/commandline/stats/) - Monitor resource usage of a running container
+* [docker stop](https://docs.docker.com/engine/reference/commandline/stop/) - Stop a container
+* [docker rm](https://docs.docker.com/engine/reference/commandline/rm/) - Remove a container
+* [docker rmi](https://docs.docker.com/engine/reference/commandline/rmi/) - Remove an image
+
+To review all the possible Docker CLI commands [see their CLI guide](https://docs.docker.com/engine/reference/commandline/cli/)
+
 ### Automation
 
 <details><summary>Windows</summary>
@@ -341,7 +352,6 @@ Open Windows Task Scheduler > 'Create Task' > Name your Task
 -Actions > 'New' > Action is 'Start A Program' > Browse to the .bat file you just created > select that file > 'Ok'
 
 To test, right click the task in Task Scheduler and hit run. A Command Prompt should appear, your docker pull command will run first followed by your ingest command. 
-
 
 </p>
 </details>
@@ -370,7 +380,6 @@ Call your script as a job to be executed on a schedule. In this case, once a day
 
 </p>
 </details>
-
 
 ### Configure Network Access
 The DIA requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
@@ -416,7 +425,7 @@ See the [Docker cp command guide for help copying logs to a local file system](h
 ## Security
 
 * Encryption:
-  * Data is ingested over HTTPS
+  * Data is encrypted in-transit over HTTPS
   * Data at rest is encrypted in a private AWS S3 bucket using AES-256 bit encryption
 
 *** 
