@@ -26,6 +26,7 @@ const TYPES = {
     SNS: Symbol('SNS'),
     SQS: Symbol('SQS'),
     TenantName: Symbol('TenantName'),
+    TenantID: Symbol('TenantID'),
     QueryService: Symbol('QueryService')
 };
 

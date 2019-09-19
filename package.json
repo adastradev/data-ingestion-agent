@@ -57,7 +57,7 @@
   "license": "MIT",
   "dependencies": {
     "@adastradev/aws-api-gateway-client": "0.2.18-beta.3",
-    "@adastradev/data-ingestion-sdk": "^1.0.4",
+    "@adastradev/data-ingestion-sdk": "^1.1.0",
     "@adastradev/serverless-discovery-sdk": "^2.0.2",
     "@adastradev/user-management-sdk": "^2.0.1",
     "@types/bluebird-global": "^3.5.9",

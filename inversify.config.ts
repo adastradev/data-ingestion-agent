@@ -189,6 +189,7 @@ const startup = async () => {
         const queueUrl = tenantSettingsResponse.data.tenantDataIngestionQueueUrl;
         const bucketPath = tenantSettingsResponse.data.dataIngestionBucketPath;
         const tenantName = tenantSettingsResponse.data.tenantName;
+        const tenantID = tenantSettingsResponse.data.tenantID;
 
         logger.info('Looking up ingestion settings');
         let globalConfigResponse;
@@ -218,6 +219,7 @@ const startup = async () => {
         container.bind<string>(TYPES.IngestFailedTopicArn).toConstantValue(ingestFailedSnsTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
         container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
+        container.bind<string>(TYPES.TenantID).toConstantValue(tenantID);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
             .to(IntegrationConfigFactory).inSingletonScope();
         container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();

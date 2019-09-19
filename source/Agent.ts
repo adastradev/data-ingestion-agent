@@ -21,7 +21,6 @@ export enum AgentMode { 'ShutdownRequested', 'Listening', 'Adhoc' }
 export class Agent {
 
     private mode: AgentMode = AgentMode.Listening;
-    private tenantID: string;
 
     constructor(
         @inject(TYPES.Logger) private readonly logger: Winston.Logger,
@@ -31,10 +30,8 @@ export class Agent {
         @inject(TYPES.SQS) private readonly sqs: SQS,
         @inject(TYPES.SNS) private readonly sns: SNS,
         @inject(TYPES.IngestFailedTopicArn) private readonly ingestFailedTopic: string,
-        @inject(TYPES.Bucket) private readonly bucketPath: string
-    ) {
-        this.tenantID = this.bucketPath.split('/')[1];
-    }
+        @inject(TYPES.TenantID) private readonly tenantID: string
+    ) {}
 
     public async main() {
         process.on('SIGTERM', () => {
