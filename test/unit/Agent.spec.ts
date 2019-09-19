@@ -99,7 +99,7 @@ describe('Agent', () => {
         });
     });
 
-    describe.only('main', () => {
+    describe('main', () => {
         let sandbox: sinon.SinonSandbox;
 
         const createTestContext = () => {
