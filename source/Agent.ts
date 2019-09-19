@@ -126,6 +126,7 @@ export class Agent {
                 this.logger.warn('Something went wrong with the agent. Attempting to send error to Ad Astra...');
 
                 const event = {
+                    default: "IngestFailed Topic",
                     tenantID: this.tenantID,
                     error: error.message
                 }
