@@ -52,7 +52,7 @@ describe('Agent', () => {
 
             const invokeSpy = sandbox.spy(dummyCommand, 'invoke');
 
-            const agent = new Agent(null, 'somequeueurl', null, container, null, null, null, null);
+            const agent = new Agent(null, 'somequeueurl', null, container, null, null, null);
             await (agent as any).handleAgentCommands();
 
             expect(invokeSpy.calledOnce).to.be.true;
@@ -66,7 +66,7 @@ describe('Agent', () => {
 
             const invokeSpy = sandbox.spy(dummyCommand, 'invoke');
 
-            const agent = new Agent(null, 'somequeueurl', null, container, null, null, null, null);
+            const agent = new Agent(null, 'somequeueurl', null, container, null, null, null);
 
             expect((agent as any).handleAgentCommands()).to.eventually.be.rejectedWith(InvalidCommandException);
         });
@@ -87,7 +87,7 @@ describe('Agent', () => {
             const getHeapStatsSpy = sinon.spy(v8, 'getHeapStatistics');
             const getHeapSpaceStatsSpy = sinon.spy(v8, 'getHeapSpaceStatistics');
             const logger = container.get<winston.Logger>(TYPES.Logger);
-            const agent = new Agent(logger, 'somequeueurl', null, container, null, null, null, null);
+            const agent = new Agent(logger, 'somequeueurl', null, container, null, null, null);
 
             const loggerSpy = sandbox.spy(logger, 'debug');
 
@@ -108,7 +108,7 @@ describe('Agent', () => {
             const sqs = new SQS();
             const mockIngestionApi = sandbox.createStubInstance(DataIngestionApi);
             const notifyFailureStub = mockIngestionApi.notifyFailure.resolves({});
-            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs, mockIngestionApi as any, 'someid', 'somename');
+            const agent = new Agent(logger, 'somequeueurl', authManager, container, sqs, mockIngestionApi as any, 'somename');
             const logHeapSpaceStatsStub = sandbox.stub(agent as any, 'logHeapSpaceStats');
             const refreshCognitoStub = sandbox.stub(authManager, 'refreshCognitoCredentials');
             const handleMessageStub = sandbox.stub(agent, 'handleMessage' as any);
@@ -195,8 +195,7 @@ describe('Agent', () => {
 
             expect(ctx.notifyFailureStub.calledOnce).to.be.true;
             expect(ctx.notifyFailureStub.getCall(0).args[0]).to.equal('somename');
-            expect(ctx.notifyFailureStub.getCall(0).args[1]).to.equal('someid');
-            expect(ctx.notifyFailureStub.getCall(0).args[2]).to.contain('Error: Failure');
+            expect(ctx.notifyFailureStub.getCall(0).args[1]).to.contain('Error: Failure');
         });
     });
 
@@ -242,7 +241,7 @@ describe('Agent', () => {
         it('should call a handler and ackwnowledge the message', async () => {
             const ctx = createTestContext();
 
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, null, null, null);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, null, null);
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),
@@ -262,7 +261,7 @@ describe('Agent', () => {
             (ctx.messageFactory.createFromJson as any).restore();
             const createFromJsonStub = sandbox.stub(ctx.messageFactory, 'createFromJson').throws(new Error('Some failure'));
 
-            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, null, null, null);
+            const agent = new Agent(ctx.logger, 'somequeueurl', ctx.authManager, container, ctx.sqs, null, null);
 
             const message = {
                 Body: JSON.stringify(new DummyMessage()),

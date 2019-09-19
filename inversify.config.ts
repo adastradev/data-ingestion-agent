@@ -217,7 +217,6 @@ const startup = async () => {
         container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snsTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
         container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
-        container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
             .to(IntegrationConfigFactory).inSingletonScope();
         container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();

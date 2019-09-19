@@ -30,7 +30,6 @@ export class Agent {
         @inject(TYPES.Container) private readonly container: Container,
         @inject(TYPES.SQS) private readonly sqs: SQS,
         @inject(TYPES.DataIngestionApi) private readonly ingestionApi: DataIngestionApi,
-        @inject(TYPES.TenantId) private readonly tenantId: string,
         @inject(TYPES.TenantName) private readonly tenantName: string
     ) { }
 
@@ -81,7 +80,6 @@ export class Agent {
             try {
                 await this.ingestionApi.notifyFailure(
                     this.tenantName,
-                    this.tenantId,
                     `A failure occurred when ingesting data for \'${this.tenantName}\'. ${error}`);
             } catch (err) {
                 this.logger.error(`Unable to send ingestion failure notification`);

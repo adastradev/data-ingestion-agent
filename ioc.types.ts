@@ -25,7 +25,6 @@ const TYPES = {
     SnapshotReceivedTopicArn: Symbol('SnapshotReceivedTopicArn'),
     SNS: Symbol('SNS'),
     SQS: Symbol('SQS'),
-    TenantId: Symbol('TenantId'),
     TenantName: Symbol('TenantName'),
     QueryService: Symbol('QueryService')
 };
