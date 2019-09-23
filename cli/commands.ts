@@ -1,4 +1,5 @@
 import WizardCommand from './Wizard';
+import ScheduleCommand from './Schedule';
 import { ICommandConfig } from './ICommandConfig';
 
 export interface ICommands {
@@ -6,5 +7,6 @@ export interface ICommands {
 }
 
 export default {
-  wizard: WizardCommand
+  wizard: WizardCommand,
+  schedule: ScheduleCommand
 } as ICommands;
