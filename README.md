@@ -18,7 +18,7 @@ The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into
 ## Pre-requisites
 
 * Ad Astra Cloud credentials
-* Review the docker [CLI documentation](https://docs.docker.com/engine/reference/commandline/cli/); familiarize yourself with the common commands noted in the [docker](#docker)
+* Review the docker [CLI documentation](https://docs.docker.com/engine/reference/commandline/cli/); familiarize yourself with the common commands noted in the [docker section](#docker)
 
 * Docker version 18.02 or greater (Community Edition or any Enterprise Edition)
   * [Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
