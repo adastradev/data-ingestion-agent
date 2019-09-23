@@ -14,6 +14,7 @@ import {
 import sleep from './Util/sleep';
 import * as v8 from 'v8';
 import { InvalidCommandException } from './InvalidCommandException';
+import { DataIngestionApi } from '@adastradev/data-ingestion-sdk';
 
 export enum AgentMode { 'ShutdownRequested', 'Listening', 'Adhoc' }
 
@@ -27,7 +28,9 @@ export class Agent {
         @inject(TYPES.QueueUrl) private readonly queueUrl: string,
         @inject(TYPES.AuthManager) private readonly authManager: CustomAuthManager,
         @inject(TYPES.Container) private readonly container: Container,
-        @inject(TYPES.SQS) private readonly sqs: SQS
+        @inject(TYPES.SQS) private readonly sqs: SQS,
+        @inject(TYPES.DataIngestionApi) private readonly ingestionApi: DataIngestionApi,
+        @inject(TYPES.TenantName) private readonly tenantName: string
     ) { }
 
     public async main() {
@@ -73,6 +76,15 @@ export class Agent {
             if (error.response !== undefined && error.response.data !== undefined) {
                 this.logger.debug('Axios response data: ' + JSON.stringify(error.response.data));
             }
+
+            try {
+                await this.ingestionApi.notifyFailure(
+                    this.tenantName,
+                    `A failure occurred when ingesting data for \'${this.tenantName}\'. ${error}`);
+            } catch (err) {
+                this.logger.error(`Unable to send ingestion failure notification`);
+            }
+
             throw error;
         }
     }

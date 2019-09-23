@@ -189,6 +189,7 @@ const startup = async () => {
         const queueUrl = tenantSettingsResponse.data.tenantDataIngestionQueueUrl;
         const bucketPath = tenantSettingsResponse.data.dataIngestionBucketPath;
         const tenantName = tenantSettingsResponse.data.tenantName;
+        const tenantId = tenantSettingsResponse.data.tenantID;
 
         logger.info('Looking up ingestion settings');
         let globalConfigResponse;
@@ -240,6 +241,9 @@ const startup = async () => {
         container.bind<ICommand>(TYPES.INGEST).to(AdHocIngestCommand);
         container.bind<ICommand>(TYPES.PREVIEW).to(AdHocPreviewCommand);
 
+        // APIs
+        container.bind<DataIngestionApi>(TYPES.DataIngestionApi).toConstantValue(dataIngestionApi);
+
         // TODO: Revisit, is this necessary?
         container.bind<Container>(TYPES.Container).toConstantValue(container);
 
@@ -250,6 +254,7 @@ const startup = async () => {
         if (error.response !== undefined && error.response.data !== undefined) {
             logger.debug('Axios response data: ' + JSON.stringify(error.response.data));
         }
+
         throw error;
     }
 };

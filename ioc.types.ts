@@ -5,6 +5,7 @@ const TYPES = {
     ConnectionPool: Symbol('ConnectionPool'),
     Container: Symbol('Container'),
     DDLHelper: Symbol('DDLHelper'),
+    DataIngestionApi: Symbol('DataIngestionApi'),
     DataReader: Symbol('IngestionReader'),
     DataWriter: Symbol('IngestionWriter'),
     DummyHandler: Symbol('DummyHandler'),
