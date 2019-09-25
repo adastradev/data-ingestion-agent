@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc --sourceMap true",
+    "lint": "tslint {source,test}/**/*.ts",
     "test:clean": "npm run test:clean-coverage && npm run test:clean-nyc",
     "test:clean-coverage": "rimraf ./coverage",
     "test:clean-nyc": "rimraf ./.nyc_output",
@@ -114,6 +115,7 @@
     "ts-node": "^7.0.1",
     "ts-sinon": "^1.0.24",
     "tslint": "^5.11.0",
+    "tslint-config-security": "^1.16.0",
     "tslint-no-unused-expression-chai": "^0.1.4"
   },
   "cloudDependencies": {
