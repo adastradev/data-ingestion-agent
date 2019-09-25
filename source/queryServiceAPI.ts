@@ -20,6 +20,7 @@ export class QueryService {
             integrationtype
         };
         if (formatted) {
+            // tslint:disable: no-string-literal
             queryParams['formatted'] = formatted;
         }
 
