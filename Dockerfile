@@ -60,7 +60,7 @@ RUN mkdir /var/log/dia
 WORKDIR /app
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib/oracle /usr/lib/oracle
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib64/libaio* /lib/
-COPY --from=build-env /app/package.json .
+COPY --from=build-env /app/package.json package.json
 COPY --from=build-env /app/dist dist
 COPY --from=build-env /app/docs docs
 COPY --from=build-env /app/node_modules node_modules
