@@ -1,7 +1,7 @@
 options:
   max-time: 120
 
-image: atlassian/default-image:2
+image: node:10
 
 pipelines:
   branches:
