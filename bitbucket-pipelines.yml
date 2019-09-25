@@ -1,7 +1,7 @@
 options:
   max-time: 120
 
-image: atlassian/default-image:2
+image: node:10
 
 pipelines:
   branches:
@@ -10,6 +10,7 @@ pipelines:
           services:
             - docker
           script:
+            - npm audit --only=prod
             - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_PROD
             - export DEFAULT_STAGE=prod
 
@@ -37,7 +38,8 @@ pipelines:
       - step:
           services:
             - docker
-          script: 
+          script:
+            - npm audit --only=prod
             - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_DEV
             - export DEFAULT_STAGE=dev
             - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`

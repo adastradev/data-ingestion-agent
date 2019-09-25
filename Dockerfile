@@ -27,13 +27,16 @@ RUN apt-get update && apt-get -y install git-core
 WORKDIR /app
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib/oracle /usr/lib/oracle
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib64/libaio* /lib/
-COPY package.json package-lock.json *.ts *config* ./
+COPY package.json package-lock.json .snyk tslint.json *.ts *config* ./
 COPY source ./source
 COPY test ./test
 COPY docs ./docs
 COPY cli ./cli
 
 RUN npm ci &&\
+    npm audit &&\
+    npm run lint &&\
+    npm run snyk:protect &&\
     npm run build &&\
     npm run test:clean &&\
     npm run unit-test &&\
@@ -57,7 +60,7 @@ RUN mkdir /var/log/dia
 WORKDIR /app
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib/oracle /usr/lib/oracle
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib64/libaio* /lib/
-COPY --from=build-env /app/package.json .
+COPY --from=build-env /app/package.json package.json
 COPY --from=build-env /app/dist dist
 COPY --from=build-env /app/docs docs
 COPY --from=build-env /app/node_modules node_modules

@@ -9,7 +9,7 @@ import { Logger } from 'winston';
 import TYPES from '../../ioc.types';
 import startup from '../../inversify.config';
 import { Container } from 'inversify';
-// tslint:disable-next-line:no-var-requires
+// tslint:disable-next-line:no-var-requires no-string-literal
 global['fetch'] = require('node-fetch');
 
 const expect = chai.expect;

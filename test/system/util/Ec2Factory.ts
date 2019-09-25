@@ -1,5 +1,5 @@
 import * as aws from 'aws-sdk';
-import InstanceConfig from '../InstanceConfig';
+import IInstanceConfig from '../IInstanceConfig';
 import { TerminateInstancesRequest } from 'aws-sdk/clients/ec2';
 
 /**
@@ -17,7 +17,7 @@ export default class Ec2Factory {
 
     constructor() {
 
-        const cfg: InstanceConfig = require('../instanceConfig.json');
+        const cfg: IInstanceConfig = require('../instanceConfig.json');
         this.config = cfg;
 
         this.client = new aws.EC2({ apiVersion: '2016-11-15', region: this.config.region });

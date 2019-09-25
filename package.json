@@ -1,11 +1,12 @@
 {
   "name": "@adastradev/data-ingestion-agent",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Ad Astra Docker agent code base for cloud integration without VPN tunnels",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc --sourceMap true",
+    "lint": "tslint {source,test}/**/*.ts",
     "test:clean": "npm run test:clean-coverage && npm run test:clean-nyc",
     "test:clean-coverage": "rimraf ./coverage",
     "test:clean-nyc": "rimraf ./.nyc_output",
@@ -13,6 +14,7 @@
     "test:coverage-check": "nyc check-coverage",
     "test:coverage-report": "nyc report --reporter=\"text-summary\"",
     "test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 300000 \"test/{unit,integration}/**/*.spec.ts\"",
+    "snyk:protect": "snyk protect",
     "unit-test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
     "integration-test": "nyc --require ts-node/register mocha --timeout 120000 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
@@ -89,9 +91,9 @@
     "oracledb": "^3.0.0",
     "proxy-agent": "^3.0.3",
     "shelljs": "^0.8.2",
+    "snyk": "^1.228.5",
     "through2": "^2.0.3",
     "ts-loader": "^5.2.1",
-    "ts-sinon": "^1.0.12",
     "typescript": "^3.0.3",
     "winston": "^3.1.0"
   },
@@ -111,7 +113,9 @@
     "sinon": "^7.0.0",
     "ssh2": "^0.6.1",
     "ts-node": "^7.0.1",
+    "ts-sinon": "^1.0.24",
     "tslint": "^5.11.0",
+    "tslint-config-security": "^1.16.0",
     "tslint-no-unused-expression-chai": "^0.1.4"
   },
   "cloudDependencies": {

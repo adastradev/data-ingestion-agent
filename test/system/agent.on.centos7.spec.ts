@@ -2,7 +2,7 @@
 import * as chai from 'chai';
 import Ec2Factory from './util/Ec2Factory';
 import * as node_ssh from 'node-ssh';
-import InstanceConfig from './InstanceConfig';
+import IInstanceConfig from './IInstanceConfig';
 import IInvoker from './util/CommandInvokers/IInvoker';
 import SshCommandInvoker from './util/CommandInvokers/SshCommandInvoker';
 import { InstallDockerCommand } from './util/InstanceCommands/CentOS7/Commands';
@@ -14,7 +14,7 @@ const expect = chai.expect;
 describe('Data Ingestion Agent on CentOS 7', () => {
 
     const ec2Factory: Ec2Factory = new Ec2Factory();
-    const instanceConfig: InstanceConfig = require('./instanceConfig.json');
+    const instanceConfig: IInstanceConfig = require('./instanceConfig.json');
     const targetInstanceType: string = 'linux_centos7';
     let sshClient: node_ssh = null;
     let commandInvoker: IInvoker<string, string> = null;
