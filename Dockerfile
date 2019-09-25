@@ -34,6 +34,7 @@ COPY docs ./docs
 COPY cli ./cli
 
 RUN npm ci &&\
+    npm audit &&\
     npm run build &&\
     npm run test:clean &&\
     npm run unit-test &&\

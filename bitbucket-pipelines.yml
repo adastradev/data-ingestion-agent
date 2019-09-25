@@ -10,6 +10,7 @@ pipelines:
           services:
             - docker
           script:
+            - npm audit
             - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_PROD
             - export DEFAULT_STAGE=prod
 
@@ -37,7 +38,8 @@ pipelines:
       - step:
           services:
             - docker
-          script: 
+          script:
+            - npm audit
             - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_DEV
             - export DEFAULT_STAGE=dev
             - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
