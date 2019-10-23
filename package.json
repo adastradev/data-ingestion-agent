@@ -21,7 +21,8 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "secure": "gulp secure"
   },
   "pre-commit": [
     "unit-test"
@@ -106,9 +107,11 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.2",
+    "gulp": "^4.0.2",
+    "gulp-snyk": "^0.1.1",
     "install": "^0.12.1",
     "mocha": "^5.2.0",
-    "npm": "^6.10.1",
+    "npm": "^6.12.0",
     "nyc": "^14.1.0",
     "pre-commit": "^1.2.2",
     "rimraf": "^2.6.3",
