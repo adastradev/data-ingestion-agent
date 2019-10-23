@@ -1,4 +1,18 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.13.5
 ignore: {}
-patch: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - proxy-agent > https-proxy-agent:
+        patched: '2019-10-23T16:07:42.468Z'
+    - proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-23T16:07:42.468Z'
+    - '@adastradev/user-management-sdk > proxy-agent > https-proxy-agent':
+        patched: '2019-10-23T16:07:42.468Z'
+    - snyk > proxy-agent > https-proxy-agent:
+        patched: '2019-10-23T16:07:42.468Z'
+    - '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > https-proxy-agent':
+        patched: '2019-10-23T16:07:42.468Z'
+    - snyk > proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-23T16:07:42.468Z'
