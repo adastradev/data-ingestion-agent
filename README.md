@@ -381,6 +381,12 @@ Call your script as a job to be executed on a schedule. In this case, once a day
 </p>
 </details>
 
+In addition to scheduling the DIA, it is helpful to automate checking if Docker is running. Here are some links to Docker's documentation to help address those areas:
+
+[Configure Docker to start on reboot](https://docs.docker.com/install/linux/linux-postinstall/#configure-docker-to-start-on-boot)
+
+[Check whether Docker is running](https://docs.docker.com/config/daemon/#check-whether-docker-is-running)
+
 ### Configure Network Access
 The DIA requires *outbound* internet access over HTTPS to Amazon Web Services (*.amazonaws.com). In general, the agent should be provided outbound internet access via providing a bridge network as shown above. If runnning through an internet proxy, it is recommended to configure the proxy at `docker run` time by using an environment variable `--env HTTPS_PROXY="https://127.0.0.1:3001"`. For more information, see the [Configure Docker to use a proxy server](https://docs.docker.com/network/proxy/).
 
