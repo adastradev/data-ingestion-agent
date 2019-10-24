@@ -34,7 +34,6 @@ COPY docs ./docs
 COPY cli ./cli
 
 RUN npm ci &&\
-    npm audit &&\
     npm run lint &&\
     npm run snyk:protect &&\
     npm run build &&\
