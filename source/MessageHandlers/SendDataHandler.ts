@@ -177,13 +177,15 @@ export default class SendDataHandler implements IMessageHandler {
                     } else {
 
                         try {
-                            if (!process.env.INGEST_RESTORATION_RESOURCES
-                                || process.env.INGEST_RESTORATION_RESOURCES.toLowerCase() === 'true') {
+                            // Unless set explicitly to false, ingest DDL and metadata
+                            if (!['false', 'FALSE'].includes(process.env.INGEST_RESTORATION_RESOURCES)) {
                                 // Ingest DDL if not disabled
                                 const ingested = await this.ingestDDL(validTables, folderPath);
 
                                 // Add to manifest file
                                 manifest.files.push(ingested.fileName);
+                            } else {
+                                this._logger.info('Skipping DDL upload.');
                             }
 
                             await this._connectionPool.close();
@@ -194,12 +196,13 @@ export default class SendDataHandler implements IMessageHandler {
                                 }
                             });
 
-                            if (!process.env.INGEST_RESTORATION_RESOURCES
-                                || process.env.INGEST_RESTORATION_RESOURCES.toLowerCase() === 'true') {
+                            if (!['false', 'FALSE'].includes(process.env.INGEST_RESTORATION_RESOURCES)) {
                                 // Ingest metadata
                                 const uploaded = await this.ingestMetadata(aggregateMetadata, folderPath);
 
                                 manifest.files.push(uploaded.fileName);
+                            } else {
+                                this._logger.info('Skipping metadata upload.');
                             }
 
                             // Calculate overall duration in milliseconds and write to manifest
