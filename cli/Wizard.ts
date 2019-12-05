@@ -159,7 +159,7 @@ export default {
         message: 'Enter an agent docker image tag to use (use default for production):',
         default: () => process.env.image || 'adastradev/data-ingestion-agent:latest',
         validate: validateNotEmptyString,
-        formatOrder: 15,
+        formatOrder: 16,
         formatString: '${(this.agent.image || "adastradev/data-ingestion-agent:latest")} '
       },
       {
@@ -172,8 +172,17 @@ export default {
           { name: 'custom', value: 'custom', short:  2}
         ],
         default: () => process.env.network || 'bridge',
-        formatOrder: 14,
+        formatOrder: 15,
         formatString: '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} '
+      },
+      {
+        type: 'input',
+        name: 'agent.ingestRestorationResources',
+        message: 'Would you like to include the metadata/DDL queries used for data restoration? (use default to include queries):',
+        default: () => 'TRUE',
+        validate: validateNotEmptyString,
+        formatOrder: 14,
+        formatString: '-e INGEST_RESTORATION_RESOURCES=\'${this.agent.ingestRestorationResources}\' '
       },
       {
         type: 'confirm',
@@ -249,7 +258,7 @@ export default {
         type: 'confirm',
         name: 'agent.confirmedAccurate',
         message: 'Are all of the entered values correct?',
-        formatOrder: 16,
+        formatOrder: 17,
         formatString: '${this.agent.mode}'
       }
     ],
