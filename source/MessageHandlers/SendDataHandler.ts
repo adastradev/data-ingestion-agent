@@ -178,7 +178,7 @@ export default class SendDataHandler implements IMessageHandler {
 
                         try {
                             if (!process.env.INGEST_RESTORATION_RESOURCES
-                                || process.env.INGEST_RESTORATION_RESOURCES.toLowerCase() === 'true') {
+                                || process.env.INGEST_RESTORATION_RESOURCES.toLowerCase() !== 'false') {
                                 // Ingest DDL if not disabled
                                 const ingested = await this.ingestDDL(validTables, folderPath);
 
@@ -195,7 +195,7 @@ export default class SendDataHandler implements IMessageHandler {
                             });
 
                             if (!process.env.INGEST_RESTORATION_RESOURCES
-                                || process.env.INGEST_RESTORATION_RESOURCES.toLowerCase() === 'true') {
+                                || process.env.INGEST_RESTORATION_RESOURCES.toLowerCase() !== 'false') {
                                 // Ingest metadata
                                 const uploaded = await this.ingestMetadata(aggregateMetadata, folderPath);
 
