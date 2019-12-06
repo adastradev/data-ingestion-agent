@@ -178,7 +178,7 @@ export default {
       {
         type: 'input',
         name: 'agent.ingestRestorationResources',
-        message: 'Would you like to include the metadata/DDL queries used for data restoration? (use default to include queries):',
+        message: 'Would you like to include the metadata/DDL queries used for data restoration? (TRUE/FALSE - use default to include queries):',
         default: () => 'TRUE',
         validate: validateNotEmptyString,
         formatOrder: 14,
