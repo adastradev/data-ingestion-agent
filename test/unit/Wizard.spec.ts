@@ -103,13 +103,14 @@ describe('Wizard', () => {
                 dbUser: 'test',
                 dbPassword: 'test',
                 advancedMode: false,
+                ingestRestorationResources: 'TRUE',
                 confirmedAccurate: true
               }
             };
 
             const result = await Wizard.apply(Wizard.prompts, args);
             expect(result).to.be.false;
-            expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest ingest');
+            expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' -e INGEST_RESTORATION_RESOURCES=\'TRUE\' --network=bridge adastradev/data-ingestion-agent:latest ingest');
         });
 
         it('should produce a non-advanced mode preview command', async () => {
@@ -125,13 +126,14 @@ describe('Wizard', () => {
               dbUser: 'test',
               dbPassword: 'test',
               advancedMode: false,
+              ingestRestorationResources: 'TRUE',
               confirmedAccurate: true
             }
           };
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest preview');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e INGEST_RESTORATION_RESOURCES=\'TRUE\' --network=bridge adastradev/data-ingestion-agent:latest preview');
         });
 
         // it('should produce a non-advanced mode background command', async () => {
@@ -176,13 +178,14 @@ describe('Wizard', () => {
               network: 'my-first-network',
               image: 'adastradev/data-ingestion-agent:0.9',
               concurrentConnections: 5,
+              ingestRestorationResources: 'TRUE',
               confirmedAccurate: true
             }
           };
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 preview');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 -e INGEST_RESTORATION_RESOURCES=\'TRUE\' --network=my-first-network adastradev/data-ingestion-agent:0.9 preview');
         });
 
         it('should produce an advanced mode ingest command', async () => {
@@ -205,13 +208,14 @@ describe('Wizard', () => {
               network: 'my-first-network',
               image: 'adastradev/data-ingestion-agent:0.9',
               concurrentConnections: 5,
+              ingestRestorationResources: 'TRUE',
               confirmedAccurate: true
             }
           };
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 --network=my-first-network adastradev/data-ingestion-agent:0.9 ingest');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' -e LOG_LEVEL=silly -e DISCOVERY_SERVICE=\'http://someuri\' -e DEFAULT_STAGE=dev -e AWS_REGION=us-east-2 -e CONCURRENT_CONNECTIONS=5 -e INGEST_RESTORATION_RESOURCES=\'TRUE\' --network=my-first-network adastradev/data-ingestion-agent:0.9 ingest');
         });
 
         // it('should produce an advanced mode background command', async () => {
@@ -620,6 +624,28 @@ describe('Wizard', () => {
         result = prompt.when({ agent: { advancedMode: false, network: 'bridge' }});
         expect(result).to.be.false;
       });
+    });
+
+    describe('prompts.agent.ingestRestorationResources', () => {
+      let prompt;
+      const promptName = 'ingestRestorationResources';
+      const formats: IFormatTestCase[] = [
+        { cfg: { ingestRestorationResources: 'TRUE' }, val: '-e INGEST_RESTORATION_RESOURCES=\'TRUE\' ', desc: 'Ingest Restoration Resources'}
+      ];
+
+      before(() => {
+        prompt = getAgentPromptName(promptName);
+      });
+
+      it('provides a default', () => {
+        expect(prompt.default()).to.equal('TRUE');
+      });
+
+      for (const exp of formats) {
+        it(`formats ${exp.desc}`, () => {
+          validateFormat(prompt, exp);
+        });
+      }
     });
 
     describe('prompts.agent.discoverySvcUri', () => {

@@ -216,7 +216,8 @@ The docker agent also supports the following optional arguments:
 # [dev, prod]
 -e DEFAULT_STAGE=prod 
 -e AWS_REGION=us-east-1 
--e CONCURRENT_CONNECTIONS=5 
+-e CONCURRENT_CONNECTIONS=5
+-e INGEST_RESTORATION_RESOURCES=<false or FALSE>
 # [error, warn, info, verbose, debug, silly]
 -e LOG_LEVEL=info
 ```
