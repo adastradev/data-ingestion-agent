@@ -7,6 +7,7 @@ import { Logger } from 'winston';
 import IDataReader, { IQueryResult } from '../IDataReader';
 import IConnectionPool from '../IConnectionPool';
 import { TableNotFoundException } from '../../TableNotFoundException';
+import { InvalidColumnIdentifierException } from '../../InvalidColumnIdentifierException';
 
 import 'reflect-metadata';
 import { IIntegrationConfig, IntegrationSystemType, IntegrationType, IQueryDefinition  } from '../../IIntegrationConfig';
@@ -88,6 +89,8 @@ export default class OracleReader implements IDataReader {
                 // Translate - ORA-00942: table or view does not exist
                 if (error.errorNum && error.errorNum === 942) {
                     reject(new TableNotFoundException(queryStatement, `Query execution unsuccessful. ${error.message}`));
+                } else if (error.errorNum && error.errorNum === 904) {
+                    reject(new InvalidColumnIdentifierException(queryStatement, `Query execution unsuccessful. ${error.message}`));
                 } else {
                     this._logger.error(`Failed to execute: '${queryStatement}' - ${error.stack}`);
                     reject(error);
