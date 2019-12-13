@@ -18,6 +18,7 @@ import IConnectionPool from '../DataAccess/IConnectionPool';
 import { IntegrationSystemType, IntegrationType, IQueryDefinition, IQueryMetadata  } from '../IIntegrationConfig';
 import { mapLimit } from 'async';
 import { TableNotFoundException } from '../TableNotFoundException';
+import { InvalidColumnIdentifierException } from '../InvalidColumnIdentifierException';
 import { SNS } from 'aws-sdk';
 import IDDLHelper from '../DataAccess/IDDLHelper';
 import * as stream from 'stream';
@@ -152,7 +153,8 @@ export default class SendDataHandler implements IMessageHandler {
 
                     } catch (err) {
                         delete validTables[queryDefinition.name];
-                        if (err instanceof TableNotFoundException) {
+                        if (err instanceof TableNotFoundException ||
+                            err instanceof InvalidColumnIdentifierException) {
                             // ignore query statements that fail due to missing tables/views
                             this._logger.warn(`${err.message || ''} - queryStatement: ${err.queryStatement}`);
                             queryCallback(null, { name: queryDefinition.name, data: null});

@@ -13,6 +13,7 @@ import TYPES from '../../ioc.types';
 import IConnectionPool from '../../source/DataAccess/IConnectionPool';
 import { IQueryResult } from '../../source/DataAccess/IDataReader';
 import { TableNotFoundException } from '../../source/TableNotFoundException';
+import { InvalidColumnIdentifierException } from '../../source/InvalidColumnIdentifierException';
 import IDDLHelper from '../../source/DataAccess/IDDLHelper';
 import OracleDDLHelper from '../../source/DataAccess/Oracle/OracleDDLHelper';
 
@@ -201,6 +202,25 @@ describe('OracleReader', () => {
                     .rejectedWith(TableNotFoundException);
 
             (queryStream as any).emit('error', { errorNum: 942 });
+        });
+
+        it('should reject the query when an invalid column exception occurs', async () => {
+            const poolStub = stubInterface<IConnectionPool>();
+
+            const logger: Logger = container.get<Logger>(TYPES.Logger);
+            const oracleReader: OracleReader = new OracleReader(logger, poolStub);
+
+            (sandbox.stub(oracleReader, 'getMetadataAsStream' as any) as sinon.SinonStub).returns({});
+            (sandbox.stub(oracleReader, 'getTransformStream' as any) as sinon.SinonStub).returns({});
+
+            const queryStream = new Readable({objectMode: true});
+
+            expect(
+                ((oracleReader as any).subscribeToStreamEvents(queryStream, 'some statement') as Promise<IQueryResult>))
+                    .to.eventually.be
+                    .rejectedWith(InvalidColumnIdentifierException);
+
+            (queryStream as any).emit('error', { errorNum: 904 });
         });
     });
 });
