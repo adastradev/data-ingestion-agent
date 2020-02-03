@@ -58,7 +58,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@adastradev/aws-api-gateway-client": "0.2.18-beta.3",
     "@adastradev/data-ingestion-sdk": "^2.0.0",
     "@adastradev/serverless-discovery-sdk": "^2.0.2",
     "@adastradev/user-management-sdk": "^2.0.1",
@@ -74,6 +73,7 @@
     "@types/ssh2": "^0.5.36",
     "amazon-cognito-identity-js": "^3.0.2",
     "async": "^2.6.1",
+    "aws-api-gateway-client": "^0.3.3",
     "aws-sdk": "^2.329.0",
     "aws-sdk-mock": "^4.2.0",
     "axios": "^0.19.0",
