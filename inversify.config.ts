@@ -162,14 +162,11 @@ const startup = async () => {
         }
 
         // lookup SQS queue for this tenant
-        const jwtToken = cognitoSession.getIdToken().getJwtToken();
         const credentialsBearerToken: BearerTokenCredentials = {
-            idToken: jwtToken,
+            idToken: cognitoSession.getIdToken().getJwtToken(),
             type: 'BearerToken'
         };
 
-        const jwtPayload = jwtToken.decodePayload();
-        const sub = jwtPayload.sub;
         const dataIngestionApi = new DataIngestionApi(
             process.env.DATA_INGESTION_URI,
             region,
