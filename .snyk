@@ -5,8 +5,8 @@ ignore:
   SNYK-JS-KINDOF-537849:
     - '*':
         reason: None Given
-        expires: 2020-03-04T16:18:53.634Z
-  'SNYK-JS-ELLIPTIC-511941':
+        expires: 2020-03-05T20:17:57.517Z
+  SNYK-JS-ELLIPTIC-511941:
     - '*':
         reason: None Given
         expires: 2020-03-04T16:19:38.335Z
