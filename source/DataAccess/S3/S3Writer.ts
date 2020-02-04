@@ -25,7 +25,8 @@ export default class S3Writer implements IDataWriter {
         @inject(TYPES.Bucket) private _bucketPath: string,
         @inject(TYPES.OutputEncoder) private _outputEncoder: IOutputEncoder,
         @inject(TYPES.Logger) private _logger: Logger,
-        @inject(TYPES.AuthManager) private _authManager: CustomAuthManager) {
+        @inject(TYPES.AuthManager) private _authManager: CustomAuthManager,
+        @inject(TYPES.TenantId) private _tenantId: string) {
 
         this.S3_PART_SIZE_MB = 10;
         if (process.env.S3_PART_SIZE_MB) {
@@ -54,11 +55,12 @@ export default class S3Writer implements IDataWriter {
             // Otherwise, don't
             : '';
 
-        const params = {
+        const params: AWS.S3.PutObjectRequest = {
             Body: dataBody,
             Bucket:  this._bucketPath + '/' + folderPath,
             // No explicit extension if not a data file
-            Key: `${fileNamePrefix}${fileSuffix}`
+            Key: `${fileNamePrefix}${fileSuffix}`,
+            Tagging: `tenant_id=${this._tenantId}`
         };
 
         await this._authManager.refreshCognitoCredentials();

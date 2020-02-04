@@ -63,7 +63,7 @@ describe('S3Writer', () => {
                 const logger: Logger = container.get<Logger>(TYPES.Logger);
                 const encoderStub = new DummyEncoder();
                 const encoderSpy = sandbox.spy(encoderStub, 'encode');
-                const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger, stubAuthManager);
+                const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger, stubAuthManager, 'some_tenant_id');
                 const result = {} as awssdk.S3.ManagedUpload.SendData;
 
                 const dummyPromise = (): Promise<awssdk.S3.ManagedUpload.SendData> => {
@@ -93,6 +93,7 @@ describe('S3Writer', () => {
                 expect(uploadArgOptions.Bucket).to.eq('some_bucket/some_tenant_id/mockPath');
                 expect(uploadArgOptions.Key).to.contain(`${testCase.FileNamePrefix}`);
                 expect(uploadArgOptions.Body).to.be.instanceof(Readable);
+                expect(uploadArgOptions.Tagging).to.equal('tenant_id=some_tenant_id');
 
                 const uploadArgPartConfig = upload.getCall(0).args[1] as any;
                 if (testCase.S3_QUEUE_SIZE) {
@@ -113,7 +114,7 @@ describe('S3Writer', () => {
             const logger: Logger = container.get<Logger>(TYPES.Logger);
             const encoderStub = new DummyEncoder();
             const encoderSpy = sandbox.spy(encoderStub, 'encode');
-            const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger, stubAuthManager);
+            const s3Writer = new S3Writer('some_bucket/some_tenant_id', encoderStub, logger, stubAuthManager, 'some_tenant_id');
 
             const table = (s3Writer as any).isDataFile('ABCDEF');
             const metadata = (s3Writer as any).isDataFile('metadata');
