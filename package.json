@@ -59,7 +59,7 @@
   "license": "MIT",
   "dependencies": {
     "@adastradev/data-ingestion-sdk": "^2.0.1",
-    "@adastradev/serverless-discovery-sdk": "^2.1.0-beta.2",
+    "@adastradev/serverless-discovery-sdk": "^2.1.0",
     "@adastradev/user-management-sdk": "^2.2.0",
     "@babel/runtime": "^7.8.4",
     "@types/bluebird-global": "^3.5.9",
