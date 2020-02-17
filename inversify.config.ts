@@ -166,6 +166,7 @@ const startup = async () => {
             idToken: cognitoSession.getIdToken().getJwtToken(),
             type: 'BearerToken'
         };
+
         const dataIngestionApi = new DataIngestionApi(
             process.env.DATA_INGESTION_URI,
             region,
@@ -216,6 +217,7 @@ const startup = async () => {
         container.bind<string>(TYPES.QueueUrl).toConstantValue(queueUrl);
         container.bind<string>(TYPES.SnapshotReceivedTopicArn).toConstantValue(snsTopicArn);
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
+        container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
         container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
             .to(IntegrationConfigFactory).inSingletonScope();
