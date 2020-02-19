@@ -70,7 +70,7 @@ export default class S3Writer implements IDataWriter {
         // credentials on an interval independent of the httpUploadProgress
         // event call. This *should* refresh the token for this thread/S3 client
         // and no other, maybe.
-        setInterval(async () => {
+        const intervalToken = setInterval(async () => {
             await this._authManager.refreshCognitoCredentials(fileNamePrefix);
         }, 1000 * 60 * CustomAuthManager.MINUTES_BEFORE_ALLOW_REFRESH);
 
@@ -86,7 +86,7 @@ export default class S3Writer implements IDataWriter {
             });
         });
 
-        await managedUpload.promise();
+        await managedUpload.promise().then((v) => clearInterval(intervalToken));
 
         return {
             fileName: params.Key,
