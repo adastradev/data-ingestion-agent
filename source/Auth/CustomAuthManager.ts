@@ -25,6 +25,7 @@ export function configureAwsProxy(awsConfig: GlobalConfigInstance) {
 }
 
 export class CustomAuthManager {
+    public static MINUTES_BEFORE_ALLOW_REFRESH: number = 10;
     private locator: ICognitoUserPoolLocator;
     private poolData: ICognitoUserPoolApiModel;
     private region: string;
@@ -32,7 +33,6 @@ export class CustomAuthManager {
     private cognitoUserSession: CognitoUserSession;
     private authenticatorURI: string;
     private lastRefresh: number;
-    private minutesBeforeAllowRefresh: number = 30;
     private iamCredentials;
 
     constructor(
@@ -89,7 +89,7 @@ export class CustomAuthManager {
         });
     }
 
-    public async refreshCognitoCredentials(): Promise<any> {
+    public async refreshCognitoCredentials(context: string = ''): Promise<any> {
         return new Promise((resolve, reject) => {
             if (this.needsRefresh() === true) {
                 this.lastRefresh = (new Date()).getTime();
@@ -108,7 +108,8 @@ export class CustomAuthManager {
                                 process.env.AWS_ACCESS_KEY_ID = this.iamCredentials.accessKeyId;
                                 process.env.AWS_SECRET_ACCESS_KEY = this.iamCredentials.secretAccessKey;
                                 process.env.AWS_SESSION_TOKEN = this.iamCredentials.sessionToken;
-                                console.log(`New expiry: ${(this.iamCredentials as CognitoIdentityCredentials).expireTime}`);
+                                const contextMsg = (context) ? `for context (${context})` : '';
+                                console.log(`New expiry ${contextMsg}: ${(this.iamCredentials as CognitoIdentityCredentials).expireTime}`);
                             }
                             resolve();
                         });
@@ -135,7 +136,7 @@ export class CustomAuthManager {
 
     private needsRefresh = () => {
         const currentTime = (new Date()).getTime();
-        if (currentTime - this.lastRefresh >= this.minutesBeforeAllowRefresh * 60 * 1000) {
+        if (currentTime - this.lastRefresh >= CustomAuthManager.MINUTES_BEFORE_ALLOW_REFRESH * 60 * 1000) {
             return true;
         } else {
             return false;

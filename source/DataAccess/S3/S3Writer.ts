@@ -63,7 +63,16 @@ export default class S3Writer implements IDataWriter {
             Tagging: `tenant_id=${this._tenantId}`
         };
 
-        await this._authManager.refreshCognitoCredentials();
+        await this._authManager.refreshCognitoCredentials(fileNamePrefix);
+
+        // In case we experience a long wait between running the
+        // query and the first receipt of the result refresh the
+        // credentials on an interval independent of the httpUploadProgress
+        // event call. This *should* refresh the token for this thread/S3 client
+        // and no other, maybe.
+        setInterval(async () => {
+            await this._authManager.refreshCognitoCredentials(fileNamePrefix);
+        }, 1000 * 60 * CustomAuthManager.MINUTES_BEFORE_ALLOW_REFRESH);
 
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();
@@ -72,7 +81,7 @@ export default class S3Writer implements IDataWriter {
 
         managedUpload.on('httpUploadProgress', (evt) => {
             this._logger.verbose(`Progress: ${evt.loaded} bytes uploaded (File: ${params.Key})`);
-            this._authManager.refreshCognitoCredentials().then(() => {
+            this._authManager.refreshCognitoCredentials(fileNamePrefix).then(() => {
                 return true;
             });
         });
