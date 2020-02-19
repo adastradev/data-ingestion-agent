@@ -72,7 +72,7 @@ export default class S3Writer implements IDataWriter {
         // and no other, maybe.
         const intervalToken = setInterval(async () => {
             await this._authManager.refreshCognitoCredentials(fileNamePrefix);
-        }, 1000 * 60 * CustomAuthManager.MINUTES_BEFORE_ALLOW_REFRESH);
+        }, 1000 * 60 * this._authManager.MINUTES_BEFORE_ALLOW_REFRESH);
 
         // Parallelize multi-part upload
         const s3Obj = new AWS.S3();

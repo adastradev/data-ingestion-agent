@@ -42,7 +42,7 @@ describe('AuthManager', () => {
 
     it('Should have ability to login and refresh multiple times successfully', async () => {
         const auth = new CustomAuthManager(locator, region);
-        (auth as any).minutesBeforeAllowRefresh = 0;
+        (auth as any).MINUTES_BEFORE_ALLOW_REFRESH = 0;
         await auth.signIn(process.env.ASTRA_CLOUD_USERNAME, process.env.ASTRA_CLOUD_PASSWORD);
         await auth.refreshCognitoCredentials();
         const iamCredsOne = auth.getIamCredentials();

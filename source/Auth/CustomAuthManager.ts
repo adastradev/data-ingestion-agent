@@ -25,7 +25,7 @@ export function configureAwsProxy(awsConfig: GlobalConfigInstance) {
 }
 
 export class CustomAuthManager {
-    public static MINUTES_BEFORE_ALLOW_REFRESH: number = 10;
+    public readonly MINUTES_BEFORE_ALLOW_REFRESH: number = 10;
     private locator: ICognitoUserPoolLocator;
     private poolData: ICognitoUserPoolApiModel;
     private region: string;
@@ -136,7 +136,7 @@ export class CustomAuthManager {
 
     private needsRefresh = () => {
         const currentTime = (new Date()).getTime();
-        if (currentTime - this.lastRefresh >= CustomAuthManager.MINUTES_BEFORE_ALLOW_REFRESH * 60 * 1000) {
+        if (currentTime - this.lastRefresh >= this.MINUTES_BEFORE_ALLOW_REFRESH * 60 * 1000) {
             return true;
         } else {
             return false;
