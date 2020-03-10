@@ -41,7 +41,6 @@ pipelines:
             - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_DEV
             - export DEFAULT_STAGE=dev
             - export NORMALIZED_DOCKER_TAG=`echo $BITBUCKET_BRANCH | sed -e "s|\/|_|"`
-            - echo $BITBUCKET_BRANCH
             - export IMAGE_NAME=data-ingestion-agent:$NORMALIZED_DOCKER_TAG
             - export REMOTE_IMAGE_NAME=adastradev/$IMAGE_NAME
             - . ./pipeline/build-docker-image.sh
