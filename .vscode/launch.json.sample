@@ -28,7 +28,8 @@
                 "CONCURRENT_CONNECTIONS": "10",
                 "PROCESS_MAX_MEMORY_SIZE_MB": "4096",
                 "S3_QUEUE_SIZE": "10",
-                "S3_PART_SIZE_MB": "10"
+                "S3_PART_SIZE_MB": "10",
+                "RUN_MATILLION": "false"
             },
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
@@ -77,7 +78,8 @@
                 "DISCOVERY_SERVICE": "",
                 "AWS_REGION": "us-east-1",
                 "S3_BUCKET_DEPLOY": "adastra-dev-data-ingestion",
-                "DEFAULT_STAGE": "dev"
+                "DEFAULT_STAGE": "dev",
+                "RUN_MATILLION": "false"
             }
         },
         {           
