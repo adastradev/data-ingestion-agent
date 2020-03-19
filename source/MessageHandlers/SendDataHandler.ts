@@ -32,6 +32,7 @@ interface IManifest {
     tenantId: string;
     tenantName: string;
     ingestionPath: string;
+    runMatillion: string;
 }
 
 let STATEMENT_CONCURRENCY = 5;
@@ -106,7 +107,8 @@ export default class SendDataHandler implements IMessageHandler {
             integrationType,
             tenantName: this._tenantName,
             tenantId: this._tenantId,
-            ingestionPath: folderPath
+            ingestionPath: folderPath,
+            runMatillion: process.env.RUN_MATILLION
         };
 
         await this._connectionPool.open();
