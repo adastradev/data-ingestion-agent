@@ -38,7 +38,7 @@ describe('SendDataHandler', () => {
                 { name: 'all_tables', query: 'SELECT * FROM ALL_TABLES' }
             ],
             type: 'Banner'
-        });
+        } as any);
 
         it('should successfully return after handling a message', async () => {
             const message: IMessage = SendDataMessage.create({}, '1234');
@@ -52,7 +52,7 @@ describe('SendDataHandler', () => {
                 bucket: 'blah'
             });
 
-            const tableAssociations: Array<[string, string]> = [];
+            const tableAssociations: [string, string][] = [];
             const stubConnection = {
                 execute: async () => Promise.resolve({ rows: tableAssociations })
             };
@@ -82,7 +82,7 @@ describe('SendDataHandler', () => {
 
             (writer.ingest as sinon.SinonStub).reset();
             (writer.ingest as sinon.SinonStub).onFirstCall().rejects(new Error('Failure to ingest'));
-            const tableAssociations: Array<[string, string]> = [];
+            const tableAssociations: [string, string][] = [];
             const stubConnection = {
                 execute: async () => Promise.resolve({ rows: tableAssociations })
             };
@@ -118,7 +118,7 @@ describe('SendDataHandler', () => {
                         fileName: 'blah',
                         bucket: 'blah'
                     });
-            const tableAssociations: Array<[string, string]> = [];
+            const tableAssociations: [string, string][] = [];
             const stubConnection = {
                 execute: async () => Promise.resolve({ rows: tableAssociations })
             };

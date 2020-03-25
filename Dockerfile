@@ -1,5 +1,5 @@
 # compile image intended for building and testing
-FROM node:8-slim AS build-env
+FROM node:10-slim AS build-env
 ENV LD_LIBRARY_PATH /usr/lib/oracle/18.3/client64/lib
 
 ARG DEFAULT_STAGE
@@ -50,7 +50,7 @@ RUN rm -rf node_modules dist/test &&\
     apt-get -y remove git-core && apt-get clean
 
 # compile image intended for production use
-FROM node:8-slim AS prod-env
+FROM node:10-slim AS prod-env
 ARG DEFAULT_STAGE
 ARG DISCOVERY_SERVICE
 ARG AWS_REGION

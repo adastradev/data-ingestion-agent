@@ -21,7 +21,6 @@
       "named-imports-order": "case-insensitive"
     }],
     "no-unused-expression": false,
-    "no-unused-expression-chai": true,
     "no-empty": false
   },
   "rulesDirectory": []
