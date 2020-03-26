@@ -220,6 +220,7 @@ The docker agent also supports the following optional arguments:
 -e INGEST_RESTORATION_RESOURCES=<false or FALSE>
 # [error, warn, info, verbose, debug, silly]
 -e LOG_LEVEL=info
+-e RUN_MATILLION=<true or false> # defaults to false
 ```
 
 ### Query Preview Mode
