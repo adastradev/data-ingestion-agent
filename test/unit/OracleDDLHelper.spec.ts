@@ -11,7 +11,7 @@ const expect = chai.expect;
 
 describe('OracleDDLHelper', () => {
 
-    const createTestContext = (tableAssociations: Array<[string, string]> = []) => {
+    const createTestContext = (tableAssociations: [string, string][] = []) => {
         const stubConnection = {
             execute: async () => Promise.resolve({ rows: tableAssociations })
         };
@@ -91,7 +91,7 @@ describe('OracleDDLHelper', () => {
     describe('prioritizeObjects', () => {
 
         it('should return a properly sorted list of objects to create', async () => {
-            const tableAssociations: Array<[string, string]> = [['a', 'b'], ['b', 'c']];
+            const tableAssociations: [string, string][] = [['a', 'b'], ['b', 'c']];
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);
@@ -102,7 +102,7 @@ describe('OracleDDLHelper', () => {
         });
 
         it('should return a properly sorted list of objects to create when an independent circular dependency exists', async () => {
-            const tableAssociations: Array<[string, string]> = [['a', 'b'], ['b', 'c'], ['e', 'e']];
+            const tableAssociations: [string, string][] = [['a', 'b'], ['b', 'c'], ['e', 'e']];
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);
@@ -113,7 +113,7 @@ describe('OracleDDLHelper', () => {
         });
 
         it('should return a properly sorted list of objects to create when an unknown table exists in the associations', async () => {
-            const tableAssociations: Array<[string, string]> = [['a', 'b'], ['b', 'c'], ['e', 'e'], ['e', 'x']];
+            const tableAssociations: [string, string][] = [['a', 'b'], ['b', 'c'], ['e', 'e'], ['e', 'x']];
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);
@@ -124,7 +124,7 @@ describe('OracleDDLHelper', () => {
         });
 
         it('should fail if there are circular dependencies', async () => {
-            const tableAssociations: Array<[string, string]> = [['a', 'b'], ['b', 'c'], ['c', 'a']];
+            const tableAssociations: [string, string][] = [['a', 'b'], ['b', 'c'], ['c', 'a']];
             const ctx = createTestContext(tableAssociations);
 
             const helper = new OracleDDLHelper(ctx.pool);

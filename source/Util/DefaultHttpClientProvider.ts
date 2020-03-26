@@ -2,7 +2,7 @@ import { IHttpClientProvider } from './IHttpClientProvider';
 import { ApiCredentials, BearerTokenCredentials, IAMCredentials } from '@adastradev/serverless-discovery-sdk';
 import { IHttpClient } from './IHttpClient';
 
-const apigClientFactory: any = require('aws-api-gateway-client').default; // tslint:disable-line
+const apigClientFactory: any = require('@adastradev/aws-api-gateway-client').default; // tslint:disable-line
 
 export class DefaultHttpClientProvider implements IHttpClientProvider {
     public getClient(serviceEndpointUri: string, region: string, credentials?: ApiCredentials): IHttpClient {

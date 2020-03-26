@@ -23,7 +23,7 @@ describe('PreviewHandler', () => {
                 'SELECT * FROM ALL_TABLES'
             ],
             type: 'Banner'
-        });
+        } as any);
 
         it('should successfully return after handling a message', async () => {
             const message: IMessage = PreviewMessage.create({}, '1234');
