@@ -32,7 +32,7 @@ interface IManifest {
     tenantId: string;
     tenantName: string;
     ingestionPath: string;
-    runMatillion: string;
+    runMatillion: boolean;
     ingestionBucket: string;
 }
 
@@ -109,7 +109,7 @@ export default class SendDataHandler implements IMessageHandler {
             tenantName: this._tenantName,
             tenantId: this._tenantId,
             ingestionPath: folderPath,
-            runMatillion: process.env.RUN_MATILLION,
+            runMatillion: (process.env.RUN_MATILLION || '').toLowerCase() === 'true',
             ingestionBucket: this._bucketPath
         };
 
