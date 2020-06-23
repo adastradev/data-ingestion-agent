@@ -73,7 +73,7 @@
     "@types/shelljs": "^0.8.7",
     "@types/sinon": "^7.5.2",
     "@types/ssh2": "^0.5.41",
-    "amazon-cognito-identity-js": "^3.2.6",
+    "amazon-cognito-identity-js": "^3.3.3",
     "async": "^3.2.0",
     "aws-sdk": "^2.649.0",
     "aws-sdk-mock": "^5.1.0",
