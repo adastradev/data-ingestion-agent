@@ -36,7 +36,7 @@ COPY source ./source
 COPY test ./test
 COPY docs ./docs
 COPY cli ./cli
-COPY .git ./.git
+COPY git ./.git
 
 RUN npm ci &&\
     npm run lint &&\
