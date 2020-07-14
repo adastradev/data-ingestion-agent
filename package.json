@@ -10,7 +10,7 @@
     "test:clean": "npm run test:clean-coverage && npm run test:clean-nyc",
     "test:clean-coverage": "rimraf ./coverage",
     "test:clean-nyc": "rimraf ./.nyc_output",
-    "test:codecov": "codecov",
+    "test:codecov": "nyc report --reporter=text-lcov | codecov",
     "test:coverage-check": "nyc check-coverage",
     "test:coverage-report": "nyc report --reporter=\"text-summary\"",
     "test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 300000 \"test/{unit,integration}/**/*.spec.ts\"",
