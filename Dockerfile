@@ -26,7 +26,7 @@ ENV RUN_MATILLION=$RUN_MATILLION
 ENV DISCOVERY_SERVICE=$DISCOVERY_SERVICE
 ENV INGEST_RESTORATION_RESOURCES=$INGEST_RESTORATION_RESOURCES
 
-RUN apt-get update && apt-get -y install git-core
+RUN apt-get update && apt-get -y install git-core && apt-get -y install git
 
 WORKDIR /app
 COPY --from=adastradev/oracle-instantclient:18.3-lite /usr/lib/oracle /usr/lib/oracle
@@ -36,6 +36,7 @@ COPY source ./source
 COPY test ./test
 COPY docs ./docs
 COPY cli ./cli
+COPY .git ./.git
 
 RUN npm ci &&\
     npm run lint &&\
