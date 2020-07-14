@@ -10,7 +10,7 @@
     "test:clean": "npm run test:clean-coverage && npm run test:clean-nyc",
     "test:clean-coverage": "rimraf ./coverage",
     "test:clean-nyc": "rimraf ./.nyc_output",
-    "test:coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test:codecov": "codecov",
     "test:coverage-check": "nyc check-coverage",
     "test:coverage-report": "nyc report --reporter=\"text-summary\"",
     "test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 300000 \"test/{unit,integration}/**/*.spec.ts\"",
@@ -18,7 +18,6 @@
     "unit-test": "npm run test:clean && nyc --require ts-node/register mocha --timeout 999999 test/unit/**/*.spec.ts",
     "integration-test": "nyc --require ts-node/register mocha --timeout 120000 test/integration/**/*.spec.ts",
     "system-test": "mocha -r ts-node/register --timeout 999999 test/system/**/*.spec.ts",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "start": "node dist/start.js"
   },
   "pre-commit": [
@@ -78,6 +77,7 @@
     "aws-sdk": "^2.649.0",
     "aws-sdk-mock": "^5.1.0",
     "axios": "^0.19.2",
+    "codecov": "^3.7.0",
     "crypto": "^1.0.1",
     "dependency-graph": "^0.9.0",
     "express": "^4.16.3",
@@ -103,7 +103,6 @@
     "@types/oracledb": "^1.11.34",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.11",
     "install": "^0.13.0",
     "mocha": "^7.1.1",
     "nyc": "^15.0.0",

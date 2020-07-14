@@ -7,7 +7,7 @@ ARG INTEGRATION_TESTS_ENABLED=false
 ARG ORACLE_ENDPOINT
 ARG ORACLE_USER
 ARG ORACLE_PASSWORD
-ARG COVERALLS_REPO_TOKEN=false
+ARG CODECOV_TOKEN
 ARG COVERALLS_GIT_COMMIT
 ARG COVERALLS_GIT_BRANCH
 ARG AWS_REGION
@@ -44,7 +44,7 @@ RUN npm ci &&\
     npm run test:clean &&\
     npm run unit-test &&\
     if [ "$INTEGRATION_TESTS_ENABLED" = "true" ] ; then npm run test ; else echo Integration tests disabled ; fi &&\
-    if [ "$COVERALLS_REPO_TOKEN" = "false" ] ; then echo "Coveralls reporting disabled" ; else npm run test:coveralls ; fi
+    if [ "$CODECOV_TOKEN" = "false" ] ; then echo "Codecov reporting disabled" ; else npm run test:codecov ; fi
 RUN rm -rf node_modules dist/test &&\
     npm ci --production &&\
     apt-get -y remove git-core && apt-get clean
