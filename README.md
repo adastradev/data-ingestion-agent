@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/adastradev/data-ingestion-agent/badge.svg?branch=master)](https://coveralls.io/github/adastradev/data-ingestion-agent?branch=master)
+[![codecov](https://codecov.io/bb/adastradev/data-ingestion-agent/branch/master/graph/badge.svg?token=VDVk2mP9Xu)](https://codecov.io/bb/adastradev/data-ingestion-agent)
 
 # What is the Data Ingestion Agent?
 
