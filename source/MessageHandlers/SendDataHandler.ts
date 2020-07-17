@@ -34,6 +34,7 @@ interface IManifest {
     ingestionPath: string;
     runMatillion: boolean;
     ingestionBucket: string;
+    matillionEnv: string;
 }
 
 let STATEMENT_CONCURRENCY = 5;
@@ -110,7 +111,8 @@ export default class SendDataHandler implements IMessageHandler {
             tenantId: this._tenantId,
             ingestionPath: folderPath,
             runMatillion: (process.env.RUN_MATILLION || '').toLowerCase() === 'true',
-            ingestionBucket: this._bucketPath
+            ingestionBucket: this._bucketPath,
+            matillionEnv: this._container.get<string>(TYPES.MatillionEnv)
         };
 
         await this._connectionPool.open();
@@ -233,7 +235,13 @@ export default class SendDataHandler implements IMessageHandler {
     }
 
     private async raiseSnapshotCompletionEvent(integrationType: IntegrationType, completionTimeDescription: string, snapshotFolder: string) {
-        const snapshotReceivedEventString = JSON.stringify(new SnapshotReceivedEventModel(this._tenantId, integrationType, snapshotFolder, completionTimeDescription, this._tenantName));
+        const snapshotReceivedEventString = JSON.stringify(
+            new SnapshotReceivedEventModel(
+                this._tenantId,
+                integrationType,
+                snapshotFolder,
+                completionTimeDescription,
+                this._tenantName));
         const event = { default: snapshotReceivedEventString, lambda: snapshotReceivedEventString };
 
         this._logger.info('Sending snapshot upload completion notification');

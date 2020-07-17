@@ -13,6 +13,7 @@ const TYPES = {
     INGEST: Symbol('Ingest'),
     IntegrationConfigFactory: Symbol('IntegrationConfigFactory'),
     Logger: Symbol('Logger'),
+    MatillionEnv: Symbol('MatillionEnv'),
     MessageFactory: Symbol('MessageFactory'),
     MessageHandlerFactory: Symbol('MessageHandlerFactory'),
     OutputEncoder: Symbol('OutputEncoder'),
