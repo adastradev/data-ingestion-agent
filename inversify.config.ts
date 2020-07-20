@@ -219,6 +219,8 @@ const startup = async () => {
         container.bind<string>(TYPES.Bucket).toConstantValue(bucketPath);
         container.bind<string>(TYPES.TenantId).toConstantValue(tenantId);
         container.bind<string>(TYPES.TenantName).toConstantValue(tenantName);
+        const matillionEnv = process.env.MATILLION_ENV || `adastra-${stage}`;
+        container.bind<string>(TYPES.MatillionEnv).toConstantValue(matillionEnv);
         container.bind<IntegrationConfigFactory>(TYPES.IntegrationConfigFactory)
             .to(IntegrationConfigFactory).inSingletonScope();
         container.bind<IConnectionPool>(TYPES.ConnectionPool).to(OracleConnectionPoolProxy).inSingletonScope();
