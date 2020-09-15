@@ -19,7 +19,14 @@ The Data Ingestion Agent (DIA) enables the fast and secure delivery of data into
 
 * Ad Astra Cloud credentials
 * Review the docker [CLI documentation](https://docs.docker.com/engine/reference/commandline/cli/); familiarize yourself with the common commands noted in the [docker section](#docker)
-* [Docker version 18.02 or greater](https://docs.docker.com/engine/install/)
+* [Docker version 18.02 or greater](https://docs.docker.com/engine/install/) (Community Edition or any Enterprise Edition)
+  * [Docker download for Windows](https://docs.docker.com/docker-for-windows/install/)
+  * [Docker download for Mac](https://docs.docker.com/v17.12/docker-for-mac/install/)
+  * [Docker download for Linux (Ubuntu)](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+  * [Docker download for Linux (Debian)](https://docs.docker.com/install/linux/docker-ce/debian/)
+  * [Docker download for Linux (CentOS)](https://docs.docker.com/install/linux/docker-ce/centos/)
+  * [Docker for Redhat Enterprise Linux (RHEL)](https://www.redhat.com/en/topics/containers/what-is-docker)
+    * Redhat Enterprise Linux has its own software distribution system. Please see their documentation for installing Docker or other compatible container systems. 
 ***
 
 ## Quick Start
