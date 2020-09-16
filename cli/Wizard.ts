@@ -176,18 +176,19 @@ export default {
         formatString: '--network=${(this.agent.networkCustom || this.agent.network || "bridge")} '
       },
       {
+        type: 'confirm',
+        name: 'agent.advancedMode',
+        message: 'Would you like to configure advanced run settings?'
+      },
+      {
         type: 'input',
         name: 'agent.ingestRestorationResources',
         message: 'Would you like to include the metadata/DDL queries used for data restoration? (TRUE/FALSE - use default to include queries):',
         default: () => 'TRUE',
         validate: validateNotEmptyString,
+        when: (answers: inquirer.Answers) => answers.agent.advancedMode,
         formatOrder: 14,
         formatString: '-e INGEST_RESTORATION_RESOURCES=\'${this.agent.ingestRestorationResources}\' '
-      },
-      {
-        type: 'confirm',
-        name: 'agent.advancedMode',
-        message: 'Would you like to configure advanced run settings?'
       },
       {
         type: 'list',

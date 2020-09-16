@@ -110,7 +110,7 @@ describe('Wizard', () => {
 
             const result = await Wizard.apply(Wizard.prompts, args);
             expect(result).to.be.false;
-            expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' -e INGEST_RESTORATION_RESOURCES=\'TRUE\' --network=bridge adastradev/data-ingestion-agent:latest ingest');
+            expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest ingest');
         });
 
         it('should produce a non-advanced mode preview command', async () => {
@@ -133,30 +133,8 @@ describe('Wizard', () => {
 
           const result = await Wizard.apply(Wizard.prompts, args);
           expect(result).to.be.false;
-          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e INGEST_RESTORATION_RESOURCES=\'TRUE\' --network=bridge adastradev/data-ingestion-agent:latest preview');
+          expect(logSpy.getCall(logSpy.callCount - 2).args[0]).to.equal('docker run -it -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest preview');
         });
-
-        // it('should produce a non-advanced mode background command', async () => {
-        //   const args = {
-        //     agent: {
-        //       mode: '',
-        //       integrationType: 'Banner',
-        //       astraUserName: 'test',
-        //       astraUserPassword: 'test',
-        //       maxMemory: 2048,
-        //       database: 'ORACLE',
-        //       dbEndpoint: 'someendpoint',
-        //       dbUser: 'test',
-        //       dbPassword: 'test',
-        //       advancedMode: false,
-        //       confirmedAccurate: true
-        //     }
-        //   };
-
-        //   const result = await Wizard.apply(Wizard.prompts, args);
-        //   expect(result).to.be.false;
-        //   expect(logSpy.lastCall.args[0]).to.equal('docker run -d -m 2048M -e PROCESS_MAX_MEMORY_SIZE_MB=2048 -e INTEGRATION_TYPE=Banner -e ASTRA_CLOUD_USERNAME=\'test\' -e ASTRA_CLOUD_PASSWORD=\'test\' -e ORACLE_ENDPOINT=\'someendpoint\' -e ORACLE_USER=\'test\' -e ORACLE_PASSWORD=\'test\' --network=bridge adastradev/data-ingestion-agent:latest ');
-        // });
 
         it('should produce an advanced mode preview command', async () => {
           const args = {
