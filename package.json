@@ -74,7 +74,7 @@
     "@types/ssh2": "^0.5.44",
     "amazon-cognito-identity-js": "^3.3.3",
     "async": "^3.2.0",
-    "aws-sdk": "^2.753.0",
+    "aws-sdk": "^2.754.0",
     "aws-sdk-mock": "^5.1.0",
     "axios": "^0.19.2",
     "codecov": "^3.7.2",
