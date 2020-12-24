@@ -60,7 +60,7 @@
     "@adastradev/aws-api-gateway-client": "^1.0.2",
     "@adastradev/data-ingestion-sdk": "^2.0.2",
     "@adastradev/serverless-discovery-sdk": "^2.2.0",
-    "@adastradev/user-management-sdk": "^2.4.0",
+    "@adastradev/user-management-sdk": "^2.4.3",
     "@babel/runtime": "^7.11.2",
     "@types/bluebird-global": "^3.5.9",
     "@types/chai": "^4.2.12",
