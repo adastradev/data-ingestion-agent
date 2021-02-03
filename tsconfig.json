@@ -15,7 +15,8 @@
       "reflect-metadata",
       "mocha",
       "node"
-    ]
+    ],
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules"
