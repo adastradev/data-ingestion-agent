@@ -2,8 +2,12 @@
 version: v1.14.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JS-NODEFETCH-674311:
-    - isomorphic-fetch > node-fetch:
+  SNYK-JS-LODASH-1018905:
+    - inquirer > lodash:
         reason: None given
-        expires: '2021-03-04T20:28:10.948Z'
+        expires: '2021-04-07T21:01:07.812Z'
+  SNYK-JS-LODASH-1040724:
+    - inquirer > lodash:
+        reason: None given
+        expires: '2021-04-07T21:01:07.812Z'
 patch: {}
