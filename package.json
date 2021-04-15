@@ -90,7 +90,7 @@
     "node-fetch": "^2.6.1",
     "node-ssh": "^8.0.0",
     "oracledb": "^3.1.2",
-    "proxy-agent": "^3.1.1",
+    "proxy-agent": "^4.0.0",
     "shelljs": "^0.8.4",
     "through2": "^3.0.2",
     "ts-loader": "^6.2.2",
