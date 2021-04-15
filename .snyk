@@ -1,4 +1,12 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.14.1
-ignore: {}
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-JS-NETMASK-1089716:
+    - proxy-agent > pac-proxy-agent > pac-resolver > netmask:
+        reason: ''
+        expires: '2021-05-14T23:04:08.516Z'
+    - '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver > netmask':
+        reason: None given
+        expires: '2021-05-14T23:04:08.516Z'
 patch: {}
