@@ -1,17 +1,17 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.19.0
+version: v1.14.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
   SNYK-JS-CRYPTOJS-548472:
     - amazon-cognito-identity-js > crypto-js:
         reason: None given
-        expires: '2021-06-23T15:24:02.008Z'
+        expires: '2021-08-29T22:46:22.808Z'
   SNYK-JS-NETMASK-1089716:
     - proxy-agent > pac-proxy-agent > pac-resolver > netmask:
         reason: None given
-        expires: '2021-06-23T15:24:02.008Z'
+        expires: '2021-08-29T22:46:22.808Z'
   SNYK-JS-PATHPARSE-1077067:
     - shelljs > rechoir > resolve > path-parse:
         reason: None given
-        expires: '2021-06-23T15:24:02.008Z'
+        expires: '2021-08-29T22:46:22.808Z'
 patch: {}
