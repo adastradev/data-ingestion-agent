@@ -13,26 +13,14 @@ pipelines:
             - export DISCOVERY_SERVICE=$DISCOVERY_SERVICE_PROD
             - export DEFAULT_STAGE=prod
 
-            # Set $DOCKER_HUB_USERNAME and $DOCKER_HUB_PASSWORD as environment variables in repository settings
             - export IMAGE_NAME=adastradev/data-ingestion-agent:latest
 
             # build the Docker image (this will use the Dockerfile in the root of the repo)
             - . ./pipeline/build-docker-image.sh
 
-            # Install prereqs for wait script
-            - apt-get update
-            - apt-get install -y jq
-
-            # Waiting on docker to publish the new image from its automated build
-            # and running system tests both rely on knowing the tag of the image.
-            # Dockerhub takes the branch name and slightly mangles it to be used as
-            # an image tag.
-            - export NORMALIZED_DOCKER_TAG=latest
-
-            - . ./pipeline/wait-for-latest-docker-image.sh $NORMALIZED_DOCKER_TAG
-
-            # Run system test
-            - . ./pipeline/run-system-tests.sh
+            - docker tag $IMAGE_NAME $IMAGE_NAME
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            - docker push $IMAGE_NAME
     feature/*:
       - step:
           services:
