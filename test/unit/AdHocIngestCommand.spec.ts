@@ -8,6 +8,7 @@ import * as AWS from 'aws-sdk-mock';
 import AdHocIngestCommand from '../../source/Commands/AdHocIngestCommand';
 import SendDataMessage from '../../source/Messages/SendDataMessage';
 import { Logger } from 'winston';
+import { SendMessageResult } from 'aws-sdk/clients/sqs';
 
 const expect = chai.expect;
 
@@ -28,7 +29,7 @@ describe('AdHocIngestCommand', () => {
                 const expectedBody = SendDataMessage.create().toJson();
                 expect(params.MessageBody).to.eq(expectedBody);
                 expect(params.QueueUrl).to.eq(queueUrl);
-                callback(null, 'success');
+                callback(null, 'success' as SendMessageResult);
             });
 
             await command.invoke();

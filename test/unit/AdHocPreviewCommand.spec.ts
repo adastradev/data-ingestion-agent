@@ -8,6 +8,7 @@ import * as AWS from 'aws-sdk-mock';
 import AdHocPreviewCommand from '../../source/Commands/AdHocPreviewCommand';
 import PreviewMessage from '../../source/Messages/PreviewMessage';
 import { Logger } from 'winston';
+import { SendMessageResult } from 'aws-sdk/clients/sqs';
 
 const expect = chai.expect;
 
@@ -27,7 +28,7 @@ describe('AdHocPreviewCommand', () => {
                 const expectedBody = PreviewMessage.create().toJson();
                 expect(params.MessageBody).to.eq(expectedBody);
                 expect(params.QueueUrl).to.eq(queueUrl);
-                callback(null, 'success');
+                callback(null, 'success' as SendMessageResult);
             });
 
             await command.invoke();
