@@ -2,56 +2,6 @@
 version: v1.22.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JS-AXIOS-1579269:
-    - '@adastradev/aws-api-gateway-client > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/data-ingestion-sdk > @adastradev/aws-api-gateway-client > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/data-ingestion-sdk > @adastradev/serverless-discovery-sdk > @adastradev/aws-api-gateway-client > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/serverless-discovery-sdk > @adastradev/aws-api-gateway-client > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/user-management-sdk > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/user-management-sdk > @adastradev/aws-api-gateway-client > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/user-management-sdk > @adastradev/serverless-discovery-sdk > @adastradev/aws-api-gateway-client > axios':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - axios:
-        reason: None given
-        expires: '2022-02-25T00:24:47.242Z'
-  SNYK-JS-FOLLOWREDIRECTS-2332181:
-    - '@adastradev/aws-api-gateway-client > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/data-ingestion-sdk > @adastradev/aws-api-gateway-client > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/data-ingestion-sdk > @adastradev/serverless-discovery-sdk > @adastradev/aws-api-gateway-client > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/serverless-discovery-sdk > @adastradev/aws-api-gateway-client > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/user-management-sdk > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/user-management-sdk > @adastradev/aws-api-gateway-client > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - '@adastradev/user-management-sdk > @adastradev/serverless-discovery-sdk > @adastradev/aws-api-gateway-client > axios > follow-redirects':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - axios > follow-redirects:
-        reason: None given
-        expires: '2022-02-25T00:24:47.242Z'
   SNYK-JS-NODEFETCH-2342118:
     - '@adastradev/user-management-sdk > node-fetch':
         reason: None given
@@ -68,7 +18,7 @@ ignore:
   SNYK-JS-CRYPTOJS-548472:
     - amazon-cognito-identity-js > crypto-js:
         reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
+        expires: '2022-03-11T22:17:19.673Z'
   SNYK-JS-ANSIREGEX-1583908:
     - inquirer > strip-ansi > ansi-regex:
         reason: None given
@@ -79,18 +29,30 @@ ignore:
   SNYK-JS-SSH2-1656673:
     - node-ssh > ssh2:
         reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
+        expires: '2022-03-11T22:17:19.673Z'
   SNYK-JS-PACRESOLVER-1564857:
     - proxy-agent > pac-proxy-agent > pac-resolver:
         reason: None given
         expires: '2022-02-25T00:26:59.247Z'
+      '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver':
+        reason: None given
+        expires: '2022-03-11T22:17:19.673Z'
     - '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver':
         reason: None given
         expires: '2022-02-25T00:26:59.247Z'
+      proxy-agent > pac-proxy-agent > pac-resolver:
+        reason: None given
+        expires: '2022-03-11T22:17:19.673Z'
   SNYK-JS-NETMASK-1089716:
     - proxy-agent > pac-proxy-agent > pac-resolver > netmask:
         reason: None given
         expires: '2022-02-25T00:26:59.247Z'
+      '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver > netmask':
+        reason: None given
+        expires: '2022-03-11T22:17:19.673Z'
+    - proxy-agent > pac-proxy-agent > pac-resolver > netmask:
+        reason: None given
+        expires: '2022-03-11T22:17:19.673Z'
   SNYK-JS-PATHPARSE-1077067:
     - '*':
         reason: None given
