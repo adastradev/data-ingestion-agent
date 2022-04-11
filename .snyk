@@ -1,60 +1,25 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.22.1
+version: v1.25.0
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JS-NODEFETCH-2342118:
-    - '@adastradev/user-management-sdk > node-fetch':
-        reason: None given
-        expires: '2022-02-25T00:24:47.242Z'
-    - '@adastradev/user-management-sdk > amazon-cognito-identity-js > isomorphic-unfetch > node-fetch':
-        reason: None given
-        expires: '2022-02-25T00:24:47.242Z'
-    - codecov > teeny-request > node-fetch:
-        reason: None given
-        expires: '2022-02-25T00:24:47.242Z'
-    - isomorphic-fetch > node-fetch:
-        reason: None given
-        expires: '2022-02-25T00:24:47.242Z'
-  SNYK-JS-CRYPTOJS-548472:
-    - amazon-cognito-identity-js > crypto-js:
-        reason: None given
-        expires: '2022-03-11T22:17:19.673Z'
-  SNYK-JS-ANSIREGEX-1583908:
-    - inquirer > strip-ansi > ansi-regex:
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-    - inquirer > string-width > strip-ansi > ansi-regex:
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
   SNYK-JS-SSH2-1656673:
-    - node-ssh > ssh2:
-        reason: None given
-        expires: '2022-03-11T22:17:19.673Z'
-  SNYK-JS-PACRESOLVER-1564857:
-    - proxy-agent > pac-proxy-agent > pac-resolver:
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-      '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver':
-        reason: None given
-        expires: '2022-03-11T22:17:19.673Z'
-    - '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-      proxy-agent > pac-proxy-agent > pac-resolver:
-        reason: None given
-        expires: '2022-03-11T22:17:19.673Z'
-  SNYK-JS-NETMASK-1089716:
-    - proxy-agent > pac-proxy-agent > pac-resolver > netmask:
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
-      '@adastradev/user-management-sdk > proxy-agent > pac-proxy-agent > pac-resolver > netmask':
-        reason: None given
-        expires: '2022-03-11T22:17:19.673Z'
-    - proxy-agent > pac-proxy-agent > pac-resolver > netmask:
-        reason: None given
-        expires: '2022-03-11T22:17:19.673Z'
-  SNYK-JS-PATHPARSE-1077067:
     - '*':
-        reason: None given
-        expires: '2022-02-25T00:26:59.247Z'
+        reason: None Given
+        expires: 2022-05-05T23:05:44.364Z
+        created: 2022-04-05T23:05:44.369Z
+  SNYK-JS-PACRESOLVER-1564857:
+    - '*':
+        reason: None Given
+        expires: 2022-05-05T23:05:56.002Z
+        created: 2022-04-05T23:05:56.007Z
+  SNYK-JS-NETMASK-1089716:
+    - '*':
+        reason: None Given
+        expires: 2022-05-05T23:06:07.378Z
+        created: 2022-04-05T23:06:07.384Z
+  SNYK-JS-MINIMIST-2429795:
+    - '*':
+        reason: None Given
+        expires: 2022-05-05T23:07:05.319Z
+        created: 2022-04-05T23:07:05.325Z
 patch: {}
